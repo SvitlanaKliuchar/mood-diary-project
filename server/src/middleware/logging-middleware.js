@@ -1,5 +1,7 @@
-import morgan from 'morgan'
+import morgan from "morgan";
 
-const logger = morgan(':method :url :status :response-time ms - :res[content-length]')
+const logger = morgan(
+  ":method :url :status :response-time ms - :res[content-length]",
+);
 
-export default logger
+export default logger;
