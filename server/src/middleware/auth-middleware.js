@@ -3,7 +3,7 @@
 import { verifyJwt } from "../utils/jwt.js";
 import prisma from "../config/db.js";
 
-const authMiddleware = async (req, res, next) => {
+const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res
@@ -35,4 +35,4 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-export default authMiddleware;
+export default authenticate;
