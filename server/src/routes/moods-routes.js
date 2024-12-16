@@ -2,10 +2,10 @@ import { createMood, getMoods } from "../controllers/mood-controller.js";
 import authenticate from "../middleware/auth-middleware.js";
 import express from "express";
 
-const moodRouter = express.Router();
+const moodsRouter = express.Router();
 
-moodRouter.post("/", authenticate, createMood);
+moodsRouter.post("/", authenticate, createMood);
 
-moodRouter.get("/", authenticate, getMoods);
+moodsRouter.get("/", authenticate, getMoods);
 
-export default moodRouter;
+export default moodsRouter;
