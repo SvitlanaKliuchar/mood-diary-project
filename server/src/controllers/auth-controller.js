@@ -1,7 +1,7 @@
 import prisma from "../config/db.js";
 import bcrypt from "bcrypt";
 import { signJwt } from "../utils/jwt.js";
-import { registerSchema, loginSchema } from "../validation/auth-validation.js";
+import { loginSchema, registerSchema } from '../validation/auth/auth-validation.js'
 
 //handle user registration
 export const register = async (req, res, next) => {
