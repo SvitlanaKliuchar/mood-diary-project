@@ -20,7 +20,7 @@ export const register = async (req, res, next) => {
 
     //save the new user to the db
     const newUser = await prisma.users.create({
-      data: { username, password: hashedPassword },
+      data: { username, password_hash: hashedPassword },
     });
 
     //generate a JWT token
@@ -49,7 +49,7 @@ export const login = async (req, res, next) => {
     }
 
     //verify the password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid username or password" });
     }
