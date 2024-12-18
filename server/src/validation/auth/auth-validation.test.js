@@ -12,14 +12,14 @@ describe("Auth Validation", () => {
     })
     it("should reject registration with a weak password", () => {
         const invalidPayload = { username: "testuser", password: "weak"}
-        expect(() => registerSchema(invalidPayload)).toThrow("Password must be at least 6 characters long")
+        expect(() => registerSchema.parse(invalidPayload)).toThrow("Password must be at least 6 characters long")
     })
     it("should validate a correct login payload", () => {
         const validPayload = { username: "testuser", password: "Password123!"}
-        expect(() => loginSchema(validPayload)).not.toThrow()
+        expect(() => loginSchema.parse(validPayload)).not.toThrow()
     })
     it("should reject login with missing fields", () => {
-        const invalidPayload = { username: "testuser"}
-        expect(() => loginSchema(invalidPayload)).toThrow("Password must be at least 6 characters long")
+        const invalidPayload = { username: "testuser", password: ""}
+        expect(() => loginSchema.parse(invalidPayload)).toThrow("Password must be at least 6 characters long")
     })
 })
