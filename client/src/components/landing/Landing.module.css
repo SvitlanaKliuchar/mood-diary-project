@@ -136,7 +136,7 @@ nav a:hover {
     gap: 2rem;
     justify-content: center;
     align-items: center;
-    padding: 1rem 3rem;
+    padding: 1.5rem 3rem;
     min-height: 80vh;
     background-image: url('../../assets/images/star.png');
     background-size: cover;
@@ -151,13 +151,13 @@ nav a:hover {
     justify-content: center;
 }
 .hero-content h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
 }
 .cta-buttons {
     display: flex;
     gap: 1rem;
 }
-@media screen and (max-width:22rem) {
+@media screen and (max-width:28rem) {
     .cta-buttons {
         flex-direction: column;
     }
@@ -174,7 +174,7 @@ nav a:hover {
 .btn:hover {
     text-decoration: none;
     background-color: var(--secondary-color);
-    transform: scale(1.05); /* Slightly grow the button */
+    transform: scale(1.05); 
     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
 }
 .btn-primary {
@@ -186,4 +186,48 @@ nav a:hover {
     background-color: var(--primary-color);
     border: 1px solid var(--primary-color);
     color: var(--bg-color);
+}
+
+/* feature cards */
+
+#feature-cards {
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 1fr repeat(10, 1fr) 1fr;
+    grid-auto-rows: minmax(12rem, auto);
+    gap: 2rem;
+}
+.feature {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background-color: var(--bg-color);
+    border-radius: 20px;
+    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.2); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.feature:hover {
+    transform: scale(1.05); 
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
+}
+.feature:nth-child(1) {
+    grid-column: 2 / span 5;
+}
+.feature:nth-child(2) {
+    grid-column: 7 / span 5;
+}
+.feature:nth-child(3) {
+    grid-column: 2 / span 4;
+}
+.feature:nth-child(4) {
+    grid-column: 6 / span 5;
+    height: 80%;
+}
+@media screen and (max-width:48rem) {
+    #feature-cards {
+        display: flex;
+        flex-direction: column;
+        margin: 0rem 3rem ;
+    }
 }
