@@ -5,4 +5,9 @@
 body {
     color: var(--font-color);
     background-color: var(--bg-color-darkened-1);
+    font-family: var(--body-font);
+}
+
+h1, h2, h3 {
+    font-family: var(--h1-font);
 }

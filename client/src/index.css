@@ -16,8 +16,8 @@
   --bg-color-darkened-1:rgb(233, 246, 252);
   --bg-color-darkened-5: rgb(223, 236, 242);
   --bg-color-darkened-60: rgb(94, 99, 102);
-  /* --h1-font:  ;
-  --body-font: ; */
+  --h1-font: "Italiana", serif;
+  --body-font: "Orienta", serif;
 }
 
 html {
@@ -41,12 +41,8 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.25;
 }
 
@@ -157,7 +153,7 @@ blockquote::after {
 }
 
 :focus-visible {
-  outline: 2px solid #007BFF;
+  outline: 2px solid var(--accent-color-pink);
   outline-offset: 2px;
 }
 
