@@ -6,6 +6,12 @@
   --accent-color-pink-pale: rgb(226, 183, 245);
   --error-color: rgb(255, 0, 77);  
   --font-color: rgb(38, 37, 44);  
+  --font-color: rgb(38, 37, 44);
+  --font-color-40: rgba(38, 37, 44, 0.4);
+  --font-color-50: rgba(38, 37, 44, 0.5);
+  --font-color-60: rgba(38, 37, 44, 0.6);
+  --font-color-70: rgba(38, 37, 44, 0.7);
+  --font-color-80: rgba(38, 37, 44, 0.8);
   --bg-color: rgb(240, 250, 255); 
   --bg-color-darkened-1:rgb(233, 246, 252);
   --bg-color-darkened-5: rgb(223, 236, 242);

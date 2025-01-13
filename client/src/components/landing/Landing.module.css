@@ -5,7 +5,7 @@ nav a:hover {
 }
 .navbar {
     display: flex;
-    color: #333;
+    color: var(--font-color-70);
     background-color: var(--bg-color);
 }
 .logo {
@@ -32,7 +32,7 @@ nav a:hover {
     transition: border-color 0.3s ease;
 }
 .navbar-links-desktop li:hover {
-    color: black;
+    color: var(--font-color);
     border-color: var(--accent-color-pink-pale);
     cursor: pointer;
 }
@@ -71,7 +71,7 @@ nav a:hover {
 }
 .navbar-links-mobile li:hover {
     background-color: var(--bg-color-darkened-1);
-    color: black;
+    color: var(--font-color);
     cursor: pointer;
 }
 .link-icon {
@@ -90,10 +90,11 @@ nav a:hover {
 .close-menu-btn {
     position: absolute; 
     top: 1rem;
-    right: 1rem;
-    font-size: 2rem;
+    right: 0.5rem;
+    font-size: 1.8rem;
     font-family: 'Courier New', Courier, monospace;
-    z-index: 10001;
+    z-index: 1001;
+    color: #979797;
 }
 .overlay {
     position: fixed;
