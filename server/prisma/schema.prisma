@@ -19,7 +19,7 @@ model moods {
 model users {
   id            Int     @id @default(autoincrement())
   username      String  @unique @db.VarChar(50)
-  email         String  @unique @db.VarChar(100) 
+  email         String  @unique @db.VarChar(100)
   password_hash String
   moods         moods[]
 }

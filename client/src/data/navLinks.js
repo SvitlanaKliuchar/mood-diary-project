@@ -1,8 +1,8 @@
-import HomeIconUrl from '../assets/icons/home.svg';
-import StatsIconUrl from '../assets/icons/chart.svg';
-import CalendarIconUrl from '../assets/icons/calendar.svg';
-import SettingsIconUrl from '../assets/icons/settings.svg';
-import LogInIconUrl from '../assets/icons/log-in.svg';
+import HomeIconUrl from '../assets/icons/menu/home.svg';
+import StatsIconUrl from '../assets/icons/menu/chart.svg';
+import CalendarIconUrl from '../assets/icons/menu/calendar.svg';
+import SettingsIconUrl from '../assets/icons/menu/settings.svg';
+import LogInIconUrl from '../assets/icons/menu/log-in.svg';
 
 const navLinks = [
     { to: '/home', label: 'Home', iconUrl: HomeIconUrl },
