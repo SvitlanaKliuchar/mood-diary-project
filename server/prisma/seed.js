@@ -7,6 +7,7 @@ const seedData = async () => {
   const user1 = await prisma.users.create({
     data: {
       username: "svitlana",
+      email: "sv1234@gmail.com",
       password_hash: "hashed_password_1",
       moods: {
         create: [
@@ -27,6 +28,7 @@ const seedData = async () => {
   const user2 = await prisma.users.create({
     data: {
       username: "Lara",
+      email: "larainacio@gmail.com",
       password_hash: "hashed_password_2",
       moods: {
         create: [
