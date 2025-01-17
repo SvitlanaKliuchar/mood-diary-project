@@ -1,6 +1,6 @@
 import prisma from "../config/db.js";
 import bcrypt from "bcrypt";
-import { signJwt } from "../utils/jwt.js";
+import { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } from "../utils/jwt.js";
 import { loginSchema, registerSchema } from '../validation/auth/auth-validation.js'
 
 
@@ -27,10 +27,30 @@ export const login = async (req, res, next) => {
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
-    //generate a JWT token
-    const token = signJwt({ sub: user.id });
+    //generate tokens
+    const accessToken = signAccessToken({ sub: user.id });
+    const refreshToken = signRefreshToken({ sub: user.id })
 
-    res.status(200).json({ message: "Login successful!", token });
+    //set cookies: access_token & refresh_token
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, //15min
+    })
+
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, //7d
+    })
+
+    res.status(200).json({ message: "Login successful!", user: {
+      id: user.id,
+      username: user.username,
+      email: user.email
+    } });
   } catch (err) {
     next(err);
   }
@@ -61,13 +81,28 @@ export const register = async (req, res, next) => {
       data: { username, email, password_hash: hashedPassword },
     });
 
-    //generate a JWT token
-    const token = signJwt({ sub: newUser.id });
+    //generate tokens
+    const accessToken = signAccessToken({ sub: newUser.id });
+    const refreshToken = signRefreshToken({ sub: newUser.id })
+
+    //set cookies: access_token & refresh_token
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, //15min
+    })
+
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, //7d
+    })
 
     res.status(201).json({
       message: "User registered successfully!",
       user: { id: newUser.id, username: newUser.username, email: newUser.email },
-      token,
     });
   } catch (err) {
     next(err);
