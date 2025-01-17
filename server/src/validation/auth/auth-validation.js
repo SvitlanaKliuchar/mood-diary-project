@@ -19,31 +19,28 @@ const usernameValidation = z
   .max(30, "Username must not exceed 30 characters")
   .regex(
     /^[a-zA-Z0-9_.-]+$/,
-    "Username can only contain letters, numbers, underscores, periods, and hyphens"
+    "Username can only contain letters, numbers, underscores, periods, and hyphens",
   );
 
-const emailValidation = z
-  .string()
-  .regex(emailRegex, 'Invalid email address.')
-
+const emailValidation = z.string().regex(emailRegex, "Invalid email address.");
 
 export const loginSchema = z.object({
   identifier: z
     .string()
-    .min(1, 'Username or email are required.')
+    .min(1, "Username or email are required.")
     .refine(
       (val) => {
-        const isEmail = emailRegex.test(val)
-        const isUsername = usernameRegex.test(val)
-        return isEmail || isUsername
+        const isEmail = emailRegex.test(val);
+        const isUsername = usernameRegex.test(val);
+        return isEmail || isUsername;
       },
       {
-        message: 'Must be a valid username or email address'
-      }
+        message: "Must be a valid username or email address",
+      },
     ),
 
   password: passwordValidation,
-  rememberMe: z.boolean().optional()
+  rememberMe: z.boolean().optional(),
 });
 
 export const registerSchema = z
@@ -51,15 +48,9 @@ export const registerSchema = z
     username: usernameValidation,
     email: emailValidation,
     password: passwordValidation,
-    repeatPassword: z.string()
+    repeatPassword: z.string(),
   })
-  .refine(
-    (data) => data.password === data.repeatPassword,
-    {
-      path: ['repeatPassword'],
-      message: 'Passwords do not match.'
-    }
-
-  )
-
-
+  .refine((data) => data.password === data.repeatPassword, {
+    path: ["repeatPassword"],
+    message: "Passwords do not match.",
+  });

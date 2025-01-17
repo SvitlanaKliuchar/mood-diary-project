@@ -1,5 +1,8 @@
 import prisma from "../config/db.js";
-import { createMoodSchema, getMoodsQuerySchema } from "../validation/moods/moods-validation.js";
+import {
+  createMoodSchema,
+  getMoodsQuerySchema,
+} from "../validation/moods/moods-validation.js";
 
 export const createMood = async (req, res, next) => {
   try {
