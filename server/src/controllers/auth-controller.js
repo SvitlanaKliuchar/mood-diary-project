@@ -46,11 +46,13 @@ export const login = async (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
     })
 
-    res.status(200).json({ message: "Login successful!", user: {
-      id: user.id,
-      username: user.username,
-      email: user.email
-    } });
+    res.status(200).json({
+      message: "Login successful!", user: {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      }
+    });
   } catch (err) {
     next(err);
   }
@@ -109,3 +111,44 @@ export const register = async (req, res, next) => {
   }
 };
 
+export const refresh = async (req, res, next) => {
+  try {
+    //read the refresh token from cookie
+    const refreshToken = req.cookies.refresh_token
+    if (!refreshToken) {
+      return res.status(401).json({ error: "No refresh token provided" });
+    }
+
+    //verify refresh token
+    let decoded
+    try {
+      decoded = verifyRefreshToken(refreshToken)
+    } catch (err) {
+      return res.status(403).json({ error: "Invalid or expired refresh token" });
+    }
+
+    //check if user is still valid, not deleted etc
+    const user = await prisma.users.findUnique({ where: { id: decoded.sub } })
+    if (!user) {
+      return res.status(404).json({ error: "User not found" })
+    }
+
+    //if all is good, sign a new access token
+    const newAccessToken = signAccessToken({ sub: user.id })
+
+    //set it in cookie again (fresh 15min) 
+    res.cookie('access_token', newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.json({
+      message: "Access token refreshed successfully!"
+      // no need to re-set refresh_token here since it's still valid 
+    });
+  } catch (err) {
+    next(err)
+  }
+}
