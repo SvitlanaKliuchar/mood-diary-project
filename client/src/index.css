@@ -1,11 +1,13 @@
 :root {
-  --primary-color: rgb(183, 201, 245);       
-  --secondary-color: rgb(186, 183, 245);     
-  --accent-color-blue: rgb(84, 79, 191);   
-  --accent-color-pink: rgb(255, 0, 242);   
+  --primary-color: rgb(183, 201, 245);
+  --secondary-color: rgb(186, 183, 245);
+  --primary-color-pale: rgba(183, 201, 245, 0.5);
+  --secondary-color-pale: rgba(186, 183, 245, 0.5);
+  --accent-color-blue: rgb(84, 79, 191);
+  --accent-color-pink: rgb(255, 0, 242);
   --accent-color-pink-pale: rgb(226, 183, 245);
-  --error-color: rgb(255, 0, 77);  
-  --font-color: rgb(38, 37, 44);  
+  --error-color: rgb(255, 0, 77);
+  --font-color: rgb(38, 37, 44);
   --font-color: rgb(38, 37, 44);
   --font-color-40: rgba(38, 37, 44, 0.4);
   --font-color-50: rgba(38, 37, 44, 0.5);
@@ -13,7 +15,7 @@
   --font-color-70: rgba(38, 37, 44, 0.7);
   --font-color-80: rgba(38, 37, 44, 0.8);
   --bg-color: rgb(245, 255, 255);
-  --bg-color-darkened-1:rgb(233, 246, 252);
+  --bg-color-darkened-1: rgb(233, 246, 252);
   --bg-color-darkened-5: rgb(223, 236, 242);
   --bg-color-darkened-60: rgb(94, 99, 102);
   --h1-font: "Italiana", serif;
@@ -30,7 +32,18 @@ html {
   box-sizing: inherit;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, ol, ul, figure, blockquote {
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ol,
+ul,
+figure,
+blockquote {
   margin: 0;
   padding: 0;
 }
@@ -41,7 +54,12 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   line-height: 1.25;
   font-family: var(--h1-font);

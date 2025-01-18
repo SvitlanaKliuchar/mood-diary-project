@@ -21,12 +21,14 @@ function App() {
         <Route path="/" element={< Landing />} />
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
+        <Route path='/calendar' element={<Calendar />} />
+        <Route path='/home' element={<Home />} />
         <Route element={<ProtectedRoute />}>
-          <Route path='/calendar' element={<Calendar />} />
+          
           <Route path='/settings' element={<Settings />} />
           <Route path='/stats' element={<Stats />} />
           <Route path='/entry' element={<Entry />} />
-          <Route path='/home' element={<Home />} />
+          
         </Route>
       </Routes>
     </Router>
