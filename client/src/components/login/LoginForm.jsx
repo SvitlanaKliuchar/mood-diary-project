@@ -3,6 +3,7 @@ import styles from "./Login.module.css";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schemas/validationSchemas";
+import axios from "axios";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,11 +15,20 @@ const LoginForm = () => {
   } = useForm({ resolver: yupResolver(loginSchema) });
 
   const onSubmit = async (data) => {
-    //data contains { identifier (username or email), password }
-    console.log(data);
-    // Replace with actual login API call
-    // const response = await loginApi({ email, password });
-    // handle response (e.g., storing tokens, redirecting)
+    try {
+      const response = axios.post('/api/auth/login', data)
+      console.log('Login successful: ', response)
+      navigate('/home')
+    } catch (err) {
+      if (err.response) { 
+        console.error('Server error: ', err.response)
+      } else if (err.request) {
+        console.error('Network error: ', err.request)
+      } else {
+        console.error('Error during API call to register: ', err.message)
+      }
+    }
+
   };
   return (
     <div className={styles["form-container"]}>

@@ -3,9 +3,12 @@ import styles from "./Login.module.css";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../schemas/validationSchemas";
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios';
 
 const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate()
 
   const {
     register,
@@ -14,7 +17,19 @@ const SignupForm = () => {
   } = useForm({ resolver: yupResolver(signupSchema) });
 
   const onSubmit = async (data) => {
-    //logic here to send dat to the server to register a user
+    try {
+      const response = await axios.post('/api/auth/register', data)
+      console.log('Registration successful: ', response)
+      navigate('/home')
+    } catch (err) {
+      if (err.response) { 
+        console.error('Server error: ', err.response)
+      } else if (err.request) {
+        console.error('Network error: ', err.request)
+      } else {
+        console.error('Error during API call to register: ', err.message)
+      }
+    }
   };
 
   return (

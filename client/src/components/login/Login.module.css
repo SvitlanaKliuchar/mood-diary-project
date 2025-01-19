@@ -41,6 +41,7 @@
 
 .input-field {
     width: 100%;
+    font-size: 0.9rem;
 }
 .password-toggle {
     position: absolute;
