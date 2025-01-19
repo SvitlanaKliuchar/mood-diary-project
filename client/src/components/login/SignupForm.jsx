@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styles from "./Login.module.css";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../schemas/validationSchemas";
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios';
+import { AuthContext } from "../../contexts/authContext";
 
 const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate()
 
+  const { register: registerUser } = useContext(AuthContext)
+  
   const {
     register,
     handleSubmit,
@@ -18,17 +20,15 @@ const SignupForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post('/api/auth/register', data)
-      console.log('Registration successful: ', response)
-      navigate('/home')
-    } catch (err) {
-      if (err.response) { 
-        console.error('Server error: ', err.response)
-      } else if (err.request) {
-        console.error('Network error: ', err.request)
+      const success = await registerUser(data);
+      if (success) {
+        console.log("Register successful!");
+        navigate("/home");
       } else {
-        console.error('Error during API call to register: ', err.message)
+        console.error('Registration failed.');
       }
+    } catch (err) {
+      console.error('Error during registration process: ', err);
     }
   };
 

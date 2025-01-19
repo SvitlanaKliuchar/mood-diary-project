@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styles from "./Login.module.css";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schemas/validationSchemas";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/authContext";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const { login } = useContext(AuthContext);
 
   const {
     register,
@@ -16,20 +20,18 @@ const LoginForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = axios.post('/api/auth/login', data)
-      console.log('Login successful: ', response)
-      navigate('/home')
-    } catch (err) {
-      if (err.response) { 
-        console.error('Server error: ', err.response)
-      } else if (err.request) {
-        console.error('Network error: ', err.request)
+      const success = await login(data);
+      if (success) {
+        console.log("Login successful!");
+        navigate("/home");
       } else {
-        console.error('Error during API call to register: ', err.message)
+        console.error('Login failed. Check credentials or network issues.');
       }
+    } catch (err) {
+      console.error('Error during login process: ', err);
     }
-
   };
+
   return (
     <div className={styles["form-container"]}>
       <form

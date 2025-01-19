@@ -7,10 +7,11 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  //check if user is already authenticated on mount
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const { data } = await axios.get("/api/me", {
+        const { data } = await axios.get("/api/auth/me", {
           withCredentials: true,
         });
         if (data?.user) {
@@ -24,11 +25,10 @@ const AuthProvider = ({ children }) => {
     };
     checkUser();
   }, []);
+
   const login = async (credentials) => {
-    //call the server login endpoint
-    //on success the server sets HttpOnly cookie
     try {
-      const { data, status } = await axios.post("/api/login", credentials, {
+      const { data, status } = await axios.post("/api/auth/login", credentials, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });
@@ -36,17 +36,37 @@ const AuthProvider = ({ children }) => {
         setUser(data.user);
         return true;
       } else {
+        console.error("Login failed: Unexpected response", data);
         return false;
       }
     } catch (err) {
-      console.error("Error getting data after user login: ", err);
+      console.error("Error during login: ", err);
+      return false;
+    }
+  };
+
+  const register = async (credentials) => {
+    try {
+      const { data, status } = await axios.post("/api/auth/register", credentials, {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      });
+      if (status === 201 && data?.user) {
+        setUser(data.user);
+        return true;
+      } else {
+        console.error("Registration failed: Unexpected response", data);
+        return false;
+      }
+    } catch (err) {
+      console.error("Error during registration: ", err);
       return false;
     }
   };
 
   const logout = async () => {
     try {
-      await axios.post("/api/logout", {}, { withCredentials: true });
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
       setUser(null);
     } catch (err) {
       console.error("Error during user logout: ", err);
@@ -54,9 +74,10 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
 export default AuthProvider;
