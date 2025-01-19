@@ -9,7 +9,10 @@ import errorHandler from "./middleware/error-middleware.js";
 const app = express();
 
 //middleware
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5175',
+    credentials: true, //allow cookies
+  }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(logger);

@@ -42,7 +42,10 @@ const NavBar = () => {
             </li>
           ))}
           {user ? (<li key={"/"}>
-            <a href="/" onClick={handleLogout}>Log out</a>
+            <a href="/" onClick={(e) => {
+              e.preventDefault()
+              handleLogout()
+            }}>Log out</a>
           </li>) : (<li key={"/login"}>
             <a href="/login">Log in</a>
           </li>)}
@@ -77,7 +80,10 @@ const NavBar = () => {
                 </a>
               </li>
             ))}
-            {user ? (<li key={"/"} onClick={handleLogout}>
+            {user ? (<li key={"/"} onClick={(e) => {
+              e.preventDefault()
+              handleLogout()
+            }}>
               <img
                 src={logoutIcon}
                 alt=""

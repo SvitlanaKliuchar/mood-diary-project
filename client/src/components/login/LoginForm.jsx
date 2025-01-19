@@ -3,8 +3,8 @@ import styles from "./Login.module.css";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schemas/validationSchemas";
-import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);

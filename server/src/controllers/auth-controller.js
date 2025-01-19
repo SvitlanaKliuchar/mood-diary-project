@@ -38,17 +38,20 @@ export const login = async (req, res, next) => {
     const accessToken = signAccessToken({ sub: user.id });
     const refreshToken = signRefreshToken({ sub: user.id });
 
+    console.log("Generated Access Token:", accessToken);
+    console.log("Generated Refresh Token:", refreshToken);
+
     //set cookies: access_token & refresh_token
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
       maxAge: 15 * 60 * 1000, //15min
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
     });
@@ -61,6 +64,11 @@ export const login = async (req, res, next) => {
         email: user.email,
       },
     });
+
+    console.log("Set Cookies:");
+    console.log("Access Token:", req.cookies.access_token);
+    console.log("Refresh Token:", req.cookies.refresh_token);
+
   } catch (err) {
     next(err);
   }
@@ -99,14 +107,14 @@ export const register = async (req, res, next) => {
     //set cookies: access_token & refresh_token
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
       maxAge: 15 * 60 * 1000, //15min
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
     });
@@ -119,6 +127,10 @@ export const register = async (req, res, next) => {
         email: newUser.email,
       },
     });
+
+    console.log("Set Cookies:");
+    console.log("Access Token:", req.cookies.access_token);
+    console.log("Refresh Token:", req.cookies.refresh_token);
   } catch (err) {
     next(err);
   }
@@ -154,7 +166,7 @@ export const refresh = async (req, res, next) => {
     //set it in cookie again (fresh 15min)
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
       maxAge: 15 * 60 * 1000,
     });
@@ -173,17 +185,55 @@ export const logout = async (req, res, next) => {
     //clear both cookies
     res.clearCookie("access_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
     });
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
     });
+    console.log("Access Token (After Clear):", req.cookies.access_token);
+    console.log("Refresh Token (After Clear):", req.cookies.refresh_token);
 
     return res.json({ message: "Logged out successfully" });
   } catch (err) {
     next(err);
   }
 };
+
+export const me = async (req, res, next) => {
+  try {
+    //read the access token gfrom cookie
+    const accessToken = req.cookies.access_token
+    if (!accessToken) {
+      return res.status(401).json({ error: "Authentication token missing" });
+    }
+    //verify it
+    let decoded;
+    try {
+      decoded = verifyAccessToken(accessToken);
+    } catch (err) {
+      return res
+        .status(403)
+        .json({ error: "Invalid or expired access token" });
+    }
+    //use decoded token to find user info in db
+    const user = await prisma.users.findUnique({ where: { id: decoded.sub } })
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    //send user info to client in response
+    return res.status(200).json({
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      }
+    })
+
+  } catch (err) {
+    next(err)
+  }
+
+}

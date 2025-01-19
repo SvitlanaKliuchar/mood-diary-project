@@ -7,9 +7,12 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+ 
+
   useEffect(() => {
     const cachedUser = localStorage.getItem("user");
     if (cachedUser) {
+      console.log("Cached user data:", cachedUser)
       setUser(JSON.parse(cachedUser));
       setLoading(false);
     } else {
@@ -19,11 +22,13 @@ const AuthProvider = ({ children }) => {
             withCredentials: true,
           });
           if (data?.user) {
+            console.log("User data was fetched successfully and is now goint to be stored in localStorage", data.user)
             setUser(data.user);
             localStorage.setItem("user", JSON.stringify(data.user));
+          
           }
         } catch (err) {
-          console.error("Error checking user data: ", err);
+          console.error("Error checking user data: ", err.message);
         } finally {
           setLoading(false);
         }
@@ -74,8 +79,11 @@ const AuthProvider = ({ children }) => {
     try {
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
       setUser(null);
+      localStorage.removeItem("user")
+      return true
     } catch (err) {
       console.error("Error during user logout: ", err);
+      return false
     }
   };
 

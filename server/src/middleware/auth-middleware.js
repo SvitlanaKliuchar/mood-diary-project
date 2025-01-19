@@ -6,12 +6,12 @@ import prisma from "../config/db.js";
 const authenticate = async (req, res, next) => {
   try {
     //read the access token from cookies
-    const token = req.cookies.access_token
+    const token = req.cookies.access_token;
     if (!token) {
-      return res.status(401).json({ error: "No access token provided." })
+      return res.status(401).json({ error: "No access token provided." });
     }
 
-    //verify the token with the helper function 
+    //verify the token with the helper function
     const payload = verifyAccessToken(token);
 
     //look up the user in db
