@@ -1,11 +1,11 @@
-import React from 'react';
-import styles from './Landing.module.css'
+import React from "react";
+import styles from "./Landing.module.css";
 
 const Footer = () => {
   return (
     <footer>
-      <div className={styles['footer-content']}>
-        <div className={styles['footer-links']}>
+      <div className={styles["footer-content"]}>
+        <div className={styles["footer-links"]}>
           <div>
             <h3>Support</h3>
             <a href="#">Contact us</a>

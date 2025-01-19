@@ -1,14 +1,16 @@
-import React from 'react';
-import NavBar from '../components/landing/NavBar.jsx';
+import React from "react";
+import NavBar from "../components/landing/NavBar.jsx";
 
-import Footer from '../components/landing/Footer.jsx';
+import Footer from "../components/landing/Footer.jsx";
 
 const Login = () => {
-    return (<>
-        <NavBar />
+  return (
+    <>
+      <NavBar />
 
-        <Footer />
-    </>);
+      <Footer />
+    </>
+  );
 };
 
 export default Login;
