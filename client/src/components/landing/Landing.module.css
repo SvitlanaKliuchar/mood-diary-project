@@ -257,6 +257,7 @@ footer {
 .footer-links {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
     position: absolute;
     bottom: 20%;
@@ -282,5 +283,10 @@ footer {
 @media screen and (min-width: 50rem) {
     footer {
         height: 80vh;
+    }
+}
+@media screen and (max-width: 30rem) {
+    .footer-links {
+        min-width: 18rem;
     }
 }
