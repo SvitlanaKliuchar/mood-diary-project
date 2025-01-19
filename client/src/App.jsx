@@ -13,7 +13,6 @@ import "./index.css";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
-  const [count, setCount] = useState(0);
 
   return (
     <Router>

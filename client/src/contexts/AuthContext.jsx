@@ -7,23 +7,29 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  //check if user is already authenticated on mount
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data } = await axios.get("/api/auth/me", {
-          withCredentials: true,
-        });
-        if (data?.user) {
-          setUser(data.user);
+    const cachedUser = localStorage.getItem("user");
+    if (cachedUser) {
+      setUser(JSON.parse(cachedUser));
+      setLoading(false);
+    } else {
+      const checkUser = async () => {
+        try {
+          const { data } = await axios.get("/api/auth/me", {
+            withCredentials: true,
+          });
+          if (data?.user) {
+            setUser(data.user);
+            localStorage.setItem("user", JSON.stringify(data.user));
+          }
+        } catch (err) {
+          console.error("Error checking user data: ", err);
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error("Error checking user data: ", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkUser();
+      };
+      checkUser();
+    }
   }, []);
 
   const login = async (credentials) => {

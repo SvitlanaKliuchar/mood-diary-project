@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schemas/validationSchemas";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../contexts/authContext";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);

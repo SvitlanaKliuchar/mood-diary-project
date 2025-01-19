@@ -1,10 +1,28 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styles from "./Landing.module.css";
 import logo from "../../assets/images/logo.png";
 import navLinks from "../../data/navLinks.js";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
+import logoutIcon from '../../assets/icons/menu/logout.svg'
+import loginIcon from '../../assets/icons/menu/log-in.svg'
 
 const NavBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const { logout, user } = useContext(AuthContext)
+
+  const handleLogout = async () => {
+    try {
+      const success = await logout()
+      if (success) {
+        console.log("Logout successful.")
+      } else {
+        console.error('Logout failed. Check for network issues.');
+      }
+    } catch (err) {
+      console.error('Error during logout process: ', err);
+    }
+  }
 
   //toggle the mobile menu
   const handleMenuToggle = () => {
@@ -23,6 +41,11 @@ const NavBar = () => {
               <a href={link.to}>{link.label}</a>
             </li>
           ))}
+          {user ? (<li key={"/"}>
+            <a href="/" onClick={handleLogout}>Log out</a>
+          </li>) : (<li key={"/login"}>
+            <a href="/login">Log in</a>
+          </li>)}
         </ul>
 
         <button
@@ -54,6 +77,23 @@ const NavBar = () => {
                 </a>
               </li>
             ))}
+            {user ? (<li key={"/"} onClick={handleLogout}>
+              <img
+                src={logoutIcon}
+                alt=""
+                className={styles["link-icon"]}
+                aria-hidden="true"
+              />
+              <a href="/">Log out</a>
+            </li>) : (<li>
+              <img
+                src={loginIcon}
+                alt=""
+                className={styles["link-icon"]}
+                aria-hidden="true"
+              />
+              <a href="/login">Log in</a>
+            </li>)}
           </ul>
           <button
             className={styles["close-menu-btn"]}
