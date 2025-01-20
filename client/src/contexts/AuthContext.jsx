@@ -28,7 +28,11 @@ const AuthProvider = ({ children }) => {
           
           }
         } catch (err) {
-          console.error("Error checking user data: ", err.message);
+          if (err.response?.status === 401) {
+            console.log("No user logged in (401)");
+          } else {
+            console.error("Error checking user data: ", err.message);
+          }
         } finally {
           setLoading(false);
         }
