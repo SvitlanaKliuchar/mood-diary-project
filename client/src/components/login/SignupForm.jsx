@@ -3,15 +3,15 @@ import styles from "./Login.module.css";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../schemas/validationSchemas";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 
 const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const { register: registerUser } = useContext(AuthContext)
-  
+  const { register: registerUser } = useContext(AuthContext);
+
   const {
     register,
     handleSubmit,
@@ -25,10 +25,10 @@ const SignupForm = () => {
         console.log("Register successful!");
         navigate("/home");
       } else {
-        console.error('Registration failed.');
+        console.error("Registration failed.");
       }
     } catch (err) {
-      console.error('Error during registration process: ', err);
+      console.error("Error during registration process: ", err);
     }
   };
 

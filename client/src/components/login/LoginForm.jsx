@@ -25,10 +25,10 @@ const LoginForm = () => {
         console.log("Login successful!");
         navigate("/home");
       } else {
-        console.error('Login failed. Check credentials or network issues.');
+        console.error("Login failed. Check credentials or network issues.");
       }
     } catch (err) {
-      console.error('Error during login process: ', err);
+      console.error("Error during login process: ", err);
     }
   };
 

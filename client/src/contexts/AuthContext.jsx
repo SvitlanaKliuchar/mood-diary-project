@@ -7,12 +7,10 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
- 
-
   useEffect(() => {
     const cachedUser = localStorage.getItem("user");
     if (cachedUser) {
-      console.log("Cached user data:", cachedUser)
+      console.log("Cached user data:", cachedUser);
       setUser(JSON.parse(cachedUser));
       setLoading(false);
     } else {
@@ -22,10 +20,9 @@ const AuthProvider = ({ children }) => {
             withCredentials: true,
           });
           if (data?.user) {
-            console.log("User data was fetched successfully and is now goint to be stored in localStorage", data.user)
+            console.log("User data was fetched successfully and is now goint to be stored in localStorage", data.user);
             setUser(data.user);
             localStorage.setItem("user", JSON.stringify(data.user));
-          
           }
         } catch (err) {
           if (err.response?.status === 401) {
@@ -47,8 +44,10 @@ const AuthProvider = ({ children }) => {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });
+
       if (status === 200 && data?.user) {
         setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
         return true;
       } else {
         console.error("Login failed: Unexpected response", data);
@@ -66,8 +65,10 @@ const AuthProvider = ({ children }) => {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });
+
       if (status === 201 && data?.user) {
         setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
         return true;
       } else {
         console.error("Registration failed: Unexpected response", data);
@@ -81,13 +82,16 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post("/api/auth/logout", {}, { withCredentials: true });
-      setUser(null);
-      localStorage.removeItem("user")
-      return true
+      const res = await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      if (res.status === 200) {
+        setUser(null);
+        localStorage.removeItem("user");
+        return true;
+      }
+      return false;
     } catch (err) {
       console.error("Error during user logout: ", err);
-      return false
+      return false;
     }
   };
 
@@ -98,4 +102,4 @@ const AuthProvider = ({ children }) => {
   );
 };
 
-export default AuthProvider;
+export default AuthProvider; 

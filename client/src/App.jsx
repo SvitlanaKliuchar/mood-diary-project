@@ -13,7 +13,6 @@ import "./index.css";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
-
   return (
     <Router>
       <Routes>
