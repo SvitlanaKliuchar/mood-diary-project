@@ -8,10 +8,12 @@
     "start": "node src/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "test:api": "vitest --config vitest.config.js",
     "test:unit": "vitest src/**/*.test.js",
     "test:integration": "vitest tests/integration/**/*.test.js",
     "test:e2e": "vitest tests/e2e/**/*.test.js",
-    "test": "vitest"
+    "test:migrate": "dotenv -e .env.test -- npx prisma migrate deploy",
+    "test": "dotenv -e .env.test -- vitest"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

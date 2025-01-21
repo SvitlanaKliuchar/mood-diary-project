@@ -45,14 +45,14 @@ export const login = async (req, res, next) => {
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 15 * 60 * 1000, //15min
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
     });
 
@@ -108,14 +108,14 @@ export const register = async (req, res, next) => {
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 15 * 60 * 1000, //15min
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
     });
 
@@ -167,7 +167,7 @@ export const refresh = async (req, res, next) => {
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 15 * 60 * 1000,
     });
 
@@ -186,12 +186,12 @@ export const logout = async (req, res, next) => {
     res.clearCookie("access_token", {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
     });
     res.clearCookie("refresh_token", {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
     });
     console.log("Access Token (After Clear):", req.cookies.access_token);
     console.log("Refresh Token (After Clear):", req.cookies.refresh_token);
