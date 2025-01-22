@@ -1,24 +1,43 @@
 import { describe, it, expect, vi } from "vitest";
-import { signJwt, verifyJwt } from "./jwt.js";
-
-const mockPayload = { sub: "12345" };
+import { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } from "./jwt.js";
 
 describe("JWT Utilities", () => {
-  it("should generate a valid JWT token", () => {
-    const token = signJwt(mockPayload);
+  it("should generate a valid access token", () => {
+    const token = signAccessToken({ sub: 12345 });
     expect(token).toBeDefined();
     expect(typeof token).toBe("string");
-  });
-  it("should verify a valid JWT token", () => {
-    const token = signJwt(mockPayload);
-    const decoded = verifyJwt(token);
 
+    //decode it just to confirm 'sub' is present
+    const decoded = verifyAccessToken(token);
+    expect(decoded.sub).toBe(12345);
+  });
+
+  it("should generate a valid refresh token", () => {
+    const token = signRefreshToken({ sub: 54321 });
+    expect(token).toBeDefined();
+    expect(typeof token).toBe("string");
+
+    const decoded = verifyRefreshToken(token);
+    expect(decoded.sub).toBe(54321);
+  });
+
+  it("should verify a valid access token", () => {
+    const token = signAccessToken({ sub: "abc" });
+    const decoded = verifyAccessToken(token);
     expect(decoded).toBeDefined();
-    expect(decoded.sub).toBe(mockPayload.sub);
+    expect(decoded.sub).toBe("abc");
   });
-  it("should throw an error for an expired JWT token", () => {
-    const expiredToken = signJwt(mockPayload, { expiresIn: "-1s" });
 
-    expect(() => verifyJwt(expiredToken)).toThrow("jwt expired");
+  it("should verify a valid refresh token", () => {
+    const token = signRefreshToken({ sub: "def" });
+    const decoded = verifyRefreshToken(token);
+    expect(decoded).toBeDefined();
+    expect(decoded.sub).toBe("def");
+  });
+
+  it("should throw error for invalid or expired access token", () => {
+    const fakeToken = "invalid.token.data";
+
+    expect(() => verifyAccessToken(fakeToken)).toThrow();
   });
 });

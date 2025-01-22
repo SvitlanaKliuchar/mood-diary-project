@@ -26,7 +26,7 @@ const emailValidation = z.string().regex(emailRegex, "Invalid email address.");
 
 export const loginSchema = z.object({
   identifier: z
-    .string()
+    .string({ required_error: "Username or email are required." })  
     .min(1, "Username or email are required.")
     .refine(
       (val) => {
@@ -36,12 +36,12 @@ export const loginSchema = z.object({
       },
       {
         message: "Must be a valid username or email address",
-      },
+      }
     ),
-
   password: passwordValidation,
   rememberMe: z.boolean().optional(),
 });
+
 
 export const registerSchema = z
   .object({
