@@ -1,5 +1,6 @@
 import prisma from "../config/db.js";
 import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken'
 import {
   signAccessToken,
   signRefreshToken,
@@ -127,6 +128,9 @@ export const register = async (req, res, next) => {
         email: newUser.email,
       },
     });
+    console.log("New user =>", newUser);
+    console.log("Token =>", accessToken);
+    console.log("Decoded =>", jwt.decode(accessToken));
 
     console.log("Set Cookies:");
     console.log("Access Token:", req.cookies.access_token);
