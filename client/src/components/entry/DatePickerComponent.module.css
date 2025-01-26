@@ -1,0 +1,23 @@
+
+.custom-input:hover {
+    text-decoration: underline;
+}
+
+:global(.react-datepicker),
+:global(.react-datepicker__header) {
+    background-color: var(--bg-color);
+    border: 1px solid #ccc;
+}
+
+:global(.react-datepicker__day--selected) {
+    background-color: var(--accent-color-blue);
+    color: white;
+}
+
+:global(.react-datepicker__input-container input) {
+    display: none;
+}
+
+:global(.react-datepicker__day--outside-month) {
+    color: var(--font-color-60);
+}

@@ -1,0 +1,72 @@
+/* entry header */
+.entry-header {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.date-picker-container {
+    color: var(--accent-color-blue);
+    display: flex;
+    gap: 0.3rem;
+}
+
+.mood-options {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.mood-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    max-width: 20rem;
+    min-width: 8rem;
+    padding: 1rem 2rem;
+    border: 1px solid #ccc;
+    background-color: var(--bg-color);
+    border-radius:50%;
+    transition: border 0.3s, background-color 0.3s;
+}
+
+.mood-button:hover {
+    border: 1px solid var(--accent-color-blue);
+}
+
+.selected {
+    background-color: var(--accent-color-blue);
+    color: white;
+    border-color: var(--accent-color-blue);
+}
+
+.calendar-icon {
+    width: 1.35rem;
+    height: auto;
+}
+
+.mood-emoji {
+    width: 4rem;
+}
+@media screen and (max-width: 40rem) {
+    .mood-options {
+        gap: 0.5rem;
+    }
+    .mood-button {
+        min-width: 4rem;
+        padding: 1.2rem;
+        font-size: 0.8rem;
+    }
+    .mood-emoji {
+        width: 3rem;
+    }
+}
+/* entry main */
