@@ -8,6 +8,7 @@
     justify-content: center;
     gap: 1rem;
     border: none;
+    text-align: center;
 }
 
 .date-picker-container {
@@ -37,17 +38,18 @@
     background-color: var(--bg-color);
     border-radius:50%;
     font-size: clamp(0.8rem, 2vw, 1rem) ;
-    transition: border 0.3s, background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .mood-button:hover {
-    border: 1px solid var(--accent-color-blue);
+    border: 1px solid var(--secondary-color);
+    transform: scale(1.1);
 }
 
 .selected {
-    background-color: var(--accent-color-blue);
+    background-color: var(--secondary-color);
     color: white;
-    border-color: var(--accent-color-blue);
+    border-color: var(--secondary-color);
 }
 
 .calendar-icon {
@@ -71,3 +73,30 @@
     }
 }
 /* entry main */
+.entry-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2rem;
+    text-align: center;
+}
+.fieldset {
+    background-color: var(--bg-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 20px;
+}
+.legend {
+    color: var(--font-color-90);
+    font-size: 0.9rem;
+}
+
+.error, .success{
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.error {
+    color: var(--error-color);
+}

@@ -2,9 +2,8 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format, isToday } from "date-fns";
-import styles from "./DatePickerComponent.module.css";
-import PropTypes from 'prop-types';
-
+import styles from "./FormElements.module.css";
+import PropTypes from "prop-types";
 
 const DatePickerComponent = ({ selectedDate, onDateChange }) => {
   const today = isToday(selectedDate);
@@ -52,6 +51,5 @@ DatePickerComponent.propTypes = {
   selectedDate: PropTypes.instanceOf(Date),
   onDateChange: PropTypes.func.isRequired,
 };
-
 
 export default DatePickerComponent;
