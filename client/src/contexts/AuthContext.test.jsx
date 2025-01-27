@@ -8,9 +8,9 @@ import AuthProvider, { AuthContext } from "./AuthContext";
 //we need to mock axios so no real network calls happen
 vi.mock("axios");
 
-
 function TestConsumer() {
-  const { user, loading, login, register, logout } = React.useContext(AuthContext);
+  const { user, loading, login, register, logout } =
+    React.useContext(AuthContext);
 
   return (
     <div>
@@ -22,11 +22,19 @@ function TestConsumer() {
         <p data-testid="user-display">No user</p>
       )}
 
-      <button onClick={() => login({ identifier: "myuser", password: "mypass" })}>
+      <button
+        onClick={() => login({ identifier: "myuser", password: "mypass" })}
+      >
         Test Login
       </button>
       <button
-        onClick={() => register({ username: "NewUser", email: "new@email.com", password: "pass" })}
+        onClick={() =>
+          register({
+            username: "NewUser",
+            email: "new@email.com",
+            password: "pass",
+          })
+        }
       >
         Test Register
       </button>
@@ -44,7 +52,10 @@ describe("AuthProvider", () => {
 
   it("loads a cached user from localStorage (skips /api/auth/me)", async () => {
     //put a user in localStorage
-    localStorage.setItem("user", JSON.stringify({ id: 1, username: "CachedUser" }));
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ id: 1, username: "CachedUser" }),
+    );
 
     //if /api/auth/me was called, let's have it fail with 401
     axios.get.mockRejectedValue({ response: { status: 401 } });
@@ -52,7 +63,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     //wait for loading to finish
@@ -70,13 +81,15 @@ describe("AuthProvider", () => {
     //no user in localStorage
     //so it will call /api/auth/me
     axios.get.mockResolvedValueOnce({
-      data: { user: { id: 2, username: "FetchedUser", email: "fetched@example.com" } },
+      data: {
+        user: { id: 2, username: "FetchedUser", email: "fetched@example.com" },
+      },
     });
 
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     //initially "Loading..."
@@ -92,7 +105,11 @@ describe("AuthProvider", () => {
 
     //localStorage updated
     const stored = JSON.parse(localStorage.getItem("user"));
-    expect(stored).toEqual({ id: 2, username: "FetchedUser", email: "fetched@example.com" });
+    expect(stored).toEqual({
+      id: 2,
+      username: "FetchedUser",
+      email: "fetched@example.com",
+    });
   });
 
   it("handles 401 from /api/auth/me by leaving user null", async () => {
@@ -102,7 +119,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     //wait for loading to end
@@ -123,13 +140,15 @@ describe("AuthProvider", () => {
     //login success
     axios.post.mockResolvedValueOnce({
       status: 200,
-      data: { user: { id: 10, username: "LoggedIn", email: "logged@example.com" } },
+      data: {
+        user: { id: 10, username: "LoggedIn", email: "logged@example.com" },
+      },
     });
 
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     //wait for "Loading..." to end
@@ -160,7 +179,9 @@ describe("AuthProvider", () => {
 
   it("login returns false & doesn't set user if server error", async () => {
     axios.get.mockRejectedValueOnce({ response: { status: 401 } });
-    axios.post.mockRejectedValueOnce({ response: { status: 400, data: { error: "Invalid credentials" } } });
+    axios.post.mockRejectedValueOnce({
+      response: { status: 400, data: { error: "Invalid credentials" } },
+    });
 
     let contextRef;
     function ConsumerWithRef() {
@@ -172,7 +193,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     //wait for loading
@@ -210,7 +231,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -220,7 +241,11 @@ describe("AuthProvider", () => {
 
     let regResult;
     await act(async () => {
-      regResult = await contextRef.register({ username: "NewUser", email: "new@example.com", password: "pass" });
+      regResult = await contextRef.register({
+        username: "NewUser",
+        email: "new@example.com",
+        password: "pass",
+      });
     });
 
     expect(regResult).toBe(true);
@@ -238,7 +263,10 @@ describe("AuthProvider", () => {
 
   it("register returns false if server error", async () => {
     axios.get.mockRejectedValueOnce({ response: { status: 401 } });
-    axios.post.mockResolvedValueOnce({ status: 400, data: { error: "Email already taken" } });
+    axios.post.mockResolvedValueOnce({
+      status: 400,
+      data: { error: "Email already taken" },
+    });
 
     let contextRef;
     function ConsumerWithRef() {
@@ -249,7 +277,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -258,7 +286,11 @@ describe("AuthProvider", () => {
 
     let regResult;
     await act(async () => {
-      regResult = await contextRef.register({ username: "FailUser", email: "fail@example.com", password: "pass" });
+      regResult = await contextRef.register({
+        username: "FailUser",
+        email: "fail@example.com",
+        password: "pass",
+      });
     });
 
     expect(regResult).toBe(false);
@@ -268,10 +300,16 @@ describe("AuthProvider", () => {
 
   it("logout clears user & localStorage on success, returns true", async () => {
     //if localStorage has a user, AuthContext won't call /api/auth/me
-    localStorage.setItem("user", JSON.stringify({ id: 123, username: "PreUser" }));
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ id: 123, username: "PreUser" }),
+    );
 
     //suppose logout succeeds
-    axios.post.mockResolvedValueOnce({ status: 200, data: { message: "Logged out" } });
+    axios.post.mockResolvedValueOnce({
+      status: 200,
+      data: { message: "Logged out" },
+    });
 
     let contextRef;
     function ConsumerWithRef() {
@@ -282,7 +320,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     //initially user is from localStorage
@@ -302,7 +340,10 @@ describe("AuthProvider", () => {
   });
 
   it("logout returns false & keeps user if server throws error", async () => {
-    localStorage.setItem("user", JSON.stringify({ id: 500, username: "FailLogout" }));
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ id: 500, username: "FailLogout" }),
+    );
     axios.post.mockRejectedValue(new Error("Server died"));
 
     let contextRef;
@@ -314,7 +355,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {

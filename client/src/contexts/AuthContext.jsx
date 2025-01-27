@@ -20,7 +20,10 @@ const AuthProvider = ({ children }) => {
             withCredentials: true,
           });
           if (data?.user) {
-            console.log("User data was fetched successfully and is now goint to be stored in localStorage", data.user);
+            console.log(
+              "User data was fetched successfully and is now goint to be stored in localStorage",
+              data.user,
+            );
             setUser(data.user);
             localStorage.setItem("user", JSON.stringify(data.user));
           }
@@ -40,10 +43,14 @@ const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const { data, status } = await axios.post("/api/auth/login", credentials, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
+      const { data, status } = await axios.post(
+        "/api/auth/login",
+        credentials,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       if (status === 200 && data?.user) {
         setUser(data.user);
@@ -61,10 +68,14 @@ const AuthProvider = ({ children }) => {
 
   const register = async (credentials) => {
     try {
-      const { data, status } = await axios.post("/api/auth/register", credentials, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
+      const { data, status } = await axios.post(
+        "/api/auth/register",
+        credentials,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       if (status === 201 && data?.user) {
         setUser(data.user);
@@ -82,7 +93,11 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const res = await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      const res = await axios.post(
+        "/api/auth/logout",
+        {},
+        { withCredentials: true },
+      );
       if (res.status === 200) {
         setUser(null);
         localStorage.removeItem("user");
@@ -102,4 +117,4 @@ const AuthProvider = ({ children }) => {
   );
 };
 
-export default AuthProvider; 
+export default AuthProvider;
