@@ -10,7 +10,11 @@ export const createMoodSchema = z.object({
     },
   ),
   mood: z.string().min(1, "Mood cannot be empty"),
+  emotions: z.array(z.string()).optional(),
+  sleep: z.array(z.string()).optional(),
+  productivity: z.array(z.string()).optional(),
   note: z.string().optional(),
+  photoUrl: z.string().optional()
 });
 
 export const getMoodsQuerySchema = z.object({

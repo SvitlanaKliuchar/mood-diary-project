@@ -12,14 +12,17 @@ const seedData = async () => {
       moods: {
         create: [
           {
-            mood: "Happy",
+            mood: "good",
+            emotions: ["happy", "grateful"],
+            sleep: ["good sleep"],
+            productivity: ["start early", "focus"],
             note: "Met with my friends, felt great!",
-            date: new Date(),
+            date: new Date("2025-01-20"),
           },
           {
-            mood: "Anxious",
+            mood: "meh",
             note: "Stressed at work, too much responsibility",
-            date: new Date(),
+            date: new Date("2025-01-21"),
           },
         ],
       },
@@ -33,14 +36,18 @@ const seedData = async () => {
       moods: {
         create: [
           {
-            mood: "Excited",
+            mood: "good",
             note: "Started working on a new project",
-            date: new Date(),
+            sleep: ["bad sleep"],
+            date: new Date("2025-01-20"),
+            createdAt: new Date()
           },
           {
-            mood: "Frustrated",
+            mood: "awful",
+            emotions: ["unsure", "stressed", "angry"],
             note: "Had a meeting with my family, they were very toxic",
-            date: new Date(),
+            date: new Date("2025-01-21"),
+            createdAt: new Date()
           },
         ],
       },

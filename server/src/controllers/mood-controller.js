@@ -6,12 +6,20 @@ import {
 
 export const createMood = async (req, res, next) => {
   try {
-    //validate request payload
-    const { date, mood, note } = createMoodSchema.parse(req.body);
+    //handle file upload if present 
 
-    //save the mood to the db
+
+    //parse and validate the form data
+    const { date, mood, emotions, sleep, productivity, note } = createMoodSchema.parse({
+      ...req.body,
+      emotions: req.body.emotions ? JSON.parse(req.body.emotions) : [],
+      sleep: req.body.sleep ? JSON.parse(req.body.sleep) : [],
+      productivity: req.body.productivity ? JSON.parse(req.body.productivity) : []
+    });
+
+    //save the mood entry to the db
     const newMood = await prisma.moods.create({
-      data: { date, mood, note, userId: req.user.id },
+      data: { date, mood, emotions, sleep, productivity, note, photoUrl, userId: req.user.id },
     });
 
     res
