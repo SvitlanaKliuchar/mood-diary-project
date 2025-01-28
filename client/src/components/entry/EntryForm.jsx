@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance.js";
 import EntryMoodDate from "./EntryMoodDate.jsx";
 import EntryMain from "./EntryMain.jsx";
 import SubmitButton from "./form-elements/SubmitButton.jsx";
@@ -48,7 +48,7 @@ const EntryForm = () => {
 
     try {
       //call api
-      const response = await axios.post("/api/entry", formData, {
+      const response = await axiosInstance.post("/moods", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

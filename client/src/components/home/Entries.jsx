@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import styles from "./Home.module.css";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const Entries = () => {
+  const { user } = useContext(AuthContext)
   return (
     <div className={styles.wrapper}>
       <div className={styles["all-entries-container"]}>

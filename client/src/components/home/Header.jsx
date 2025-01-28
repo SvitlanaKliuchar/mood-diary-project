@@ -37,10 +37,11 @@ const Header = () => {
           Share how you've been feeling today, username
         </h2>
       </div>
-      <button
+      <a
         className={styles["add-entry-btn"]}
         aria-label="Add entry"
-      ></button>
+        href="/entry"
+      ></a>
     </header>
   );
 };

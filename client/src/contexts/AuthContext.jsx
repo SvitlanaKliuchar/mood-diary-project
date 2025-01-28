@@ -1,11 +1,17 @@
 import { createContext, useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance, { setupInterceptors } from "../utils/axiosInstance.js";
 
 export const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setupInterceptors({
+      logout
+    })
+  }, [])
 
   useEffect(() => {
     const cachedUser = localStorage.getItem("user");
@@ -16,12 +22,10 @@ const AuthProvider = ({ children }) => {
     } else {
       const checkUser = async () => {
         try {
-          const { data } = await axios.get("/api/auth/me", {
-            withCredentials: true,
-          });
+          const { data } = await axiosInstance.get("/auth/me");
           if (data?.user) {
             console.log(
-              "User data was fetched successfully and is now goint to be stored in localStorage",
+              "User data was fetched successfully and is now going to be stored in localStorage",
               data.user,
             );
             setUser(data.user);
@@ -40,14 +44,13 @@ const AuthProvider = ({ children }) => {
       checkUser();
     }
   }, []);
-
+  
   const login = async (credentials) => {
     try {
-      const { data, status } = await axios.post(
-        "/api/auth/login",
+      const { data, status } = await axiosInstance.post(
+        "/auth/login",
         credentials,
         {
-          withCredentials: true,
           headers: { "Content-Type": "application/json" },
         },
       );
@@ -68,11 +71,10 @@ const AuthProvider = ({ children }) => {
 
   const register = async (credentials) => {
     try {
-      const { data, status } = await axios.post(
-        "/api/auth/register",
+      const { data, status } = await axiosInstance.post(
+        "/auth/register",
         credentials,
         {
-          withCredentials: true,
           headers: { "Content-Type": "application/json" },
         },
       );
@@ -93,10 +95,9 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const res = await axios.post(
-        "/api/auth/logout",
-        {},
-        { withCredentials: true },
+      const res = await axiosInstance.post(
+        "/auth/logout",
+        {}
       );
       if (res.status === 200) {
         setUser(null);
