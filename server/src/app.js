@@ -5,6 +5,9 @@ import logger from "./middleware/logging-middleware.js";
 import authRouter from "./routes/auth-routes.js";
 import moodsRouter from "./routes/moods-routes.js";
 import errorHandler from "./middleware/error-middleware.js";
+import { fileURLToPath } from 'url'
+import path from 'path'
+import fs from 'fs'
 
 const app = express();
 
@@ -16,6 +19,11 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(logger);
+
+//serve static files from the 'uploads' directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads')));
 
 //routes
 app.use("/auth", authRouter);
