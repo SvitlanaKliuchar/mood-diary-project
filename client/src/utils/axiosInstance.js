@@ -29,7 +29,7 @@ export const setupInterceptors = ({ logout }) => {
     (response) => {
       console.log(
         "Response Interceptor (SUCCESS):",
-        `URL => ${response.config.url}, STATUS => ${response.status}`
+        `URL => ${response.config.url}, STATUS => ${response.status}`,
       );
       return response;
     },
@@ -39,7 +39,10 @@ export const setupInterceptors = ({ logout }) => {
       console.log("Response Interceptor (ERROR) triggered.");
 
       if (!error.response) {
-        console.error("no response object => possible network/CORS error:", error.message);
+        console.error(
+          "no response object => possible network/CORS error:",
+          error.message,
+        );
         return Promise.reject(new Error("Network error. Check connection."));
       }
 
@@ -62,7 +65,10 @@ export const setupInterceptors = ({ logout }) => {
             failedQueue.push({ resolve, reject });
           })
             .then(() => {
-              console.log("retrying original request after refresh =>", originalRequest.url);
+              console.log(
+                "retrying original request after refresh =>",
+                originalRequest.url,
+              );
               return axiosInstance(originalRequest);
             })
             .catch((err) => {
@@ -78,7 +84,10 @@ export const setupInterceptors = ({ logout }) => {
           console.log("calling /auth/refresh now...");
           const { data } = await axiosInstance.post("/auth/refresh");
 
-          console.log("refresh response =>", data?.message || "no message in response.");
+          console.log(
+            "refresh response =>",
+            data?.message || "no message in response.",
+          );
 
           console.log("clearing and processing any queued requests...");
           processQueue(null);
@@ -98,9 +107,13 @@ export const setupInterceptors = ({ logout }) => {
         }
       }
 
-      console.error("unhandled error =>", status, error.response.data || error.message);
+      console.error(
+        "unhandled error =>",
+        status,
+        error.response.data || error.message,
+      );
       return Promise.reject(error);
-    }
+    },
   );
 };
 

@@ -51,12 +51,15 @@ const AuthProvider = ({ children }) => {
     }
   }, []);
 
-
   const login = async (credentials) => {
     try {
-      const { data, status } = await axiosInstance.post("/auth/login", credentials, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const { data, status } = await axiosInstance.post(
+        "/auth/login",
+        credentials,
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       if (status === 200 && data?.user) {
         setUser(data.user);
@@ -72,9 +75,13 @@ const AuthProvider = ({ children }) => {
 
   const register = async (credentials) => {
     try {
-      const { data, status } = await axiosInstance.post("/auth/register", credentials, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const { data, status } = await axiosInstance.post(
+        "/auth/register",
+        credentials,
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
       if (status === 201 && data?.user) {
         setUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));

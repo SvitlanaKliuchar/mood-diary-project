@@ -26,7 +26,7 @@ const Entries = () => {
             setError("No response from server. Please try again later.");
           } else {
             setError("An unexpected error occurred.");
-            throw err
+            throw err;
           }
         } finally {
           setLoading(false);
@@ -100,12 +100,12 @@ const Entries = () => {
                     </li>
                   ))}
                   {entry.sleep?.map((sleep, idx) => (
-                    <li key={idx} className={styles['mood-tag']}>
+                    <li key={idx} className={styles["mood-tag"]}>
                       {sleep}
                     </li>
                   ))}
                   {entry.productivity?.map((productivity, idx) => (
-                    <li key={idx} className={styles['mood-tag']}>
+                    <li key={idx} className={styles["mood-tag"]}>
                       {productivity}
                     </li>
                   ))}
