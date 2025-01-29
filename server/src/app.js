@@ -7,7 +7,6 @@ import moodsRouter from "./routes/moods-routes.js";
 import errorHandler from "./middleware/error-middleware.js";
 import { fileURLToPath } from 'url'
 import path from 'path'
-import fs from 'fs'
 
 const app = express();
 

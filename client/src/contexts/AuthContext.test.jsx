@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, act, fireEvent } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  act,
+  fireEvent,
+} from "@testing-library/react";
 import React, { useState } from "react";
 import AuthProvider, { AuthContext } from "./AuthContext";
 import axiosInstance from "../utils/axiosInstance.js";
@@ -9,7 +15,8 @@ import MockAdapter from "axios-mock-adapter";
 const mock = new MockAdapter(axiosInstance);
 
 function TestConsumer() {
-  const { user, loading, login, register, logout } = React.useContext(AuthContext);
+  const { user, loading, login, register, logout } =
+    React.useContext(AuthContext);
   const [protectedData, setProtectedData] = useState(null);
   const [protectedError, setProtectedError] = useState(null);
 
@@ -35,9 +42,10 @@ function TestConsumer() {
       ) : (
         <p data-testid="user-display">No user</p>
       )}
-
       //buttons to test authentication flows
-      <button onClick={() => login({ identifier: "myuser", password: "mypass" })}>
+      <button
+        onClick={() => login({ identifier: "myuser", password: "mypass" })}
+      >
         Test Login
       </button>
       <button
@@ -52,17 +60,13 @@ function TestConsumer() {
         Test Register
       </button>
       <button onClick={() => logout()}>Test Logout</button>
-
       //button to trigger fetching of protected data
       <button onClick={fetchProtectedData}>Fetch Protected Data</button>
-
       //display fetched protected data or error messages
       {protectedData && (
         <p data-testid="protected-data">{JSON.stringify(protectedData)}</p>
       )}
-      {protectedError && (
-        <p data-testid="protected-error">{protectedError}</p>
-      )}
+      {protectedError && <p data-testid="protected-error">{protectedError}</p>}
     </div>
   );
 }
@@ -443,7 +447,9 @@ describe("AuthProvider", () => {
 
     //verify that the cached user's username is displayed
     await waitFor(() => {
-      expect(screen.getByTestId("user-display")).toHaveTextContent("CachedUser");
+      expect(screen.getByTestId("user-display")).toHaveTextContent(
+        "CachedUser",
+      );
     });
 
     //simulate fetching protected data, which should trigger a token refresh

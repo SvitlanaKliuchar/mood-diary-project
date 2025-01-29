@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import axiosInstance, { setupInterceptors } from "../utils/axiosInstance.js";
 
 export const AuthContext = createContext(null);
@@ -7,16 +7,28 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const logout = async () => {
+    try {
+      const res = await axiosInstance.post("/auth/logout");
+      if (res.status === 200) {
+        setUser(null);
+        localStorage.removeItem("user");
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("Error logging out:", err);
+      return false;
+    }
+  };
+
   useEffect(() => {
-    setupInterceptors({
-      logout
-    })
-  }, [])
+    setupInterceptors({ logout });
+  }, []);
 
   useEffect(() => {
     const cachedUser = localStorage.getItem("user");
     if (cachedUser) {
-      console.log("Cached user data:", cachedUser);
       setUser(JSON.parse(cachedUser));
       setLoading(false);
     } else {
@@ -24,18 +36,14 @@ const AuthProvider = ({ children }) => {
         try {
           const { data } = await axiosInstance.get("/auth/me");
           if (data?.user) {
-            console.log(
-              "User data was fetched successfully and is now going to be stored in localStorage",
-              data.user,
-            );
             setUser(data.user);
             localStorage.setItem("user", JSON.stringify(data.user));
           }
         } catch (err) {
           if (err.response?.status === 401) {
-            console.log("No user logged in (401)");
+            console.log("No user logged in");
           } else {
-            console.error("Error checking user data: ", err.message);
+            console.error("Error checking user data:", err.message);
           }
         } finally {
           setLoading(false);
@@ -44,69 +52,38 @@ const AuthProvider = ({ children }) => {
       checkUser();
     }
   }, []);
-  
+
   const login = async (credentials) => {
     try {
-      const { data, status } = await axiosInstance.post(
-        "/auth/login",
-        credentials,
-        {
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      const { data, status } = await axiosInstance.post("/auth/login", credentials, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (status === 200 && data?.user) {
         setUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));
         return true;
-      } else {
-        console.error("Login failed: Unexpected response", data);
-        return false;
       }
+      return false;
     } catch (err) {
-      console.error("Error during login: ", err);
+      console.error("Error during login:", err);
       return false;
     }
   };
 
   const register = async (credentials) => {
     try {
-      const { data, status } = await axiosInstance.post(
-        "/auth/register",
-        credentials,
-        {
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-
+      const { data, status } = await axiosInstance.post("/auth/register", credentials, {
+        headers: { "Content-Type": "application/json" },
+      });
       if (status === 201 && data?.user) {
         setUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));
         return true;
-      } else {
-        console.error("Registration failed: Unexpected response", data);
-        return false;
-      }
-    } catch (err) {
-      console.error("Error during registration: ", err);
-      return false;
-    }
-  };
-
-  const logout = async () => {
-    try {
-      const res = await axiosInstance.post(
-        "/auth/logout",
-        {}
-      );
-      if (res.status === 200) {
-        setUser(null);
-        localStorage.removeItem("user");
-        return true;
       }
       return false;
     } catch (err) {
-      console.error("Error during user logout: ", err);
+      console.error("Error during registration:", err);
       return false;
     }
   };

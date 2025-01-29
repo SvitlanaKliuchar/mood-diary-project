@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { format, subMonths, addMonths } from "date-fns";
 import styles from "./Home.module.css";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const Header = () => {
   const [displayedDate, setDisplayedDate] = useState(new Date());
+
+  const { user } = useContext(AuthContext);
 
   const handlePrevMonth = () => {
     setDisplayedDate((prevDate) => subMonths(prevDate, 1));
@@ -34,7 +37,7 @@ const Header = () => {
       </nav>
       <div className={styles["header-content"]}>
         <h2 className={styles["header-text"]}>
-          Share how you've been feeling today, username
+          Share how you've been feeling today, {user ? user.username : "user"}
         </h2>
       </div>
       <a

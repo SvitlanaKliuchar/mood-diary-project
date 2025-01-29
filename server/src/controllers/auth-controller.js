@@ -42,19 +42,30 @@ export const login = async (req, res, next) => {
     console.log("Generated Access Token:", accessToken);
     console.log("Generated Refresh Token:", refreshToken);
 
+    //store refresh token in the db
+    await prisma.refreshTokens.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      }
+    })
+
     //set cookies: access_token & refresh_token
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 15 * 60 * 1000, //15min
+      path: "/"
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
+      path: "/"
     });
 
     res.status(200).json({
@@ -105,19 +116,30 @@ export const register = async (req, res, next) => {
     const accessToken = signAccessToken({ sub: newUser.id });
     const refreshToken = signRefreshToken({ sub: newUser.id });
 
+    //store refresh token in the db
+    await prisma.refreshTokens.create({
+      data: {
+        token: refreshToken,
+        userId: newUser.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      }
+    })
+
     //set cookies: access_token & refresh_token
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 15 * 60 * 1000, //15min
+      path: "/"
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
+      path: "/"
     });
 
     res.status(201).json({
@@ -148,36 +170,58 @@ export const refresh = async (req, res, next) => {
       return res.status(401).json({ error: "No refresh token provided" });
     }
 
-    //verify refresh token
-    let decoded;
-    try {
-      decoded = verifyRefreshToken(refreshToken);
-    } catch (err) {
-      return res
-        .status(403)
-        .json({ error: "Invalid or expired refresh token" });
+    //verify refresh token exists in db and hasnt expired
+    const storedToken = await prisma.refreshTokens.findFirst({
+      where: {
+        token: refreshToken,
+        expiresAt: { gt: new Date() }
+      },
+      include: { user: true }
+    })
+    if (!storedToken) {
+      return res.status(403).json({ error: "Invalid refresh token, not present in db" })
     }
 
-    //check if user is still valid, not deleted etc
-    const user = await prisma.users.findUnique({ where: { id: decoded.sub } });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    //verify jwt
+    const decoded = verifyRefreshToken(refreshToken);
+    if (decoded.sub !== storedToken.userId) {
+      return res.status(403).json({ error: "Token mismatch" });
     }
 
-    //if all is good, sign a new access token
-    const newAccessToken = signAccessToken({ sub: user.id });
 
-    //set it in cookie again (fresh 15min)
+    //if all is good, generate new tokens
+    const newAccessToken = signAccessToken({ sub: storedToken.userId });
+    const newRefreshToken = signRefreshToken({ sub: storedToken.userId })
+
+    //update token in db
+    await prisma.refreshTokens.update({
+      where: { id: storedToken.id },
+      data: {
+        token: newRefreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      }
+    });
+
+
+    //set new cookies
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: "none",
       maxAge: 15 * 60 * 1000,
+      path: "/"
+    });
+
+    res.cookie("refresh_token", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/"
     });
 
     return res.json({
       message: "Access token refreshed successfully!",
-      // no need to re-set refresh_token here since it's still valid
     });
   } catch (err) {
     next(err);
@@ -186,19 +230,29 @@ export const refresh = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    //clear both cookies
+    const refreshToken = req.cookies.refresh_token;
+
+    //remove token from database if it exists
+    if (refreshToken) {
+      await prisma.refreshTokens.deleteMany({
+        where: { token: refreshToken }
+      });
+    }
+
+    //clear cookies
     res.clearCookie("access_token", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: "none",
+      path: "/"
     });
+    
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: "none",
+      path: "/"
     });
-    console.log("Access Token (After Clear):", req.cookies.access_token);
-    console.log("Refresh Token (After Clear):", req.cookies.refresh_token);
 
     return res.json({ message: "Logged out successfully" });
   } catch (err) {

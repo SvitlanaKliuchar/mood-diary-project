@@ -39,7 +39,7 @@ export const createMood = async (req, res, next) => {
 export const getMoods = async (req, res, next) => {
   try {
     //validate query parameters
-    const { date } = getMoodsQuerySchema.parse(req.body);
+    const { date } = getMoodsQuerySchema.parse(req.query);
 
     const userId = req.user.id;
     let moods;
@@ -56,7 +56,7 @@ export const getMoods = async (req, res, next) => {
       //retrieve moods for the specified date
       moods = await prisma.moods.findMany({
         where: {
-          userId,
+          user_id: userId,
           date: {
             gte: parsedDate,
             lt: endOfDay,
@@ -67,7 +67,7 @@ export const getMoods = async (req, res, next) => {
     } else {
       //retrieve all moods for the user
       moods = await prisma.moods.findMany({
-        where: { userId },
+        where: { user_id: userId },
         orderBy: { date: "asc" },
       });
     }
