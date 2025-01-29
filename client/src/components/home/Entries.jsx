@@ -1,0 +1,133 @@
+import React, { useContext, useEffect, useState } from "react";
+import styles from "./Home.module.css";
+import { AuthContext } from "../../contexts/AuthContext";
+import axiosInstance from "../../utils/axiosInstance";
+import moods from "../../data/moods.js";
+
+const Entries = () => {
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const { user, loading: authLoading } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (!authLoading) {
+      const fetchEntries = async () => {
+        try {
+          const response = await axiosInstance.get("/moods");
+          console.log("Fetched moods: ", response.data);
+          setEntries(response.data);
+          setError(null);
+        } catch (err) {
+          if (err.response) {
+            setError(err.response.data.message || "Failed to fetch entries.");
+          } else if (err.request) {
+            setError("No response from server. Please try again later.");
+          } else {
+            setError("An unexpected error occurred.");
+            throw err
+          }
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchEntries();
+    }
+  }, [authLoading]);
+
+  // helper function to find the appropriate icon for a given mood
+  const getMoodIcon = (moodValue) => {
+    const found = moods.find((m) => m.value === moodValue);
+    return found?.iconUrl || "/src/assets/icons/moods/great.svg";
+  };
+
+  // helper functions to format date and time
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
+
+  return (
+    <div className={styles.wrapper}>
+      {/* show a loading indicator until the data is fetched */}
+      {loading && <div className={styles.loading}>Loading entries...</div>}
+
+      {/* if loading is done and we have entries, display them */}
+      {!loading && entries.length > 0 && (
+        <div className={styles["all-entries-container"]}>
+          {entries.map((entry) => {
+            const iconUrl = getMoodIcon(entry.mood);
+            const dateText = formatDate(entry.date);
+            const timeText = formatTime(entry.date);
+
+            return (
+              <div className={styles["entry-container"]} key={entry.id}>
+                <div className={styles.mood}>
+                  <img
+                    className={styles.emoji}
+                    src={iconUrl}
+                    alt={`${entry.mood} emoji`}
+                  />
+                  <span>{entry.mood}</span>
+                </div>
+
+                <div className={styles["date-time"]}>
+                  <h3 className={styles.date}>{dateText}</h3>
+                  <div className={styles.time}>{timeText}</div>
+                </div>
+
+                <ul className={styles["mood-tags"]}>
+                  {entry.emotions?.map((emotion, idx) => (
+                    <li key={idx} className={styles["mood-tag"]}>
+                      {emotion}
+                    </li>
+                  ))}
+                  {entry.sleep?.map((sleep, idx) => (
+                    <li key={idx} className={styles['mood-tag']}>
+                      {sleep}
+                    </li>
+                  ))}
+                  {entry.productivity?.map((productivity, idx) => (
+                    <li key={idx} className={styles['mood-tag']}>
+                      {productivity}
+                    </li>
+                  ))}
+                </ul>
+                {/* TODO: render other fields like entry.note or entry.photoUrl here */}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* if loading is done but no entries were returned, show a fallback message */}
+      {!loading && entries.length === 0 && (
+        <div className={styles.noEntries}>No entries found.</div>
+      )}
+
+      <div className={styles["first-entry-indicator"]}>
+        &#9650;
+        <span>This was your first entry</span>
+      </div>
+    </div>
+  );
+};
+
+export default Entries;

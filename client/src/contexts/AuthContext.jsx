@@ -24,9 +24,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     setupInterceptors({ logout });
-  }, []);
 
-  useEffect(() => {
     const cachedUser = localStorage.getItem("user");
     if (cachedUser) {
       setUser(JSON.parse(cachedUser));
@@ -52,6 +50,7 @@ const AuthProvider = ({ children }) => {
       checkUser();
     }
   }, []);
+
 
   const login = async (credentials) => {
     try {
