@@ -3,9 +3,10 @@ import styles from "./Home.module.css";
 import { AuthContext } from "../../contexts/AuthContext";
 import axiosInstance from "../../utils/axiosInstance";
 import moods from "../../data/moods.js";
+import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 
 const Entries = () => {
-  const [entries, setEntries] = useState([]);
+  const { entries, refreshEntries } = useContext(EntriesContext)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -15,9 +16,7 @@ const Entries = () => {
     if (!authLoading) {
       const fetchEntries = async () => {
         try {
-          const response = await axiosInstance.get("/moods");
-          console.log("Fetched moods: ", response.data);
-          setEntries(response.data);
+          await refreshEntries();
           setError(null);
         } catch (err) {
           if (err.response) {
@@ -72,48 +71,50 @@ const Entries = () => {
       {/* if loading is done and we have entries, display them */}
       {!loading && entries.length > 0 && (
         <div className={styles["all-entries-container"]}>
-          {entries.map((entry) => {
-            const iconUrl = getMoodIcon(entry.mood);
-            const dateText = formatDate(entry.date);
-            const timeText = formatTime(entry.date);
+          {entries.slice() 
+            .sort((a, b) => new Date(b.date) - new Date(a.date)) 
+            .map((entry) => {
+              const iconUrl = getMoodIcon(entry.mood);
+              const dateText = formatDate(entry.date);
+              const timeText = formatTime(entry.date);
 
-            return (
-              <div className={styles["entry-container"]} key={entry.id}>
-                <div className={styles.mood}>
-                  <img
-                    className={styles.emoji}
-                    src={iconUrl}
-                    alt={`${entry.mood} emoji`}
-                  />
-                  <span>{entry.mood}</span>
+              return (
+                <div className={styles["entry-container"]} key={entry.id}>
+                  <div className={styles.mood}>
+                    <img
+                      className={styles.emoji}
+                      src={iconUrl}
+                      alt={`${entry.mood} emoji`}
+                    />
+                    <span>{entry.mood}</span>
+                  </div>
+
+                  <div className={styles["date-time"]}>
+                    <h3 className={styles.date}>{dateText}</h3>
+                    <div className={styles.time}>{timeText}</div>
+                  </div>
+
+                  <ul className={styles["mood-tags"]}>
+                    {entry.emotions?.map((emotion, idx) => (
+                      <li key={idx} className={styles["mood-tag"]}>
+                        {emotion}
+                      </li>
+                    ))}
+                    {entry.sleep?.map((sleep, idx) => (
+                      <li key={idx} className={styles["mood-tag"]}>
+                        {sleep}
+                      </li>
+                    ))}
+                    {entry.productivity?.map((productivity, idx) => (
+                      <li key={idx} className={styles["mood-tag"]}>
+                        {productivity}
+                      </li>
+                    ))}
+                  </ul>
+                  {/* TODO: render other fields like entry.note or entry.photoUrl here */}
                 </div>
-
-                <div className={styles["date-time"]}>
-                  <h3 className={styles.date}>{dateText}</h3>
-                  <div className={styles.time}>{timeText}</div>
-                </div>
-
-                <ul className={styles["mood-tags"]}>
-                  {entry.emotions?.map((emotion, idx) => (
-                    <li key={idx} className={styles["mood-tag"]}>
-                      {emotion}
-                    </li>
-                  ))}
-                  {entry.sleep?.map((sleep, idx) => (
-                    <li key={idx} className={styles["mood-tag"]}>
-                      {sleep}
-                    </li>
-                  ))}
-                  {entry.productivity?.map((productivity, idx) => (
-                    <li key={idx} className={styles["mood-tag"]}>
-                      {productivity}
-                    </li>
-                  ))}
-                </ul>
-                {/* TODO: render other fields like entry.note or entry.photoUrl here */}
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       )}
 

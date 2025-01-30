@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance.js";
 import EntryMoodDate from "./EntryMoodDate.jsx";
 import EntryMain from "./EntryMain.jsx";
 import SubmitButton from "./form-elements/SubmitButton.jsx";
 import styles from "./EntryForm.module.css";
+import { useNavigate } from "react-router-dom";
+import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 
 const EntryForm = () => {
+  const navigate = useNavigate()
+  const { addEntry, refreshEntries } = useContext(EntriesContext)
   //form state
   const [date, setDate] = useState(new Date());
   const [mood, setMood] = useState("");
@@ -56,6 +60,9 @@ const EntryForm = () => {
 
       setSuccess("Entry added successfully!");
 
+      //add the new entry to the context
+      addEntry(response.data)
+
       //reset form fields
       setDate(new Date());
       setMood("");
@@ -64,8 +71,9 @@ const EntryForm = () => {
       setProductivity([]);
       setNote("");
       setPhoto(null);
-      // TODO: trigger a refresh or update to the entries list on the home page
-      // this could be done via state lifting, Context API, or other state management solutions
+      
+      //navigate to home page after successful submission
+      navigate("/home")
     } catch (err) {
       setError(
         err.response?.data?.message ||
