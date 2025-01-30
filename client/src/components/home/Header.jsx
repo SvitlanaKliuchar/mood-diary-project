@@ -2,17 +2,25 @@ import React, { useContext, useState } from "react";
 import { format, subMonths, addMonths } from "date-fns";
 import styles from "./Home.module.css";
 import { AuthContext } from "../../contexts/AuthContext";
+import { EntriesContext } from "../../contexts/EntriesContext";
 
 const Header = () => {
-  const [displayedDate, setDisplayedDate] = useState(new Date());
-
+  const { displayedDate, setDisplayedDate, refreshEntries } = useContext(EntriesContext)
   const { user } = useContext(AuthContext);
 
   const handlePrevMonth = () => {
-    setDisplayedDate((prevDate) => subMonths(prevDate, 1));
+    setDisplayedDate((prevDate) => {
+      const newDate = subMonths(prevDate, 1)
+      refreshEntries()
+      return newDate
+    });
   };
   const handleNextMonth = () => {
-    setDisplayedDate((prevDate) => addMonths(prevDate, 1));
+    setDisplayedDate((prevDate) => {
+      const newDate = addMonths(prevDate, 1)
+      refreshEntries()
+      return newDate
+    });
   };
   const formattedDate = format(displayedDate, "MMMM yyyy");
 

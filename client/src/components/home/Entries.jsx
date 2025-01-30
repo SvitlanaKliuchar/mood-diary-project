@@ -6,7 +6,7 @@ import moods from "../../data/moods.js";
 import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 
 const Entries = () => {
-  const { entries, refreshEntries } = useContext(EntriesContext)
+  const { entries, refreshEntries, displayedDate } = useContext(EntriesContext)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -33,7 +33,7 @@ const Entries = () => {
       };
       fetchEntries();
     }
-  }, [authLoading]);
+  }, [authLoading, displayedDate]);
 
   // helper function to find the appropriate icon for a given mood
   const getMoodIcon = (moodValue) => {
@@ -71,8 +71,7 @@ const Entries = () => {
       {/* if loading is done and we have entries, display them */}
       {!loading && entries.length > 0 && (
         <div className={styles["all-entries-container"]}>
-          {entries.slice() 
-            .sort((a, b) => new Date(b.date) - new Date(a.date)) 
+          {entries
             .map((entry) => {
               const iconUrl = getMoodIcon(entry.mood);
               const dateText = formatDate(entry.date);

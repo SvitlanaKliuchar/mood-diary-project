@@ -5,6 +5,7 @@ export const EntriesContext = createContext(null)
 
 export const EntriesProvider = ({ children }) => {
     const [entries, setEntries] = useState([])
+    const [displayedDate, setDisplayedDate] = useState(new Date())
 
     const addEntry = (newEntry) => {
         setEntries(prevEntries => [newEntry, ...prevEntries])
@@ -12,8 +13,15 @@ export const EntriesProvider = ({ children }) => {
 
     const refreshEntries = async () => {
         try {
-            const response = await axiosInstance.get("/moods")
-            console.log("Fetched moods: ", response.data)
+            const startOfMonth = new Date(displayedDate.getFullYear(), displayedDate.getMonth(), 1)
+            const endOfMonth = new Date(displayedDate.getFullYear(), displayedDate.getMonth() + 1, 0)
+
+            const response = await axiosInstance.get("/moods", {
+                params: {
+                    start: startOfMonth.toISOString(),
+                    end: endOfMonth.toISOString()
+                }
+            })
             setEntries(response.data)
         } catch (error) {
             console.error("Failed to fetch entries: ", error)  
@@ -21,7 +29,7 @@ export const EntriesProvider = ({ children }) => {
         }
     }
     return (
-        <EntriesContext.Provider value={{entries, addEntry, refreshEntries}}>
+        <EntriesContext.Provider value={{entries, addEntry, refreshEntries, displayedDate, setDisplayedDate}}>
             {children}
         </EntriesContext.Provider>
     )
