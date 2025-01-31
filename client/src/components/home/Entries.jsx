@@ -4,18 +4,23 @@ import { AuthContext } from "../../contexts/AuthContext";
 import axiosInstance from "../../utils/axiosInstance";
 import moods from "../../data/moods.js";
 import { EntriesContext } from "../../contexts/EntriesContext.jsx";
+import { LoadingContext } from "../../contexts/LoadingContext.jsx";
 
 const Entries = () => {
   const { entries, refreshEntries, displayedDate } = useContext(EntriesContext)
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
   const { user, loading: authLoading } = useContext(AuthContext);
+  const { startLoading, finishLoading, loadingCount } = useContext(LoadingContext)
+
+  const isLoading = loadingCount > 0
 
   useEffect(() => {
     if (!authLoading) {
       const fetchEntries = async () => {
         try {
+          startLoading()
           await refreshEntries();
           setError(null);
         } catch (err) {
@@ -28,14 +33,13 @@ const Entries = () => {
             throw err;
           }
         } finally {
-          setLoading(false);
+          finishLoading()
         }
       };
       fetchEntries();
-      
+
     }
   }, [authLoading, displayedDate]);
-  console.log("Entries being rendered:", entries.map(e => e.date));
 
 
   // helper function to find the appropriate icon for a given mood
@@ -68,11 +72,8 @@ const Entries = () => {
 
   return (
     <div className={styles.wrapper}>
-      {/* show a loading indicator until the data is fetched */}
-      {loading && <div className={styles.loading}>Loading entries...</div>}
-
       {/* if loading is done and we have entries, display them */}
-      {!loading && entries.length > 0 && (
+      {!isLoading && entries.length > 0 && (
         <div className={styles["all-entries-container"]}>
           {entries
             .map((entry) => {
@@ -98,17 +99,17 @@ const Entries = () => {
 
                   <ul className={styles["mood-tags"]}>
                     {entry.emotions?.map((emotion, idx) => (
-                      <li key={idx} className={styles["mood-tag"]}>
+                      <li key={`emotions-${entry.id}-${idx}`} className={styles["mood-tag"]}>
                         {emotion}
                       </li>
                     ))}
                     {entry.sleep?.map((sleep, idx) => (
-                      <li key={idx} className={styles["mood-tag"]}>
+                      <li key={`sleep-${entry.id}-${idx}`} className={styles["mood-tag"]}>
                         {sleep}
                       </li>
                     ))}
                     {entry.productivity?.map((productivity, idx) => (
-                      <li key={idx} className={styles["mood-tag"]}>
+                      <li key={`productivity-${entry.id}-${idx}`} className={styles["mood-tag"]}>
                         {productivity}
                       </li>
                     ))}
@@ -121,14 +122,16 @@ const Entries = () => {
       )}
 
       {/* if loading is done but no entries were returned, show a fallback message */}
-      {!loading && entries.length === 0 && (
+      {!isLoading && entries.length === 0 && (
         <div className={styles.noEntries}>No entries found.</div>
       )}
 
-      <div className={styles["first-entry-indicator"]}>
-        &#9650;
-        <span>This was your first entry</span>
-      </div>
+      {entries.length > 0 ? (<>
+        <div className={styles["first-entry-indicator"]}>
+          &#9650;
+          <span>This was your first entry</span>
+        </div>
+      </>) : <></>}
     </div>
   );
 };

@@ -6,10 +6,12 @@ import SubmitButton from "./form-elements/SubmitButton.jsx";
 import styles from "./EntryForm.module.css";
 import { useNavigate } from "react-router-dom";
 import { EntriesContext } from "../../contexts/EntriesContext.jsx";
+import { LoadingContext } from "../../contexts/LoadingContext.jsx";
 
 const EntryForm = () => {
   const navigate = useNavigate()
   const { addEntry } = useContext(EntriesContext)
+  const { startLoading, finishLoading } = useContext(LoadingContext)
   //form state
   const [date, setDate] = useState(new Date());
   const [mood, setMood] = useState("");
@@ -20,21 +22,21 @@ const EntryForm = () => {
   const [photo, setPhoto] = useState(null);
 
   //submission state
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+  const [success, setSuccess] = useState(null)
+
 
   //handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    startLoading()
     setError(null);
     setSuccess(null);
 
     //basic validation TODO: implement robust validation both client and server side
     if (!date || !mood) {
       setError("Please select both date and mood.");
-      setLoading(false);
+      finishLoading()
       return;
     }
 
@@ -60,8 +62,10 @@ const EntryForm = () => {
 
       setSuccess("Entry added successfully!");
 
+      const { mood: newMood } = response.data
+
       //add the new entry to the context
-      addEntry(response.data)
+      addEntry(newMood)
 
       //reset form fields
       setDate(new Date());
@@ -80,7 +84,7 @@ const EntryForm = () => {
           "An error occured while submitting your entry",
       );
     } finally {
-      setLoading(false);
+      finishLoading()
     }
   };
 
@@ -106,7 +110,7 @@ const EntryForm = () => {
         setPhoto={setPhoto}
       />
 
-      <SubmitButton loading={loading} />
+      <SubmitButton />
 
       {error && <p className={styles.error}>{error}</p>}
       {success && <p className={styles.success}>{success}</p>}

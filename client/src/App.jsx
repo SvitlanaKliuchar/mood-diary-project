@@ -11,9 +11,12 @@ import Home from "./pages/Home.jsx";
 import "./App.css";
 import "./index.css";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import LoadingSpinner from "./components/loading/LoadingSpinner.jsx";
 
 function App() {
   return (
+    <>
+    <LoadingSpinner />
     <Router>
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -28,6 +31,7 @@ function App() {
         </Route>
       </Routes>
     </Router>
+    </>
   );
 }
 
