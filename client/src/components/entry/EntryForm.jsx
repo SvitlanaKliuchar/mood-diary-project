@@ -9,7 +9,7 @@ import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 
 const EntryForm = () => {
   const navigate = useNavigate()
-  const { addEntry, refreshEntries } = useContext(EntriesContext)
+  const { addEntry } = useContext(EntriesContext)
   //form state
   const [date, setDate] = useState(new Date());
   const [mood, setMood] = useState("");

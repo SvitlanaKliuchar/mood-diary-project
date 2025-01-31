@@ -32,8 +32,11 @@ const Entries = () => {
         }
       };
       fetchEntries();
+      
     }
   }, [authLoading, displayedDate]);
+  console.log("Entries being rendered:", entries.map(e => e.date));
+
 
   // helper function to find the appropriate icon for a given mood
   const getMoodIcon = (moodValue) => {

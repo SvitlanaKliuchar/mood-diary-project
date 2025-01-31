@@ -13,8 +13,9 @@ export const EntriesProvider = ({ children }) => {
 
     const refreshEntries = async () => {
         try {
-            const startOfMonth = new Date(displayedDate.getFullYear(), displayedDate.getMonth(), 1)
-            const endOfMonth = new Date(displayedDate.getFullYear(), displayedDate.getMonth() + 1, 0)
+        const startOfMonth = new Date(Date.UTC(displayedDate.getFullYear(), displayedDate.getMonth(), 1));
+        
+        const endOfMonth = new Date(Date.UTC(displayedDate.getFullYear(), displayedDate.getMonth() + 1, 0, 23, 59, 59, 999));
 
             const response = await axiosInstance.get("/moods", {
                 params: {

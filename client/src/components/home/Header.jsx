@@ -11,14 +11,12 @@ const Header = () => {
   const handlePrevMonth = () => {
     setDisplayedDate((prevDate) => {
       const newDate = subMonths(prevDate, 1)
-      refreshEntries()
       return newDate
     });
   };
   const handleNextMonth = () => {
     setDisplayedDate((prevDate) => {
       const newDate = addMonths(prevDate, 1)
-      refreshEntries()
       return newDate
     });
   };
