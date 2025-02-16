@@ -7,6 +7,7 @@ import moodsRouter from "./routes/moods-routes.js";
 import errorHandler from "./middleware/error-middleware.js";
 import { fileURLToPath } from 'url'
 import path from 'path'
+import statsRouter from "./routes/stats-routes.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads
 //routes
 app.use("/auth", authRouter);
 app.use("/moods", moodsRouter);
+app.use("/stats", statsRouter)
 
 //error handling middlewares
 app.use(errorHandler);
