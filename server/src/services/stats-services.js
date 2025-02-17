@@ -61,26 +61,32 @@ function combineFactors(moodRecord) {
 }
 
 //to calculate streak
-const calculateStreak = (entries) => {
-    if (!entries.length) return 0
+function calculateStreak(entries) {
+    if (!entries.length) return 0;
 
-    let currentStreak = 1
-    let lastDate = new Date(entries[0].date)
+    let currentStreak = 1;
+    //normalize the first date to midnight
+    let lastDate = new Date(entries[0].date);
+    lastDate.setHours(0, 0, 0, 0);
 
     for (let i = 1; i < entries.length; i++) {
-        const entryDate = new Date(entries[i].date)
-        const diffDays = Math.floor((lastDate - entryDate) / (1000 * 60 * 60 * 24))
+        let entryDate = new Date(entries[i].date);
+        entryDate.setHours(0, 0, 0, 0);
 
-        //if the difference is 1 day or 0 days (same day) => continue streak
-        if (diffDays <= 1) {
+        const diffDays = (lastDate - entryDate) / (1000 * 60 * 60 * 24);
+
+        //if exactly 1 day apart, continue streak
+        if (diffDays === 1) {
             currentStreak++;
             lastDate = entryDate;
         } else {
             break;
         }
     }
-    return currentStreak
+
+    return currentStreak;
 }
+
 
 //to convert mood to number scale
 const moodToNumber = (mood) => {
