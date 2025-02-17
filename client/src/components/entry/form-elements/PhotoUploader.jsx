@@ -1,6 +1,8 @@
 import React, { useRef } from "react";
 import PropTypes from "prop-types";
 import styles from "./FormElements.module.css";
+import galleryIcon from '../../../assets/icons/entry/gallery.svg'
+import photoIcon from '../../../assets/icons/entry/photo.svg'
 
 const PhotoUploader = ({ photo, setPhoto }) => {
   const fileInputRef = useRef(null);
@@ -24,7 +26,7 @@ const PhotoUploader = ({ photo, setPhoto }) => {
     <div className={styles["photo-uploader"]}>
       <label className={styles.label}>
         <img
-          src="src/assets/icons/entry/gallery.svg"
+          src={galleryIcon}
           alt=""
           className={styles["add-photo-icon"]}
         />
@@ -37,7 +39,7 @@ const PhotoUploader = ({ photo, setPhoto }) => {
           className={styles["upload-button"]}
         >
           <img
-            src="src/assets/icons/entry/photo.svg"
+            src={photoIcon}
             alt=""
             className={styles["upload-icon"]}
           />
@@ -49,7 +51,7 @@ const PhotoUploader = ({ photo, setPhoto }) => {
           className={styles["upload-button"]}
         >
           <img
-            src="src/assets/icons/entry/gallery.svg"
+            src={galleryIcon}
             alt=""
             className={styles["upload-icon"]}
           />

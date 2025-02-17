@@ -3,6 +3,7 @@ import styles from "./EntryForm.module.css";
 import DatePickerComponent from "./form-elements/DatePickerComponent.jsx";
 import MoodSelector from "./form-elements/MoodSelector.jsx";
 import PropTypes from "prop-types";
+import calendarIcon from '../../assets/icons/other/calendar-icon.svg'
 
 const EntryMoodDate = ({ mood, setMood, date, setDate }) => {
   return (
@@ -12,7 +13,7 @@ const EntryMoodDate = ({ mood, setMood, date, setDate }) => {
       <div className={styles["date-picker-container"]}>
         <img
           className={styles["calendar-icon"]}
-          src="src/assets/icons/other/calendar-icon.svg"
+          src={calendarIcon}
           alt=""
         />
         <DatePickerComponent selectedDate={date} onDateChange={setDate} />

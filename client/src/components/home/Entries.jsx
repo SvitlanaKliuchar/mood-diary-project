@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import styles from "./Home.module.css";
 import { AuthContext } from "../../contexts/AuthContext";
-import axiosInstance from "../../utils/axiosInstance";
 import moods from "../../data/moods.js";
 import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 import { LoadingContext } from "../../contexts/LoadingContext.jsx";
+import { useNavigate } from "react-router-dom";
+
 
 const Entries = () => {
-  const { entries, refreshEntries, displayedDate } = useContext(EntriesContext)
+  const { entries, refreshEntries, displayedDate, updateEntry, deleteEntry } = useContext(EntriesContext)
   const [error, setError] = useState(null);
 
 
@@ -15,6 +16,7 @@ const Entries = () => {
   const { startLoading, finishLoading, loadingCount } = useContext(LoadingContext)
 
   const isLoading = loadingCount > 0
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!authLoading) {
@@ -40,6 +42,14 @@ const Entries = () => {
 
     }
   }, [authLoading, displayedDate]);
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteEntry(id)
+    } catch (error) {
+      setError("Failed to delete entry")
+    }
+  }
 
 
   // helper function to find the appropriate icon for a given mood
@@ -113,7 +123,20 @@ const Entries = () => {
                         {productivity}
                       </li>
                     ))}
+
                   </ul>
+                  <div className={styles["update-delete-container"]}>
+                    <button
+                      onClick={() => navigate(`/entry/${entry.id}`)}
+                      className={styles["update-btn"]}
+                      aria-label="Update Mood Entry"
+                    ></button>
+                    <button
+                      onClick={() => handleDelete(entry.id)}
+                      className={styles["delete-btn"]}
+                      aria-label="Delete Mood Entry"
+                    ></button>
+                  </div>
                   {/* TODO: render other fields like entry.note or entry.photoUrl here */}
                 </div>
               );

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import styles from "./LoadingSpinner.module.css";
 import { LoadingContext } from "../../contexts/LoadingContext";
 
-const LoadingSpinner = ( {delay = 200} ) => {
+const LoadingSpinner = ( {delay = 300} ) => {
   const { loadingCount } = useContext(LoadingContext)
   const [showSpinner, setShowSpinner] = useState(false)
 

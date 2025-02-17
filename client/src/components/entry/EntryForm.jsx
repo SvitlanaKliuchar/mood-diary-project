@@ -1,17 +1,21 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance.js";
 import EntryMoodDate from "./EntryMoodDate.jsx";
 import EntryMain from "./EntryMain.jsx";
 import SubmitButton from "./form-elements/SubmitButton.jsx";
 import styles from "./EntryForm.module.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 import { LoadingContext } from "../../contexts/LoadingContext.jsx";
 
 const EntryForm = () => {
+  const { id } = useParams()
+  const isEditing = !!id //true if id is present, false if not
+
   const navigate = useNavigate()
-  const { addEntry } = useContext(EntriesContext)
+  const { addEntry, entries, updateEntry } = useContext(EntriesContext)
   const { startLoading, finishLoading } = useContext(LoadingContext)
+
   //form state
   const [date, setDate] = useState(new Date());
   const [mood, setMood] = useState("");
@@ -25,6 +29,24 @@ const EntryForm = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null)
 
+  //if editing, preload existing data
+  useEffect(() => {
+    if (!isEditing) return
+
+    //the entry is already in context (entries)
+    const existingEntry = entries.find((e) => e.id === Number(id))
+    
+    if (existingEntry) {
+      //populate local state
+      setDate(new Date(existingEntry.date));
+      setMood(existingEntry.mood);
+      setEmotions(existingEntry.emotions || []);
+      setSleep(existingEntry.sleep || []);
+      setProductivity(existingEntry.productivity || []);
+      setNote(existingEntry.note || "");
+    }
+
+  }, [id, isEditing, entries])
 
   //handle form submission
   const handleSubmit = async (e) => {
@@ -33,7 +55,8 @@ const EntryForm = () => {
     setError(null);
     setSuccess(null);
 
-    //basic validation TODO: implement robust validation both client and server side
+    //basic validation
+    //TODO: implement robust validation both client and server side
     if (!date || !mood) {
       setError("Please select both date and mood.");
       finishLoading()
@@ -53,31 +76,37 @@ const EntryForm = () => {
     }
 
     try {
-      //call api
-      const response = await axiosInstance.post("/moods", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      if (isEditing) {
+        await updateEntry(id, formData)
+        setSuccess("Entry updated successfully!")
 
-      setSuccess("Entry added successfully!");
-
-      const { mood: newMood } = response.data
-
-      //add the new entry to the context
-      addEntry(newMood)
-
-      //reset form fields
-      setDate(new Date());
-      setMood("");
-      setEmotions([]);
-      setSleep([]);
-      setProductivity([]);
-      setNote("");
-      setPhoto(null);
-      
-      //navigate to home page after successful submission
-      navigate("/home")
+        navigate("/home")
+      } else {
+        const response = await axiosInstance.post("/moods", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+  
+        setSuccess("Entry added successfully!");
+  
+        const { mood: newMood } = response.data
+  
+        //add the new entry to the context
+        addEntry(newMood)
+  
+        //reset form fields
+        setDate(new Date());
+        setMood("");
+        setEmotions([]);
+        setSleep([]);
+        setProductivity([]);
+        setNote("");
+        setPhoto(null);
+        
+        //navigate to home page after successful submission
+        navigate("/home")
+      }
     } catch (err) {
       setError(
         err.response?.data?.message ||

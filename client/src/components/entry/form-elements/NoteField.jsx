@@ -1,13 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styles from "./FormElements.module.css";
+import noteIcon from '../../../assets/icons/entry/note.svg'
 
 const NoteField = ({ note, setNote }) => {
   return (
     <div className={styles["note-field"]}>
       <label htmlFor="quick-note" className={styles.label}>
         <img
-          src="src/assets/icons/entry/note.svg"
+          src={noteIcon}
           alt=""
           className={styles["note-icon"]}
         />

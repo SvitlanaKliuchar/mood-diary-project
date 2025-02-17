@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import Landing from "./pages/Landing.jsx";
 import Login from "./pages/Login.jsx";
@@ -25,6 +24,7 @@ function App() {
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/home" element={<Home />} />
         <Route path="/entry" element={<Entry />} />
+        <Route path="/entry/:id" element={<Entry />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/settings" element={<Settings />} />
           <Route path="/stats" element={<Stats />} />
