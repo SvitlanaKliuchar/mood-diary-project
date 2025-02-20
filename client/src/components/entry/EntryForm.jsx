@@ -9,12 +9,12 @@ import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 import { LoadingContext } from "../../contexts/LoadingContext.jsx";
 
 const EntryForm = () => {
-  const { id } = useParams()
-  const isEditing = !!id //true if id is present, false if not
+  const { id } = useParams();
+  const isEditing = !!id; //true if id is present, false if not
 
-  const navigate = useNavigate()
-  const { addEntry, entries, updateEntry } = useContext(EntriesContext)
-  const { startLoading, finishLoading } = useContext(LoadingContext)
+  const navigate = useNavigate();
+  const { addEntry, entries, updateEntry } = useContext(EntriesContext);
+  const { startLoading, finishLoading } = useContext(LoadingContext);
 
   //form state
   const [date, setDate] = useState(new Date());
@@ -27,15 +27,15 @@ const EntryForm = () => {
 
   //submission state
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null)
+  const [success, setSuccess] = useState(null);
 
   //if editing, preload existing data
   useEffect(() => {
-    if (!isEditing) return
+    if (!isEditing) return;
 
     //the entry is already in context (entries)
-    const existingEntry = entries.find((e) => e.id === Number(id))
-    
+    const existingEntry = entries.find((e) => e.id === Number(id));
+
     if (existingEntry) {
       //populate local state
       setDate(new Date(existingEntry.date));
@@ -45,13 +45,12 @@ const EntryForm = () => {
       setProductivity(existingEntry.productivity || []);
       setNote(existingEntry.note || "");
     }
-
-  }, [id, isEditing, entries])
+  }, [id, isEditing, entries]);
 
   //handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    startLoading()
+    startLoading();
     setError(null);
     setSuccess(null);
 
@@ -59,7 +58,7 @@ const EntryForm = () => {
     //TODO: implement robust validation both client and server side
     if (!date || !mood) {
       setError("Please select both date and mood.");
-      finishLoading()
+      finishLoading();
       return;
     }
 
@@ -77,24 +76,24 @@ const EntryForm = () => {
 
     try {
       if (isEditing) {
-        await updateEntry(id, formData)
-        setSuccess("Entry updated successfully!")
+        await updateEntry(id, formData);
+        setSuccess("Entry updated successfully!");
 
-        navigate("/home")
+        navigate("/home");
       } else {
         const response = await axiosInstance.post("/moods", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-  
+
         setSuccess("Entry added successfully!");
-  
-        const { mood: newMood } = response.data
-  
+
+        const { mood: newMood } = response.data;
+
         //add the new entry to the context
-        addEntry(newMood)
-  
+        addEntry(newMood);
+
         //reset form fields
         setDate(new Date());
         setMood("");
@@ -103,9 +102,9 @@ const EntryForm = () => {
         setProductivity([]);
         setNote("");
         setPhoto(null);
-        
+
         //navigate to home page after successful submission
-        navigate("/home")
+        navigate("/home");
       }
     } catch (err) {
       setError(
@@ -113,7 +112,7 @@ const EntryForm = () => {
           "An error occured while submitting your entry",
       );
     } finally {
-      finishLoading()
+      finishLoading();
     }
   };
 

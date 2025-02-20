@@ -2,26 +2,26 @@ import React, { useContext, useEffect, useState } from "react";
 import styles from "./LoadingSpinner.module.css";
 import { LoadingContext } from "../../contexts/LoadingContext";
 
-const LoadingSpinner = ( {delay = 300} ) => {
-  const { loadingCount } = useContext(LoadingContext)
-  const [showSpinner, setShowSpinner] = useState(false)
+const LoadingSpinner = ({ delay = 300 }) => {
+  const { loadingCount } = useContext(LoadingContext);
+  const [showSpinner, setShowSpinner] = useState(false);
 
   useEffect(() => {
     let timer;
     if (loadingCount > 0) {
-      //start a timer to delay spinner appearance 
+      //start a timer to delay spinner appearance
       timer = setTimeout(() => {
-        setShowSpinner(true)
-      }, delay)
+        setShowSpinner(true);
+      }, delay);
     } else {
-      setShowSpinner(false)
+      setShowSpinner(false);
     }
 
     //clean up the timer on unmount or if loadingCount changes
     return () => {
-      if (timer) clearTimeout(timer)
-    }
-  }, [loadingCount, delay])
+      if (timer) clearTimeout(timer);
+    };
+  }, [loadingCount, delay]);
 
   if (!showSpinner) return null;
 

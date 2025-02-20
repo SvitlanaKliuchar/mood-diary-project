@@ -1,14 +1,15 @@
 import { useContext, useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { AuthContext } from '../../contexts/AuthContext';
 import styles from './MoodDashboard.module.css'
 import axiosInstance from '../../utils/axiosInstance.js';
 import { LoadingContext } from '../../contexts/LoadingContext.jsx';
-import { ResponsiveContainer } from 'recharts';
 import Streak from './stats-elements/Streak.jsx';
 import MoodChart from './stats-elements/MoodChart.jsx';
+import MoodCounts from './stats-elements/MoodCounts.jsx';
 import DayOfWeekAvg from './stats-elements/DayOfWeekAvg.jsx';
 import MoodStability from './stats-elements/MoodStability.jsx';
+import ProductivityScore from './stats-elements/ProductivityCorrelation.jsx';
+import ActivityPatterns from './stats-elements/ActivityPatterns.jsx';
 
 const MoodDashboard = () => {
     const [streak, setStreak] = useState(0)
@@ -24,6 +25,8 @@ const MoodDashboard = () => {
 
     const [error, setError] = useState(null)
     const [success, setSuccess] = useState(null)
+
+    const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe'];
 
     useEffect(() => {
         if (!user?.id) return;
@@ -60,52 +63,36 @@ const MoodDashboard = () => {
     return (
         <div className={styles['dashboard-container']}>
             <div className={styles['mood-dashboard']}>
-                <div className={styles['top-two-rows']}>
+                <div className={`${styles['days-in-a-row']} ${styles['dashboard-item']}`}>
                     <Streak streak={streak} />
-
                 </div>
-
-                <div className={`${styles['day-of-week-avg']} ${styles['dashboard-item']}`}>
-                    <ResponsiveContainer width={600} height="80%">
-                        <DayOfWeekAvg dayOfWeekAvg={dayOfWeekAvg} />
-                    </ResponsiveContainer>
-                </div>
-
                 <div className={`${styles['mood-stability']} ${styles['dashboard-item']}`}>
+                    <h3>Mood Stability</h3>
                     <MoodStability stabilityScore={stabilityScore} />
+                </div>
+                <div className={`${styles['mood-chart']} ${styles['dashboard-item']}`}>
+                    <h3>Mood Trends</h3>
+                    <MoodChart moodChartData={moodChartData} />
+                </div>
+                <div className={`${styles['daily-mood-avg']} ${styles['dashboard-item']}`}>
+                    <h3>Daily Mood Averages</h3>
+                    <DayOfWeekAvg dayOfWeekAvg={dayOfWeekAvg} />
+                </div>
+
+                <div className={`${styles['mood-distribution']} ${styles['dashboard-item']}`}>
+                    <h3>Mood Distribution</h3>
+                    <MoodCounts moodCounts={moodCounts} />
                 </div>
 
                 <div className={`${styles['activity-patterns']} ${styles['dashboard-item']}`}>
                     <h3>Activity Patterns</h3>
-                    <ul>
-                        {activityPatterns.map((pattern, idx) => (
-                            <li key={idx}>
-                                {pattern.activities.join(' & ')} - {pattern.count} times
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div className={`${styles['mood-counts']} ${styles['dashboard-item']}`}>
-                    <h3>Mood Counts</h3>
-                    <div className={styles["circular-gauge"]} style={{ "--percent": 0.6 }}>
-                        <div className={styles["gauge-bg"]}></div>
-                        <div className={styles["gauge-fill"]}></div>
-                        <div className={styles["gauge-value"]}>3</div>
-                    </div>
-                    <ul className={styles['mood-counts-list']}>
-                        {moodCountsArray.map(({ mood, count }) => (
-                            <li key={mood}>
-                                {mood}: {count}
-                            </li>
-                        ))}
-
-                    </ul>
-                </div>
-                <div className={`${styles['productivity-correlation']} ${styles['dashboard-item']}`}>
-                    <h3>Productivity Correlation</h3>
-                    <p>{productivityCorrelation}</p>
+                    <ActivityPatterns activityPatterns={activityPatterns} />
                 </div>
 
+                <div className={`${styles['productivity-impact']} ${styles['dashboard-item']}`}>
+                    <h3>Productivity Impact</h3>
+                    <ProductivityScore correlation={productivityCorrelation} />
+                </div>
             </div>
         </div>
     );

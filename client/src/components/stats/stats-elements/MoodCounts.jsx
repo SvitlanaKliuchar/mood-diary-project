@@ -1,36 +1,49 @@
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
+const MoodCounts = ({ moodCounts }) => {
 
-const MoodCounts = ({moodCounts}) => {
-    const moodCountsArray = Object.entries(moodCounts).map(([mood, count]) => ({
-        name: mood,
-        value: count,
-      }));
+  const moodColors = {
+    great: "#6EC6FF", 
+    good: "#58D68D", 
+    meh: "#D5D8DC", 
+    bad: "#E59866", 
+    awful: "#D9534F"
+};
+  
+  const moodOrder = ["great", "good", "meh", "bad", "awful"];
 
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']; 
+  const processedData = Object.entries(moodCounts).map(([mood, count]) => ({
+    name: mood,
+    value: count,
+    color: moodColors[mood]
+  }))
+  .sort((a, b) => moodOrder.indexOf(a.name) - moodOrder.indexOf(b.name));
 
   return (
-    <>
-    <PieChart width={400} height={400}>
-  <Pie
-    data={moodCountsArray}
-    cx="50%"
-    cy="50%"
-    labelLine={false}
-    label={({ name, value }) => `${name} (${value})`}
-    outerRadius={100}
-    fill="#8884d8"
-    dataKey="value"
-  >
-    {moodCountsArray.map((entry, index) => (
-      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-    ))}
-  </Pie>
-  <Tooltip />
-  <Legend />
-</PieChart>
-</>
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={processedData}
+          innerRadius={60}
+          outerRadius={80}
+          paddingAngle={5}
+          dataKey="value"
+        >
+          {processedData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={entry.color} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
   );
 };
 

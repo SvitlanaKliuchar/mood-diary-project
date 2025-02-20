@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import PropTypes from "prop-types";
 import styles from "./FormElements.module.css";
-import galleryIcon from '../../../assets/icons/entry/gallery.svg'
-import photoIcon from '../../../assets/icons/entry/photo.svg'
+import galleryIcon from "../../../assets/icons/entry/gallery.svg";
+import photoIcon from "../../../assets/icons/entry/photo.svg";
 
 const PhotoUploader = ({ photo, setPhoto }) => {
   const fileInputRef = useRef(null);
@@ -25,11 +25,7 @@ const PhotoUploader = ({ photo, setPhoto }) => {
   return (
     <div className={styles["photo-uploader"]}>
       <label className={styles.label}>
-        <img
-          src={galleryIcon}
-          alt=""
-          className={styles["add-photo-icon"]}
-        />
+        <img src={galleryIcon} alt="" className={styles["add-photo-icon"]} />
         Add Photo:
       </label>
       <div className={styles["button-group"]}>
@@ -38,11 +34,7 @@ const PhotoUploader = ({ photo, setPhoto }) => {
           onClick={handleTakePhoto}
           className={styles["upload-button"]}
         >
-          <img
-            src={photoIcon}
-            alt=""
-            className={styles["upload-icon"]}
-          />
+          <img src={photoIcon} alt="" className={styles["upload-icon"]} />
           Take Photo
         </button>
         <button
@@ -50,11 +42,7 @@ const PhotoUploader = ({ photo, setPhoto }) => {
           onClick={handleAddFromGallery}
           className={styles["upload-button"]}
         >
-          <img
-            src={galleryIcon}
-            alt=""
-            className={styles["upload-icon"]}
-          />
+          <img src={galleryIcon} alt="" className={styles["upload-icon"]} />
           Add from Gallery
         </button>
       </div>

@@ -6,10 +6,7 @@ import { FaCheck } from "react-icons/fa";
 const SubmitButton = () => {
   return (
     <div className={styles["submit"]}>
-      <button
-        type="submit"
-        className={styles["submit-button"]}
-      >
+      <button type="submit" className={styles["submit-button"]}>
         <FaCheck className={styles["check-icon"]} aria-hidden="true" />
       </button>
       <span className={styles.text}>Save</span>

@@ -5,19 +5,20 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { EntriesContext } from "../../contexts/EntriesContext";
 
 const Header = () => {
-  const { displayedDate, setDisplayedDate, refreshEntries } = useContext(EntriesContext)
+  const { displayedDate, setDisplayedDate, refreshEntries } =
+    useContext(EntriesContext);
   const { user } = useContext(AuthContext);
 
   const handlePrevMonth = () => {
     setDisplayedDate((prevDate) => {
-      const newDate = subMonths(prevDate, 1)
-      return newDate
+      const newDate = subMonths(prevDate, 1);
+      return newDate;
     });
   };
   const handleNextMonth = () => {
     setDisplayedDate((prevDate) => {
-      const newDate = addMonths(prevDate, 1)
-      return newDate
+      const newDate = addMonths(prevDate, 1);
+      return newDate;
     });
   };
   const formattedDate = format(displayedDate, "MMMM yyyy");

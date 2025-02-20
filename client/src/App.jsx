@@ -15,22 +15,22 @@ import LoadingSpinner from "./components/loading/LoadingSpinner.jsx";
 function App() {
   return (
     <>
-    <LoadingSpinner />
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/entry" element={<Entry />} />
-        <Route path="/entry/:id" element={<Entry />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/stats" element={<Stats />} />
-        </Route>
-      </Routes>
-    </Router>
+      <LoadingSpinner />
+      <Router>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/entry" element={<Entry />} />
+          <Route path="/entry/:id" element={<Entry />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/stats" element={<Stats />} />
+          </Route>
+        </Routes>
+      </Router>
     </>
   );
 }
