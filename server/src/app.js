@@ -8,6 +8,7 @@ import errorHandler from "./middleware/error-middleware.js";
 import { fileURLToPath } from 'url'
 import path from 'path'
 import statsRouter from "./routes/stats-routes.js";
+import googleOAuthRouter from "./routes/google-oauth-routes.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads
 
 //routes
 app.use("/auth", authRouter);
+app.use("/auth", googleOAuthRouter);
 app.use("/moods", moodsRouter);
 app.use("/stats", statsRouter)
 

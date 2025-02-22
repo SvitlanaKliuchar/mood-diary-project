@@ -32,6 +32,8 @@ model users {
   password_hash  String
   moods          moods[]
   refreshTokens  refreshTokens[] 
+  googleId       String?   @unique
+  githubId       String?   @unique
 }
 
 model refreshTokens {

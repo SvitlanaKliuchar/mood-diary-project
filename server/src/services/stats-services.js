@@ -135,26 +135,38 @@ const calculateMoodStability = (entries) => {
 }
 
 const analyzeActivityPatterns = (entries) => {
-    const patterns = {}
+    //group entries by mood first
+    const moodActivityMap = {}
 
-    entries.forEach(({ activities }) => {
-        if (activities && activities.length > 1) {
-            //generate pair combos 
-            for (let i = 0; i < activities.length; i++) {
-                for (let j = i + 1; j < activities.length; j++) {
-                    const pair = [activities[i], activities[j]].sort().join("-");
-                    patterns[pair] = (patterns[pair] || 0) + 1;
-                }
-            }
+    //process each entry
+    entries.forEach(entry => {
+        const { mood, activities } = entry
+
+        if (!moodActivityMap[mood]) {
+            moodActivityMap[mood] = {};
+        }
+
+        //count frequency of each individual activity for this mood
+        if (activities && activities.length) {
+            activities.forEach(activity => {
+                moodActivityMap[mood][activity] = (moodActivityMap[mood][activity] || 0) + 1;
+            });
         }
     })
-    return Object.entries(patterns)
-        .sort(([, countA], [, countB]) => countB - countA) //descending
-        .slice(0, 5)
-        .map(([pair, count]) => ({
-            activities: pair.split("-"),
-            count
-        }));
+
+
+    //convert to array and sort by frequency
+    const result = {}
+    Object.entries(moodActivityMap).forEach(([mood, activities]) => {
+        result[mood.toLowerCase()] = Object.entries(activities)
+            .map(([activity, count]) => ({
+                activity,
+                count
+            }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5); //to only keep top 5 most frequent activities
+    })
+    return result
 }
 
 const calculateDayOfWeekAverages = (entries) => {
