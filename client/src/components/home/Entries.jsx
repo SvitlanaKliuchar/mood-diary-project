@@ -19,7 +19,7 @@ const Entries = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!authLoading) {
+    if (!authLoading && user) {
       const fetchEntries = async () => {
         try {
           startLoading();
@@ -40,7 +40,7 @@ const Entries = () => {
       };
       fetchEntries();
     }
-  }, [authLoading, displayedDate]);
+  }, [authLoading, user, displayedDate]);
 
   const handleDelete = async (id) => {
     try {

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { AuthContext } from "./AuthContext";
 
@@ -44,6 +44,15 @@ export const EntriesProvider = ({ children }) => {
       setEntries([]);
     }
   };
+
+  // fix the issue of entries not being fetched right after user logs in
+  // trigger refresh whenever the user logs in or displayedDate changes.
+  useEffect(() => {
+    if (user) {
+      refreshEntries();
+    }
+  }, [user, displayedDate]);
+
 
   const updateEntry = async (id, formData) => {
     try {

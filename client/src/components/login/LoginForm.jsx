@@ -119,11 +119,19 @@ const LoginForm = () => {
           <span>Or continue with</span>
         </div>
         <div className={styles["social-login-container"]}>
-          <button type="button" className={styles["social-btn"]}>
-            Provider 1
+          <button
+            type="button"
+            className={styles["social-btn"]}
+            onClick={() => (window.location.href = '/auth/google')}
+          >
+            Google
           </button>
-          <button type="button" className={styles["social-btn"]}>
-            Provider 2
+          <button
+            type="button"
+            className={styles["social-btn"]}
+            onClick={() => (window.location.href = '/auth/github')}
+          >
+            Github
           </button>
         </div>
       </form>
