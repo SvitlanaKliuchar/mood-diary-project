@@ -1,6 +1,7 @@
 import passport from "passport";
-import prisma from "../config/db";
-import { signAccessToken, signRefreshToken } from "../utils/jwt";
+import prisma from "../config/db.js";
+import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
+import { CLIENT_URL } from "../config/index.js";
 
 //initialize google OAuth
 export const googleOAuth = passport.authenticate('google', { scope: ['profile', 'email'] })
@@ -40,7 +41,7 @@ export const googleOAuthCallback = async (req, res) => {
             path: '/',
         });
 
-        res.redirect('/home')
+        res.redirect(`${CLIENT_URL}/home`)
     } catch (error) {
         console.error('Google Auth Callback Error:', error);
         res.status(500).json({ error: 'Internal server error during google authentication' });

@@ -9,6 +9,12 @@ import { fileURLToPath } from 'url'
 import path from 'path'
 import statsRouter from "./routes/stats-routes.js";
 import googleOAuthRouter from "./routes/google-oauth-routes.js";
+import githubOAuthRouter from "./routes/github-oauth-routes.js";
+import { SESSION_SECRET } from "./config/index.js";
+import session from "express-session";
+import './config/passport.js'
+import passport from "passport";
+
 
 const app = express();
 
@@ -20,6 +26,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(logger);
+app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 //serve static files from the 'uploads' directory
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +39,7 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads
 //routes
 app.use("/auth", authRouter);
 app.use("/auth", googleOAuthRouter);
+app.use("/auth", githubOAuthRouter);
 app.use("/moods", moodsRouter);
 app.use("/stats", statsRouter)
 
