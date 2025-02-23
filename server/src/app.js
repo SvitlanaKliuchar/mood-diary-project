@@ -14,6 +14,7 @@ import { SESSION_SECRET } from "./config/index.js";
 import session from "express-session";
 import './config/passport.js'
 import passport from "passport";
+import passwordResetRouter from "./routes/password-reset-routes.js";
 
 
 const app = express();
@@ -40,6 +41,7 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads
 app.use("/auth", authRouter);
 app.use("/auth", googleOAuthRouter);
 app.use("/auth", githubOAuthRouter);
+app.use("/auth", passwordResetRouter)
 app.use("/moods", moodsRouter);
 app.use("/stats", statsRouter)
 
