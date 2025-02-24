@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requestPasswordReset, validateResetToken, resetPassword } from "../controllers/password-reset-controller";
+import { requestPasswordReset, validateResetToken, resetPassword } from "../controllers/password-reset-controller.js";
 
 const passwordResetRouter = Router()
 

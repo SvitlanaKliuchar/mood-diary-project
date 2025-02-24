@@ -1,12 +1,16 @@
 /* login/sign-up form */
 .form-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
     margin-top: 4rem;
 }
 
 .login-form,
-.signup-form {
+.signup-form,
+.email-form,
+.new-password-form {
     padding: 2rem 2rem;
     background-color: var(--bg-color);
     box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.2);
@@ -15,6 +19,15 @@
     flex-direction: column;
     flex-wrap: wrap;
     gap: 0.5rem;
+}
+.form-container h1 {
+    margin-bottom: 2rem;
+}
+.email-form,
+.new-password-form {
+    padding: 1rem 2rem;
+    min-width: 25rem;
+    gap: 0rem;
 }
 
 .login-form h2,
@@ -28,12 +41,18 @@
     text-align: center;
 }
 
-.form-group {
+.form-group, .reset-form-group {
     display: flex;
     flex-direction: column;
     position: relative;
 }
+.reset-form-group {
+    gap: 0.3rem;
+}
 
+.reset-form-group label {
+    font-size: 0.8rem;
+}
 .password-input-container {
     position: relative;
     width: 100%;
@@ -67,6 +86,10 @@
     align-self: center;
 }
 
+.reset-btn {
+    font-size: 0.8rem;
+}
+
 .login-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -81,13 +104,11 @@
 .extra-options {
     font-size: 0.85rem;
     display: flex;
+    gap: 3rem;
     justify-content: space-between;
     align-items: center;
 }
 
-.extra-options input {
-  
-}
 .checkbox-label {
     font-size: 0.9rem;
     display: flex;
@@ -96,8 +117,9 @@
 }
 
 .forgot-password {
-    font-size: 0.5rem;
+    font-size: 0.65rem;
     color: var(--accent-color-blue);
+    text-decoration: underline;
 }
 
 .separator {
@@ -152,4 +174,8 @@
     color: var(--accent-color-blue);
     margin-top: 0.85rem;
     margin-bottom: -0.5rem;
+}
+.message {
+    color: var(--accent-color-blue);
+    margin-top: 1rem;
 }

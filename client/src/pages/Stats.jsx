@@ -1,4 +1,3 @@
-import React from "react";
 import NavBar from "../components/landing/NavBar.jsx";
 import MoodDashboard from "../components/stats/MoodDashboard.jsx";
 import Footer from "../components/landing/Footer.jsx";

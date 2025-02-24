@@ -1,10 +1,7 @@
-
 const MoodStability = ({ stabilityScore }) => {
   return (
     <>
-      <div >
-        {stabilityScore.toFixed(1)}%
-      </div>
+      <div>{stabilityScore.toFixed(1)}%</div>
     </>
   );
 };

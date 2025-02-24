@@ -53,7 +53,6 @@ export const EntriesProvider = ({ children }) => {
     }
   }, [user, displayedDate]);
 
-
   const updateEntry = async (id, formData) => {
     try {
       const response = await axiosInstance.put(`/moods/${id}`, formData);

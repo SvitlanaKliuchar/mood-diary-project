@@ -1,15 +1,15 @@
 import NavBar from "../components/landing/NavBar.jsx";
-import MoodCalendar from "../components/calendar/MoodCalendar.jsx";
+import NewPasswordForm from "../components/login/forgot-password/new-password-form.jsx";
 import Footer from "../components/landing/Footer.jsx";
 
-const Login = () => {
+const ResetPassword = () => {
   return (
     <>
       <NavBar />
-      <MoodCalendar />
+      <NewPasswordForm />
       <Footer />
     </>
   );
 };
 
-export default Login;
+export default ResetPassword;

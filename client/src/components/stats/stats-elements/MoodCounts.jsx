@@ -8,23 +8,23 @@ import {
 } from "recharts";
 
 const MoodCounts = ({ moodCounts }) => {
-
   const moodColors = {
-    great: "#6EC6FF", 
-    good: "#58D68D", 
-    meh: "#D5D8DC", 
-    bad: "#E59866", 
-    awful: "#D9534F"
-};
-  
+    great: "#6EC6FF",
+    good: "#58D68D",
+    meh: "#D5D8DC",
+    bad: "#E59866",
+    awful: "#D9534F",
+  };
+
   const moodOrder = ["great", "good", "meh", "bad", "awful"];
 
-  const processedData = Object.entries(moodCounts).map(([mood, count]) => ({
-    name: mood,
-    value: count,
-    color: moodColors[mood]
-  }))
-  .sort((a, b) => moodOrder.indexOf(a.name) - moodOrder.indexOf(b.name));
+  const processedData = Object.entries(moodCounts)
+    .map(([mood, count]) => ({
+      name: mood,
+      value: count,
+      color: moodColors[mood],
+    }))
+    .sort((a, b) => moodOrder.indexOf(a.name) - moodOrder.indexOf(b.name));
 
   return (
     <ResponsiveContainer width="100%" height="100%">

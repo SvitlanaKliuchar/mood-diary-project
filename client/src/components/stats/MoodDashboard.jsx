@@ -1,101 +1,116 @@
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
-import styles from './MoodDashboard.module.css'
-import axiosInstance from '../../utils/axiosInstance.js';
-import { LoadingContext } from '../../contexts/LoadingContext.jsx';
-import Streak from './stats-elements/Streak.jsx';
-import MoodChart from './stats-elements/MoodChart.jsx';
-import MoodCounts from './stats-elements/MoodCounts.jsx';
-import DayOfWeekAvg from './stats-elements/DayOfWeekAvg.jsx';
-import MoodStability from './stats-elements/MoodStability.jsx';
-import ProductivityScore from './stats-elements/ProductivityCorrelation.jsx';
-import ActivityPatterns from './stats-elements/ActivityPatterns.jsx';
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
+import styles from "./MoodDashboard.module.css";
+import axiosInstance from "../../utils/axiosInstance.js";
+import { LoadingContext } from "../../contexts/LoadingContext.jsx";
+import Streak from "./stats-elements/Streak.jsx";
+import MoodChart from "./stats-elements/MoodChart.jsx";
+import MoodCounts from "./stats-elements/MoodCounts.jsx";
+import DayOfWeekAvg from "./stats-elements/DayOfWeekAvg.jsx";
+import MoodStability from "./stats-elements/MoodStability.jsx";
+import ProductivityScore from "./stats-elements/ProductivityCorrelation.jsx";
+import ActivityPatterns from "./stats-elements/ActivityPatterns.jsx";
 
 const MoodDashboard = () => {
-    const [streak, setStreak] = useState(0)
-    const [moodChartData, setMoodChartData] = useState([])
-    const [moodCounts, setMoodCounts] = useState({})
-    const [stabilityScore, setStabilityScore] = useState(100)
-    const [activityPatterns, setActivityPatterns] = useState([])
-    const [dayOfWeekAvg, setDayOfWeekAvg] = useState({})
-    const [productivityCorrelation, setProductivityCorrelation] = useState(0)
+  const [streak, setStreak] = useState(0);
+  const [moodChartData, setMoodChartData] = useState([]);
+  const [moodCounts, setMoodCounts] = useState({});
+  const [stabilityScore, setStabilityScore] = useState(100);
+  const [activityPatterns, setActivityPatterns] = useState([]);
+  const [dayOfWeekAvg, setDayOfWeekAvg] = useState({});
+  const [productivityCorrelation, setProductivityCorrelation] = useState(0);
 
-    const { user } = useContext(AuthContext)
-    const { startLoading, finishLoading } = useContext(LoadingContext)
+  const { user } = useContext(AuthContext);
+  const { startLoading, finishLoading } = useContext(LoadingContext);
 
-    const [error, setError] = useState(null)
-    const [success, setSuccess] = useState(null)
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
-    const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe'];
+  const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#0088fe"];
 
-    useEffect(() => {
-        if (!user?.id) return;
-        //when fetching stats do :user.id
-        const fetchStats = async () => {
-            try {
-                startLoading()
-                const response = await axiosInstance.get(`/stats/${user.id}`)
-                const data = response.data
-                console.log(data)
+  useEffect(() => {
+    if (!user?.id) return;
+    //when fetching stats do :user.id
+    const fetchStats = async () => {
+      try {
+        startLoading();
+        const response = await axiosInstance.get(`/stats/${user.id}`);
+        const data = response.data;
+        console.log(data);
 
-                //update the state with fetched data
-                setStreak(data.streak);
-                setMoodChartData(data.moodChartData);
-                setMoodCounts(data.moodCounts);
-                setStabilityScore(data.stabilityScore);
-                setActivityPatterns(data.activityPatterns);
-                setDayOfWeekAvg(data.dayOfWeekAverages)
-                setProductivityCorrelation(data.productivityCorrelation)
-                setError(null)
-            } catch (error) {
-                console.error("Failed to fetch stats: ", error)
-                setError("Failed to fetch stats");
-            } finally {
-                finishLoading()
-            }
-        }
-        fetchStats()
-    }, [user])
+        //update the state with fetched data
+        setStreak(data.streak);
+        setMoodChartData(data.moodChartData);
+        setMoodCounts(data.moodCounts);
+        setStabilityScore(data.stabilityScore);
+        setActivityPatterns(data.activityPatterns);
+        setDayOfWeekAvg(data.dayOfWeekAverages);
+        setProductivityCorrelation(data.productivityCorrelation);
+        setError(null);
+      } catch (error) {
+        console.error("Failed to fetch stats: ", error);
+        setError("Failed to fetch stats");
+      } finally {
+        finishLoading();
+      }
+    };
+    fetchStats();
+  }, [user]);
 
-    //convert mood counts to an array for display
-    const moodCountsArray = Object.entries(moodCounts).map(([mood, count]) => ({ mood, count }))
+  //convert mood counts to an array for display
+  const moodCountsArray = Object.entries(moodCounts).map(([mood, count]) => ({
+    mood,
+    count,
+  }));
 
-    return (
-        <div className={styles['dashboard-container']}>
-            <div className={styles['mood-dashboard']}>
-                <div className={`${styles['days-in-a-row']} ${styles['dashboard-item']}`}>
-                    <Streak streak={streak} />
-                </div>
-                <div className={`${styles['mood-stability']} ${styles['dashboard-item']}`}>
-                    <h3>Mood Stability</h3>
-                    <MoodStability stabilityScore={stabilityScore} />
-                </div>
-                <div className={`${styles['mood-chart']} ${styles['dashboard-item']}`}>
-                    <h3>Mood Trends</h3>
-                    <MoodChart moodChartData={moodChartData} />
-                </div>
-                <div className={`${styles['daily-mood-avg']} ${styles['dashboard-item']}`}>
-                    <h3>Daily Mood Averages</h3>
-                    <DayOfWeekAvg dayOfWeekAvg={dayOfWeekAvg} />
-                </div>
-
-                <div className={`${styles['mood-distribution']} ${styles['dashboard-item']}`}>
-                    <h3>Mood Distribution</h3>
-                    <MoodCounts moodCounts={moodCounts} />
-                </div>
-
-                <div className={`${styles['activity-patterns']} ${styles['dashboard-item']}`}>
-                    <h3>Activity Patterns</h3>
-                    <ActivityPatterns activityPatterns={activityPatterns} />
-                </div>
-
-                <div className={`${styles['productivity-impact']} ${styles['dashboard-item']}`}>
-                    <h3>Productivity Impact</h3>
-                    <ProductivityScore correlation={productivityCorrelation} />
-                </div>
-            </div>
+  return (
+    <div className={styles["dashboard-container"]}>
+      <div className={styles["mood-dashboard"]}>
+        <div
+          className={`${styles["days-in-a-row"]} ${styles["dashboard-item"]}`}
+        >
+          <Streak streak={streak} />
         </div>
-    );
+        <div
+          className={`${styles["mood-stability"]} ${styles["dashboard-item"]}`}
+        >
+          <h3>Mood Stability</h3>
+          <MoodStability stabilityScore={stabilityScore} />
+        </div>
+        <div className={`${styles["mood-chart"]} ${styles["dashboard-item"]}`}>
+          <h3>Mood Trends</h3>
+          <MoodChart moodChartData={moodChartData} />
+        </div>
+        <div
+          className={`${styles["daily-mood-avg"]} ${styles["dashboard-item"]}`}
+        >
+          <h3>Daily Mood Averages</h3>
+          <DayOfWeekAvg dayOfWeekAvg={dayOfWeekAvg} />
+        </div>
+
+        <div
+          className={`${styles["mood-distribution"]} ${styles["dashboard-item"]}`}
+        >
+          <h3>Mood Distribution</h3>
+          <MoodCounts moodCounts={moodCounts} />
+        </div>
+
+        <div
+          className={`${styles["activity-patterns"]} ${styles["dashboard-item"]}`}
+        >
+          <h3>Activity Patterns</h3>
+          <ActivityPatterns activityPatterns={activityPatterns} />
+        </div>
+
+        <div
+          className={`${styles["productivity-impact"]} ${styles["dashboard-item"]}`}
+        >
+          <h3>Productivity Impact</h3>
+          <ProductivityScore correlation={productivityCorrelation} />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default MoodDashboard;

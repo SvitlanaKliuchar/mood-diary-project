@@ -167,14 +167,14 @@ const SignupForm = () => {
           <button
             type="button"
             className={styles["social-btn"]}
-            onClick={() => (window.location.href = '/auth/google')}
+            onClick={() => (window.location.href = "/auth/google")}
           >
             Google
           </button>
           <button
             type="button"
             className={styles["social-btn"]}
-            onClick={() => (window.location.href = '/auth/github')}
+            onClick={() => (window.location.href = "/auth/github")}
           >
             Github
           </button>

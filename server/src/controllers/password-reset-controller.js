@@ -2,7 +2,7 @@ import crypto from 'crypto'
 import nodemailer from 'nodemailer'
 import bcrypt from 'bcrypt'
 import prisma from '../config/db.js'
-import { CLIENT_URL } from '../config'
+import { CLIENT_URL } from '../config/index.js'
 import { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } from '../config/index.js'
 
 export const requestPasswordReset = async (req, res) => {

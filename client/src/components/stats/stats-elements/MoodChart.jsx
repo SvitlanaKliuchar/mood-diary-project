@@ -1,4 +1,3 @@
-
 import {
   LineChart,
   Line,
@@ -15,7 +14,7 @@ const MoodChart = ({ moodChartData }) => {
     4: "good",
     3: "meh",
     2: "bad",
-    1: "awful"
+    1: "awful",
   };
 
   const processedData = moodChartData.map((item) => ({
@@ -24,28 +23,24 @@ const MoodChart = ({ moodChartData }) => {
   }));
 
   return (
-    <ResponsiveContainer width="100%" height="100%" >
+    <ResponsiveContainer width="100%" height="100%">
       <LineChart
         data={processedData}
         margin={{ top: 0, right: 0, left: 0, bottom: 20 }}
       >
-        <CartesianGrid
-          strokeDasharray="3 3"
-          stroke="#e0e0e0"
-        />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
         <XAxis
           dataKey="date"
           tickMargin={10}
           stroke="#666"
-          tick={{ fill: '#666' }}
-          
+          tick={{ fill: "#666" }}
         />
         <YAxis
           domain={[1, 5]}
           tickFormatter={(tick) => moodScale[tick]}
           tickMargin={10}
           stroke="#666"
-          tick={{ fill: '#666' }}
+          tick={{ fill: "#666" }}
           padding={{ top: 20, bottom: 20 }}
         />
         <Tooltip formatter={(value) => [moodScale[value], "mood"]} />
