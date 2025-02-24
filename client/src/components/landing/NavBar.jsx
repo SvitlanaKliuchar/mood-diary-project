@@ -31,9 +31,9 @@ const NavBar = () => {
   return (
     <header>
       <nav className={`${styles.navbar} shadow`}>
-        <div className={styles.logo}>
+        <a href="/home" className={styles.logo}>
           <img src={logo} alt="Harmonia logo, links to homepage" />
-        </div>
+        </a>
 
         <ul className={styles["navbar-links-desktop"]}>
           {navLinks.map((link) => (
@@ -72,9 +72,9 @@ const NavBar = () => {
         <div
           className={`${styles["mobile-menu-container"]} ${isMobileMenuOpen ? styles["mobile-menu-container--open"] : ""}`}
         >
-          <div className={styles["logo-mobile-menu"]}>
+          <a href="/home" className={styles["logo-mobile-menu"]}>
             <img src={logo} alt="Harmonia logo, links to homepage" />
-          </div>
+          </a>
           <ul className={styles["navbar-links-mobile"]}>
             {navLinks.map((link) => (
               <li key={link.to}>
