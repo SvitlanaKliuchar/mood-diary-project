@@ -15,7 +15,8 @@
         'moodChart moodChart'
         'dailyMoodAvg dailyMoodAvg'
         'activityPatterns moodDistribution'
-        'productivityImpact productivityImpact';
+        'productivityImpact productivityImpact'
+        ;
     width: calc(100vw - 8rem);
     gap: 1.5rem;
 }
@@ -59,20 +60,14 @@
     padding: 1rem 4rem;
     text-align: center;
 }
-.dashboard-item
-:not(.days-in-a-row)
-:not(.productivity-impact)
-:not(.mood-stability) {
-
-}
-
 
 /* days in a row streak */
 
 .days-in-a-row h3, .mood-stability h3, 
 .mood-chart h3, .daily-mood-avg h3, 
 .activity-patterns h3, .mood-distribution h3, 
-.productivity-impact h3 {
+.productivity-impact h3,
+.word-cloud h3 {
     align-self: start;
     font-size: clamp(1rem, 4vw, 1.4rem);
     color: var(--font-color);
@@ -251,4 +246,22 @@
     .activity-icon {
         height: 1.3rem;
     }
+}
+
+.word-cloud {
+
+}
+.word-cloud-container {
+
+}
+.word-cloud-svg-container {
+
+}
+.word-cloud-svg-container svg {
+
+}
+.tips {
+    margin-top: 1rem;
+    color: var(--font-color-60);
+    font-size: 0.7rem;
 }
