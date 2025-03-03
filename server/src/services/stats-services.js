@@ -1,4 +1,9 @@
 import prisma from "../config/db.js"
+import natural from 'natural';
+import stopwords from 'natural/lib/natural/util/stopwords.js';
+
+const tokenizer = new natural.WordTokenizer()
+const stemmer = natural.PorterStemmer
 
 export const calculateMoodStats = async (userId) => {
     try {
@@ -17,6 +22,7 @@ export const calculateMoodStats = async (userId) => {
                 emotions: true,
                 sleep: true,
                 productivity: true,
+                note: true
             }
         })
 
@@ -25,14 +31,19 @@ export const calculateMoodStats = async (userId) => {
             activities: combineFactors(m)
         }))
 
+        const notesArray = moods
+            .filter(m => m.note && m.note.trim().length > 0) //remove empty/null notes
+            .map(m => m.note) //extract text only
+
         const streak = calculateStreak(entries)
         const moodChartData = calculateMoodChartData(entries);
         const moodCounts = calculateMoodCounts(entries);
         const stabilityScore = calculateMoodStability(entries);
         const activityPatterns = analyzeActivityPatterns(entries);
-
         const dayOfWeekAverages = calculateDayOfWeekAverages(entries);
         const productivityCorrelation = approximateProductivityCorrelation(entries);
+        const wordCloudData = notesArray.length > 0 ? processNotes(notesArray) : [];
+        const moodWordPatterns = calculateMoodWordPatterns(entries)
 
         return {
             streak,
@@ -41,7 +52,9 @@ export const calculateMoodStats = async (userId) => {
             stabilityScore,
             activityPatterns,
             dayOfWeekAverages,
-            productivityCorrelation
+            productivityCorrelation,
+            wordCloudData,
+            moodWordPatterns
         }
     } catch (error) {
         console.error('Error calculating mood stats:', error);
@@ -239,4 +252,48 @@ const approximateProductivityCorrelation = (entries) => {
 const average = (nums) => {
     if (!nums.length) return 0;
     return nums.reduce((acc, n) => acc + n, 0) / nums.length;
+}
+
+const processNotes = (notes) => {
+    //combine all notes into one text
+    const allText = notes.join(' ').toLowerCase()
+
+    //tokenize text
+    const tokens = tokenizer.tokenize(allText)
+
+    //remove stopwords and stem words
+    const processedTokens = tokens
+        .filter(token => !stopwords.words.includes(token))
+        .map(token => stemmer.stem(token))
+
+    //count frequencies
+    const wordFreq = {}
+    processedTokens.forEach(token => {
+        wordFreq[token] = (wordFreq[token] || 0) + 1
+    })
+
+    return Object.entries(wordFreq)
+        .map(([word, count]) => ({ text: word, value: count }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 100); // Top 100 words    
+}
+
+const calculateMoodWordPatterns = (entries) => {
+    //group entries by mood
+    const moodGroups = {}
+    entries.forEach(entry => {
+        if (!entry.note) return
+
+        const mood = entry.mood
+        if (!moodGroups[mood]) moodGroups[mood] = [];
+        moodGroups[mood].push(entry.note);
+    })
+
+    //process each mood group
+    const moodWordMap = {}
+    Object.entries(moodGroups).forEach(([mood, notes]) => {
+        moodWordMap[mood] = processNotes(notes).slice(0, 10)
+    })
+
+    return moodWordMap
 }
