@@ -10,8 +10,6 @@ import path from 'path'
 import statsRouter from "./routes/stats-routes.js";
 import googleOAuthRouter from "./routes/google-oauth-routes.js";
 import githubOAuthRouter from "./routes/github-oauth-routes.js";
-import { SESSION_SECRET } from "./config/index.js";
-import session from "express-session";
 import './config/passport.js'
 import passport from "passport";
 import passwordResetRouter from "./routes/password-reset-routes.js";
@@ -27,9 +25,8 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(logger);
-app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
-app.use(passport.session());
+
 
 
 //serve static files from the 'uploads' directory

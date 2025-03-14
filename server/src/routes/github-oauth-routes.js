@@ -6,7 +6,7 @@ const githubOAuthRouter = Router()
 
 githubOAuthRouter.get('/github', githubOAuth)
 
-githubOAuthRouter.get('/github/callback', passport.authenticate('github', { failureRedirect: '/auth/github/login-failed' }), githubOAuthCallback)
+githubOAuthRouter.get('/github/callback', passport.authenticate('github', { session: false, failureRedirect: '/auth/github/login-failed' }), githubOAuthCallback)
 
 githubOAuthRouter.get('/github/login-failed', githubOAuthFailure)
 

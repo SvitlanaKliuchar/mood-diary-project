@@ -3,7 +3,7 @@ import prisma from "../config/db.js";
 import { signAccessToken, signRefreshToken } from '../utils/jwt.js'
 import { CLIENT_URL } from "../config/index.js";
 
-export const githubOAuth = passport.authenticate('github', { scope: ['user:email']})
+export const githubOAuth = passport.authenticate('github', { scope: ['user:email'], session: false })
 
 export const githubOAuthCallback = async (req, res) => {
     try {
@@ -25,14 +25,14 @@ export const githubOAuthCallback = async (req, res) => {
         //set cookies
         res.cookie('access_token', accessToken, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: 'none',
             maxAge: 15 * 60 * 1000,
             path: '/'
         })
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: 'none',
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/'

@@ -4,11 +4,12 @@ import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
 import { CLIENT_URL } from "../config/index.js";
 
 //initialize google OAuth
-export const googleOAuth = passport.authenticate('google', { scope: ['profile', 'email'] })
+export const googleOAuth = passport.authenticate('google', { scope: ['profile', 'email'],  session: false }, )
 
 //Google OAuth Callback to handle user data and JWT token creation
 export const googleOAuthCallback = async (req, res) => {
     try {
+        console.log('User from Google OAuth:', req.user);  
         const user = req.user
 
         //generate JWT tokens
@@ -27,7 +28,7 @@ export const googleOAuthCallback = async (req, res) => {
         //set tokens in cookies
         res.cookie('access_token', accessToken, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: 'none',
             maxAge: 15 * 60 * 1000,
             path: '/',
@@ -35,12 +36,13 @@ export const googleOAuthCallback = async (req, res) => {
 
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: 'none',
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/',
         });
 
+        console.log('Cookies set:', req.cookies);
         res.redirect(`${CLIENT_URL}/home`)
     } catch (error) {
         console.error('Google Auth Callback Error:', error);

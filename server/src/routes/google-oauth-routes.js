@@ -6,7 +6,7 @@ const googleOAuthRouter = Router()
 
 googleOAuthRouter.get('/google', googleOAuth)
 
-googleOAuthRouter.get('/google/callback', passport.authenticate('google', { failureRedirect: '/auth/google/login-failed' }), googleOAuthCallback)
+googleOAuthRouter.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: '/auth/google/login-failed' }), googleOAuthCallback)
 
 googleOAuthRouter.get('/google/login-failed', googleOAuthFailure)
 
