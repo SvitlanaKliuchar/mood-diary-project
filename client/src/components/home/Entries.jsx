@@ -151,7 +151,7 @@ const Entries = () => {
 
       {/* if loading is done but no entries were returned, show a fallback message */}
       {!isLoading && entries.length === 0 && (
-        <div className={styles.noEntries}>No entries found.</div>
+        <div className={styles['no-entries']}>No entries found.</div>
       )}
 
       {entries.length > 0 ? (

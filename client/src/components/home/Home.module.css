@@ -164,7 +164,7 @@
     flex-wrap: wrap;
     text-align: center;
     column-gap: 0.8rem;
-    font-size: 0.5rem;
+    font-size: 0.6rem;
 
 }
 
@@ -211,6 +211,10 @@
 .update-btn:hover, .delete-btn:hover {
     opacity: 0.8;
     transform: scale(1.1);
+}
+
+.no-entries {
+    text-align: center;
 }
 
 @media screen and (max-width: 21rem) {

@@ -22,10 +22,6 @@
   --body-font: "Orienta", serif;
 }
 
-html {
-  box-sizing: border-box;
-}
-
 *,
 *::before,
 *::after {
@@ -49,7 +45,8 @@ blockquote {
 }
 
 html {
-  font-size: 100%;
+  box-sizing: border-box;
+  font-size: 125%;
   line-height: 1.5;
   -webkit-text-size-adjust: 100%;
 }
