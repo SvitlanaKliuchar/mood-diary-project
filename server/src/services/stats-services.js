@@ -214,12 +214,12 @@ const calculateDayOfWeekAverages = (entries) => {
 const approximateProductivityCorrelation = (entries) => {
     if (entries.length < 2) return 0;
 
-    // Extract pairs of (moodValue, productivityLength)
+    //extract pairs of (moodValue, productivityLength)
     const dataPairs = entries.map(e => {
         return [moodToNumber(e.mood), (e.productivity || []).length];
     });
 
-    // Let's do a simple Cov(X,Y)/[StdDev(X)*StdDev(Y)] approach
+    //a simple Cov(X,Y)/[StdDev(X)*StdDev(Y)] approach
     // 1) compute means
     const moodMean = average(dataPairs.map(dp => dp[0]));
     const prodMean = average(dataPairs.map(dp => dp[1]));
@@ -238,13 +238,13 @@ const approximateProductivityCorrelation = (entries) => {
         dataPairs.reduce((acc, [, pVal]) => acc + Math.pow(pVal - prodMean, 2), 0)
     );
 
-    // if either std is 0, correlation is undefined or zero
+    //if either std is 0, correlation is undefined or zero
     if (moodStd === 0 || prodStd === 0) return 0;
 
-    // correlation coefficient in [-1, 1]
+    // orrelation coefficient in [-1, 1]
     const correlation = numerator / (moodStd * prodStd);
 
-    // Round to 3 decimals for convenience
+    //round to 3 decimals for convenience
     return parseFloat(correlation.toFixed(3));
 }
 
@@ -261,21 +261,48 @@ const processNotes = (notes) => {
     //tokenize text
     const tokens = tokenizer.tokenize(allText)
 
-    //remove stopwords and stem words
-    const processedTokens = tokens
-        .filter(token => !stopwords.words.includes(token))
-        .map(token => stemmer.stem(token))
+    //remove stopwords 
+    const filteredTokens = tokens.filter(token => !stopwords.words.includes(token))
 
-    //count frequencies
-    const wordFreq = {}
-    processedTokens.forEach(token => {
-        wordFreq[token] = (wordFreq[token] || 0) + 1
+    // create a mapping between stemmed words and their original forms
+    const stemToOriginal = {}
+    const stemmedTokens = []
+
+    filteredTokens.forEach(token => {
+        const stemmed = stemmer.stem(token)
+        stemmedTokens.push(stemmed)
+
+        //keep track of the most frequent original form for each stem
+        if (!stemToOriginal[stemmed]) {
+            stemToOriginal[stemmed] = { word: token, count: 1 }
+        } else {
+            stemToOriginal[stemmed].count += 1
+
+            //if this original form appears more frequently, use it as the representative
+            if (stemToOriginal[stemmed].count <
+                filteredTokens.filter(t => stemmer.stem(t) === stemmed && t === token).length) {
+                stemToOriginal[stemmed].word = token;
+                stemToOriginal[stemmed].count = filteredTokens.filter(t =>
+                    stemmer.stem(t) === stemmed && t === token).length;
+            }
+        }
     })
 
+    //count frequencies of stemmed words
+    const wordFreq = {};
+    stemmedTokens.forEach(token => {
+        wordFreq[token] = (wordFreq[token] || 0) + 1;
+    });
+
+    //create the final array with original words but stemmed frequencies
     return Object.entries(wordFreq)
-        .map(([word, count]) => ({ text: word, value: count }))
+        .map(([stemmedWord, count]) => ({
+            text: stemToOriginal[stemmedWord].word, 
+            stem: stemmedWord, 
+            value: count
+        }))
         .sort((a, b) => b.value - a.value)
-        .slice(0, 100); // Top 100 words    
+        .slice(0, 100); //top 100 words
 }
 
 const calculateMoodWordPatterns = (entries) => {
