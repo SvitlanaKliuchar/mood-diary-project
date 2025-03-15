@@ -11,6 +11,7 @@ import MoodStability from "./stats-elements/MoodStability.jsx";
 import ProductivityScore from "./stats-elements/ProductivityCorrelation.jsx";
 import ActivityPatterns from "./stats-elements/ActivityPatterns.jsx";
 import WordCloud from "./stats-elements/WordCloud.jsx";
+import MoodWordAssociations from "./stats-elements/MoodWordAssociations.jsx";
 
 const MoodDashboard = () => {
   const [streak, setStreak] = useState(0);
@@ -21,6 +22,7 @@ const MoodDashboard = () => {
   const [dayOfWeekAvg, setDayOfWeekAvg] = useState({});
   const [productivityCorrelation, setProductivityCorrelation] = useState(0);
   const [wordCloudData, setWordCloudData] = useState([])
+  const [moodWordAssociations, setMoodWordAssociations] = useState({})
 
   const { user } = useContext(AuthContext);
   const { startLoading, finishLoading } = useContext(LoadingContext);
@@ -49,6 +51,7 @@ const MoodDashboard = () => {
         setDayOfWeekAvg(data.dayOfWeekAverages);
         setProductivityCorrelation(data.productivityCorrelation);
         setWordCloudData(data.wordCloudData)
+        setMoodWordAssociations(data.moodWordAssociations)
         setError(null);
       } catch (error) {
         console.error("Failed to fetch stats: ", error);
@@ -59,12 +62,6 @@ const MoodDashboard = () => {
     };
     fetchStats();
   }, [user]);
-
-  //convert mood counts to an array for display
-  const moodCountsArray = Object.entries(moodCounts).map(([mood, count]) => ({
-    mood,
-    count,
-  }));
 
   return (
     <div className={styles["dashboard-container"]}>
@@ -116,6 +113,12 @@ const MoodDashboard = () => {
         >
           <h3>Word Cloud</h3>
           <WordCloud data={wordCloudData} />
+        </div>
+        <div
+          className={`${styles["word-mood-associations"]} ${styles["dashboard-item"]}`}
+        >
+          <h3>Word Mood Patterns</h3>
+          <MoodWordAssociations moodWordAssociations={moodWordAssociations} />
         </div>
       </div>
     </div>

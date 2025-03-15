@@ -252,7 +252,6 @@ footer {
     left: 50%;
     transform: translateX(-50%);
     color: var(--bg-color);
-    font-size: 0.5rem;
 }
 .footer-links {
     display: flex;
@@ -260,7 +259,7 @@ footer {
     justify-content: center;
     gap: 2rem;
     position: absolute;
-    bottom: 20%;
+    bottom: 15%;
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--bg-color);

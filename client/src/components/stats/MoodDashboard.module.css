@@ -16,7 +16,7 @@
         'dailyMoodAvg dailyMoodAvg'
         'activityPatterns moodDistribution'
         'productivityImpact productivityImpact'
-        ;
+    ;
     width: calc(100vw - 8rem);
     gap: 1.5rem;
 }
@@ -63,9 +63,12 @@
 
 /* days in a row streak */
 
-.days-in-a-row h3, .mood-stability h3, 
-.mood-chart h3, .daily-mood-avg h3, 
-.activity-patterns h3, .mood-distribution h3, 
+.days-in-a-row h3,
+.mood-stability h3,
+.mood-chart h3,
+.daily-mood-avg h3,
+.activity-patterns h3,
+.mood-distribution h3,
 .productivity-impact h3,
 .word-cloud h3 {
     align-self: start;
@@ -134,16 +137,16 @@
     .mood-dashboard {
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto minmax(400px, auto) minmax(400px, auto) minmax(400px, auto) minmax(400px, auto)  auto;
-        grid-template-areas: 
-          'streak'
-          'stability'
-          'moodChart'
-          'dailyMoodAvg'
-          'activityPatterns'
-          'moodDistribution'
-          'productivityImpact';
-          gap: 1rem;
+        grid-template-rows: auto auto minmax(400px, auto) minmax(400px, auto) minmax(400px, auto) minmax(400px, auto) auto;
+        grid-template-areas:
+            'streak'
+            'stability'
+            'moodChart'
+            'dailyMoodAvg'
+            'activityPatterns'
+            'moodDistribution'
+            'productivityImpact';
+        gap: 1rem;
     }
 
 }
@@ -153,32 +156,38 @@
         width: 100vw;
         margin: 0 0.25rem;
     }
+
     .dashboard-container {
         align-items: center;
         justify-content: center;
     }
-    
+
 }
 
 @media screen and (max-width: 30rem) {
     .days-in-a-row {
         padding: 0.8rem 1.6rem;
     }
+
     .progress-indicator {
         gap: 0.7rem;
     }
+
     .circle {
         height: 2rem;
         width: 2rem;
     }
+
     .streak-count {
         padding: 0.25rem 0.75rem;
         font-size: 1rem;
     }
+
     .progress-indicator::before {
         right: 1rem;
     }
 }
+
 @media screen and (max-width: 21rem) {
     .progress-indicator::before {
         right: 0.6rem;
@@ -186,15 +195,16 @@
 }
 
 /* activity patterns */
-.activity-patterns {
-  
-}
+.activity-patterns {}
+
 .select-mood {
     border-radius: 10px;
 }
+
 .select-mood-icon {
     position: relative;
 }
+
 .often-together-container {
     display: flex;
     flex-direction: column;
@@ -203,9 +213,11 @@
     gap: 1rem;
     font-size: clamp(0.9rem, 4vw, 1rem);
 }
+
 .often-together-container h3 {
     color: var(--accent-color-blue);
 }
+
 .activity-patterns-container {
     display: flex;
     flex-wrap: wrap;
@@ -213,18 +225,20 @@
     align-items: start;
     gap: 1rem;
 }
+
 .activity-count {
     display: flex;
     gap: 0.3rem;
     justify-content: center;
     align-items: center;
 }
-.activity {
 
-}
+.activity {}
+
 .count {
     color: var(--font-color-50);
 }
+
 .mood-icon {
     position: absolute;
     top: -0.9rem;
@@ -232,6 +246,7 @@
     height: 4rem;
     width: auto;
 }
+
 .activity-icon {
     height: 1.5rem;
     width: auto;
@@ -243,25 +258,148 @@
         right: 5rem;
         top: -0.5rem;
     }
+
     .activity-icon {
         height: 1.3rem;
     }
 }
 
-.word-cloud {
-
-}
-.word-cloud-container {
-
-}
-.word-cloud-svg-container {
-
-}
-.word-cloud-svg-container svg {
-
-}
+/* word cloud */
 .tips {
     margin-top: 1rem;
     color: var(--font-color-60);
     font-size: 0.7rem;
+}
+
+/* word mood associations */
+.mood-word-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-button {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid var(--font-color-40);
+    background-color: var(--bg-color);
+    color: var(--font-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.view-button-active {
+    background-color: var(--primary-color);
+    color: var(--bg-color);
+    border-color: var(--primary-color);
+}
+
+.mood-words-container,
+.word-pairs-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mood-title {
+    text-transform: capitalize;
+    color: var(--primary-color);
+}
+
+.word-cloud-inline {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 1rem;
+    max-width: 100%;
+    min-height: 150px;
+    background-color: var(--bg-color-lighter);
+    border-radius: 8px;
+}
+
+.word-pairs-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: var(--bg-color-lighter);
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.word-pair-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--font-color-20);
+}
+
+.word-pair-item:last-child {
+    border-bottom: none;
+}
+
+.word-pair {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pair-word {
+    font-weight: 500;
+}
+
+.pair-connector {
+    color: var(--font-color-60);
+    font-size: 1.1rem;
+}
+
+.pair-count {
+    color: var(--font-color-60);
+    font-size: 0.9rem;
+}
+
+.word-legend {
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--font-color-60);
+    margin-top: 0.5rem;
+}
+
+.no-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: var(--font-color-60);
+    text-align: center;
+}
+
+@media screen and (max-width: 40rem) {
+    .mood-word-controls {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .view-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .view-button {
+        flex: 1;
+        text-align: center;
+    }
 }
