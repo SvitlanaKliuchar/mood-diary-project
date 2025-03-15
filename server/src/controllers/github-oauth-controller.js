@@ -25,15 +25,15 @@ export const githubOAuthCallback = async (req, res) => {
         //set cookies
         res.cookie('access_token', accessToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            secure: false,
+            sameSite: 'lax',
             maxAge: 15 * 60 * 1000,
             path: '/'
         })
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            secure: false,
+            sameSite: 'lax',
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/'
         })

@@ -4,12 +4,12 @@ import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
 import { CLIENT_URL } from "../config/index.js";
 
 //initialize google OAuth
-export const googleOAuth = passport.authenticate('google', { scope: ['profile', 'email'],  session: false }, )
+export const googleOAuth = passport.authenticate('google', { scope: ['profile', 'email'], session: false },)
 
 //Google OAuth Callback to handle user data and JWT token creation
 export const googleOAuthCallback = async (req, res) => {
     try {
-        console.log('User from Google OAuth:', req.user);  
+        console.log('User from Google OAuth:', req.user);
         const user = req.user
 
         //generate JWT tokens
@@ -25,19 +25,25 @@ export const googleOAuthCallback = async (req, res) => {
             }
         })
 
+        // Log the stored token
+        const storedToken = await prisma.refreshTokens.findFirst({
+            where: { token: refreshToken }
+        });
+        console.log("Stored refresh token in DB:", storedToken);
+
         //set tokens in cookies
         res.cookie('access_token', accessToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            secure: false,
+            sameSite: 'lax',
             maxAge: 15 * 60 * 1000,
             path: '/',
         });
 
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            secure: false,
+            sameSite: 'lax',
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/',
         });
@@ -52,5 +58,5 @@ export const googleOAuthCallback = async (req, res) => {
 
 //handle google login failure
 export const googleOAuthFailure = (req, res) => {
-    res.status(401).json({ error: 'Google login failed, try again.'})
+    res.status(401).json({ error: 'Google login failed, try again.' })
 }
