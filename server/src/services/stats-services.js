@@ -294,11 +294,11 @@ const processNotes = (notes, allMoodNotes = null) => {
         wordFreq[token] = (wordFreq[token] || 0) + 1;
     });
 
+    let tfidfScores = {}
     //calculate TF-IDF if allMoodNotes is provided
     if (allMoodNotes) {
-        let tfidfScores = {}
         //calculate idf for each term 
-        const totalMoodsLength = Object.keys(allMoodNotes).length
+        const totalMoods = Object.keys(allMoodNotes).length
         const idfScores = {}
 
         //for each term, count in how many moods it appears
@@ -326,7 +326,7 @@ const processNotes = (notes, allMoodNotes = null) => {
             text: stemToOriginal[stemmedWord].word,
             stem: stemmedWord,
             value: count,
-            tfidf: tfidf[stemmedWord] || 0
+            tfidf: tfidfScores[stemmedWord] || 0
         }))
         .sort((a, b) => b.value - a.value)
         .slice(0, 100); //top 100 words
