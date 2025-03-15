@@ -43,7 +43,7 @@ export const calculateMoodStats = async (userId) => {
         const dayOfWeekAverages = calculateDayOfWeekAverages(entries);
         const productivityCorrelation = approximateProductivityCorrelation(entries);
         const wordCloudData = notesArray.length > 0 ? processNotes(notesArray) : [];
-        const moodWordPatterns = calculateMoodWordPatterns(entries)
+        const moodWordAssociations = analyzeMoodWordAssociations(entries);
 
         return {
             streak,
@@ -54,7 +54,7 @@ export const calculateMoodStats = async (userId) => {
             dayOfWeekAverages,
             productivityCorrelation,
             wordCloudData,
-            moodWordPatterns
+            moodWordAssociations
         }
     } catch (error) {
         console.error('Error calculating mood stats:', error);
@@ -254,7 +254,7 @@ const average = (nums) => {
     return nums.reduce((acc, n) => acc + n, 0) / nums.length;
 }
 
-const processNotes = (notes) => {
+const processNotes = (notes, allMoodNotes = null) => {
     //combine all notes into one text
     const allText = notes.join(' ').toLowerCase()
 
@@ -294,33 +294,106 @@ const processNotes = (notes) => {
         wordFreq[token] = (wordFreq[token] || 0) + 1;
     });
 
+    //calculate TF-IDF if allMoodNotes is provided
+    if (allMoodNotes) {
+        let tfidfScores = {}
+        //calculate idf for each term 
+        const totalMoodsLength = Object.keys(allMoodNotes).length
+        const idfScores = {}
+
+        //for each term, count in how many moods it appears
+        Object.keys(wordFreq).forEach(term => {
+            let moodCount = 0
+            Object.keys(allMoodNotes).forEach(mood => {
+                //check if the term appears in notes for this mood
+                const moodText = allMoodNotes[mood].join(' ').toLowerCase();
+                if (moodText.includes(stemToOriginal[term].word)) {
+                    moodCount++;
+                }
+            })
+
+             //calculate IDF: log(totalMoods / moodCount)
+             idfScores[term] = Math.log(totalMoods / (moodCount || 1));
+            
+             //calculate TF-IDF: term frequency * IDF
+             tfidfScores[term] = wordFreq[term] * idfScores[term];
+        })
+    }
+
     //create the final array with original words but stemmed frequencies
     return Object.entries(wordFreq)
         .map(([stemmedWord, count]) => ({
-            text: stemToOriginal[stemmedWord].word, 
-            stem: stemmedWord, 
-            value: count
+            text: stemToOriginal[stemmedWord].word,
+            stem: stemmedWord,
+            value: count,
+            tfidf: tfidf[stemmedWord] || 0
         }))
         .sort((a, b) => b.value - a.value)
         .slice(0, 100); //top 100 words
 }
 
-const calculateMoodWordPatterns = (entries) => {
+const findCoOccurringWords = (notes, windowSize = 5) => {
+    //preprocess all notes
+    const allText = notes.join(' ').toLowerCase();
+    const tokens = tokenizer.tokenize(allText)
+        .filter(token => !stopwords.words.includes(token));
+    
+    //track co-occurrences within sliding window
+    const coOccurrences = {};
+    
+    for (let i = 0; i < tokens.length; i++) {
+        const currentToken = tokens[i];
+        const stemmedCurrent = stemmer.stem(currentToken);
+        
+        //look ahead within window size
+        for (let j = i + 1; j < Math.min(i + windowSize + 1, tokens.length); j++) {
+            const windowToken = tokens[j];
+            const stemmedWindow = stemmer.stem(windowToken);
+            
+            //skip if same stem word
+            if (stemmedCurrent === stemmedWindow) continue;
+            
+            //create pair key (alphabetical ordering)
+            const pairKey = [stemmedCurrent, stemmedWindow].sort().join("_");
+            
+            if (!coOccurrences[pairKey]) {
+                coOccurrences[pairKey] = {
+                    words: [currentToken, windowToken],
+                    count: 1
+                };
+            } else {
+                coOccurrences[pairKey].count++;
+            }
+        }
+    }
+    
+    //convert to array and sort by frequency
+    return Object.values(coOccurrences)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 20); //top 20 co-occurring pairs
+}
+
+const analyzeMoodWordAssociations = (entries) => {
     //group entries by mood
     const moodGroups = {}
     entries.forEach(entry => {
-        if (!entry.note) return
-
-        const mood = entry.mood
+        if (!entry.note) return;
+        
+        const mood = entry.mood;
         if (!moodGroups[mood]) moodGroups[mood] = [];
         moodGroups[mood].push(entry.note);
-    })
-
-    //process each mood group
-    const moodWordMap = {}
+    });
+    
+    //process each mood group with TF-IDF to find distinctive words
+    const moodWordAssociations = {};
     Object.entries(moodGroups).forEach(([mood, notes]) => {
-        moodWordMap[mood] = processNotes(notes).slice(0, 10)
-    })
-
-    return moodWordMap
+        moodWordAssociations[mood] = {
+            words: processNotes(notes, moodGroups)
+                .sort((a, b) => b.tfidf - a.tfidf) //sort by TF-IDF for distinctive words
+                .slice(0, 15),  //top 15 distinctive words
+            coOccurring: findCoOccurringWords(notes)
+        };
+    });
+    
+    return moodWordAssociations;
 }
