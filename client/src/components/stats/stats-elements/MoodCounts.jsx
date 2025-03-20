@@ -6,16 +6,16 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import moods from "../../../data/moods.js";
 
 const MoodCounts = ({ moodCounts }) => {
   const moodColors = {
-    great: "#6EC6FF",
-    good: "#58D68D",
-    meh: "#D5D8DC",
-    bad: "#E59866",
-    awful: "#D9534F",
+    great: moods[0].color,
+    good: moods[1].color,
+    meh: moods[2].color,
+    bad: moods[3].color,
+    awful: moods[4].color,
   };
-
   const moodOrder = ["great", "good", "meh", "bad", "awful"];
 
   const processedData = Object.entries(moodCounts)

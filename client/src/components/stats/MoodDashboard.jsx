@@ -115,11 +115,14 @@ const MoodDashboard = () => {
           <WordCloud data={wordCloudData} />
         </div>
         <div
-          className={`${styles["word-mood-associations"]} ${styles["dashboard-item"]}`}
+          className={`${styles["mood-word-associations"]} ${styles["dashboard-item"]}`}
         >
-          <h3>Word Mood Patterns</h3>
+          <h3>Mood Word Patterns</h3>
           <MoodWordAssociations moodWordAssociations={moodWordAssociations} />
         </div>
+        <p className={styles['dashboard-text']}>
+        Keep up the good work! The more entries we have to analyze, the more insightful the stats data will be for you.
+        </p>
       </div>
     </div>
   );

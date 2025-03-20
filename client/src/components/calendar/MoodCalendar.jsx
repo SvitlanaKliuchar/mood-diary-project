@@ -4,110 +4,125 @@ import "react-calendar/dist/Calendar.css";
 import {
   startOfMonth,
   endOfMonth,
-  eachDayOfInterval,
   format,
-  getDay,
+  isSameDay
 } from "date-fns";
-import axios from "axios";
 import styles from "./MoodCalendar.module.css";
+import moods from '../../data/moods.js'
+import axiosInstance from "../../utils/axiosInstance.js";
 
-const MOOD_COLORS = {
-  rad: "#7cc576",
-  good: "#a4d47f",
-  meh: "#70cce1",
-  bad: "#b39ddb",
-  awful: "#ef9a9a",
+const moodColors = {
+  great: moods[0].color,
+  good: moods[1].color,
+  meh: moods[2].color,
+  bad: moods[3].color,
+  awful: moods[4].color,
 };
 
-// Define default moods for prototyping
-const defaultMoods = {
-  "2025-01-01": "rad",
-  "2025-01-02": "good",
-  "2025-01-03": "meh",
-  "2025-01-04": "bad",
-  "2025-01-05": "awful",
-  "2025-01-06": "rad",
-  "2025-01-07": "good",
-  // Add more defaults as necessary for demonstration
-};
-
-const MoodCalendar = ({ userId }) => {
-  // Initialize dayMoods with default moods
-  const [dayMoods, setDayMoods] = useState(defaultMoods);
+const MoodCalendar = () => {
+  const [dayMoods, setDayMoods] = useState({});
   const [date, setDate] = useState(new Date());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  const monthIndex = date.getMonth(); // 0-based month index
-  const year = date.getFullYear();
-  const month = monthIndex + 1; // 1-based month for API call if needed
-
-  // Fetch mood data whenever the visible month/year changes
   useEffect(() => {
     async function fetchMoods() {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get("/api/moods", {
-          params: { year, month, userId },
+        // get first and last day of the visible month for API filtering
+        const firstDay = startOfMonth(date);
+        const lastDay = endOfMonth(date);
+        
+        // format dates for API
+        const start = format(firstDay, "yyyy-MM-dd");
+        const end = format(lastDay, "yyyy-MM-dd");
+        
+        const response = await axiosInstance.get("/moods", {
+          params: { start, end },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
         });
-        // Overwrite default moods with fetched data if available
-        setDayMoods(response.data || defaultMoods);
+        
+        // process the API response to map dates to moods
+        const moodMap = {};
+        response.data.forEach(entry => {
+          const dateKey = format(new Date(entry.date), "yyyy-MM-dd");
+          moodMap[dateKey] = entry.mood.toLowerCase();
+        });
+        
+        setDayMoods(moodMap);
       } catch (err) {
-        setError(err.response?.data?.message || err.message);
-        // Keep default moods on error
+        console.error("Error fetching mood data:", err);
+        setError(err.response?.data?.message || "Failed to fetch mood data");
       } finally {
         setLoading(false);
       }
     }
+    
     fetchMoods();
-  }, [year, month, userId]);
+  }, [date]); // re-fetch when the displayed month changes
 
-  const firstDayOfMonth = startOfMonth(new Date(year, monthIndex));
-  const lastDayOfMonth = endOfMonth(firstDayOfMonth);
-  const allDays = eachDayOfInterval({
-    start: firstDayOfMonth,
-    end: lastDayOfMonth,
-  });
+  const handleDateChange = (newDate) => {
+    setDate(newDate);
+    setSelectedDate(newDate);
+  };
 
-  const startingWeekday = getDay(firstDayOfMonth);
-  const shiftForMondayStart = (startingWeekday + 6) % 7;
-  const blanksBefore = Array(shiftForMondayStart).fill(null);
-
-  const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const calendarDays = [...blanksBefore, ...allDays];
-  const weeks = [];
-  for (let i = 0; i < calendarDays.length; i += 7) {
-    weeks.push(calendarDays.slice(i, i + 7));
-  }
-
-  function getMoodColor(date) {
-    if (!date) return null;
-    // Defensive check if dayMoods becomes undefined
-    if (!dayMoods) return null;
-    const key = format(date, "yyyy-MM-dd");
-    const mood = dayMoods[key];
-    return mood ? MOOD_COLORS[mood] || "#cccccc" : null;
-  }
-
-  const tileContent = ({ date, view }) => {
+  // render the days with custom styling
+  const tileContent = ({ date: tileDate, view }) => {
     if (view !== "month") return null;
-    const color = getMoodColor(date);
-    if (!color) return null;
-
+    
+    const dateKey = format(tileDate, "yyyy-MM-dd");
+    const mood = dayMoods[dateKey];
+    const isToday = isSameDay(tileDate, new Date());
+    const isSelected = selectedDate && isSameDay(tileDate, selectedDate);
+    
+    // handle days with mood entries
+    if (mood && moodColors[mood]) {
+      return (
+        <div 
+          className={`${styles.dayCircle} ${isToday ? styles.today : ''} ${isSelected ? styles.activeDay : ''}`} 
+          style={{ backgroundColor: moodColors[mood] }}
+        >
+          {tileDate.getDate()}
+        </div>
+      );
+    }
+    
+    // non-mood days still need a consistent structure
     return (
-      <div className={styles.dayCircle} style={{ backgroundColor: color }}>
-        {date.getDate()}
+      <div 
+        className={`${styles.dayCircleEmpty} ${isToday ? styles.today : ''} ${isSelected ? styles.activeDay : ''}`}
+      >
+        {tileDate.getDate()}
       </div>
     );
   };
 
-  if (loading) return <div>Loading calendar...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading && Object.keys(dayMoods).length === 0) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingSpinner}></div>
+        Loading calendar...
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className={styles.errorMessage}>Error: {error}</div>;
+  }
 
   return (
     <div className={styles["calendar-container"]}>
-      <Calendar onChange={setDate} value={date} tileContent={tileContent} />
+      <Calendar
+        onChange={handleDateChange}
+        value={date}
+        tileContent={tileContent}
+        formatDay={() => ""} 
+        className={styles.calendar}
+      />
     </div>
   );
 };

@@ -16,6 +16,8 @@
         'dailyMoodAvg dailyMoodAvg'
         'activityPatterns moodDistribution'
         'productivityImpact productivityImpact'
+        'wordCloud moodWordAssociations'
+        'text text'
     ;
     width: calc(100vw - 8rem);
     gap: 1.5rem;
@@ -47,6 +49,18 @@
 
 .productivity-impact {
     grid-area: productivityImpact;
+}
+
+.word-cloud {
+    grid-area: wordCloud;
+}
+
+.mood-word-associations {
+    grid-area: moodWordAssociations;
+}
+
+.dashboard-text {
+    grid-area: text;
 }
 
 .dashboard-item {
@@ -279,6 +293,12 @@
     margin-bottom: 1rem;
     width: 100%;
 }
+.select-mood {
+    position: relative;
+}
+.mood-icon-2 {
+    position: absolute;
+}
 
 .view-toggle {
     display: flex;
@@ -385,6 +405,11 @@
     padding: 2rem;
     color: var(--font-color-60);
     text-align: center;
+}
+
+.dashboard-text {
+    text-align: center;
+    color: var(--font-color-70);
 }
 
 @media screen and (max-width: 40rem) {

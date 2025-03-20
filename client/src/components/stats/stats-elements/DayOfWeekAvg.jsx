@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import moods from "../../../data/moods.js";
 
 const DayOfWeekAvg = ({ dayOfWeekAvg }) => {
   const dayOrder = [
@@ -32,11 +33,11 @@ const DayOfWeekAvg = ({ dayOfWeekAvg }) => {
 
   //color mapping
   const moodColors = {
-    great: "#6EC6FF",
-    good: "#58D68D",
-    meh: "#D5D8DC",
-    bad: "#E59866",
-    awful: "#D9534F",
+    great: moods[0].color,
+    good: moods[1].color,
+    meh: moods[2].color,
+    bad: moods[3].color,
+    awful: moods[4].color,
   };
 
   const processedData = dayOrder.map((day) => ({

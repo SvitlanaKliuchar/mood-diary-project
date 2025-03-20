@@ -94,7 +94,7 @@ const MoodWordAssociations = ({ moodWordAssociations }) => {
                         ))}
                     </select>
                     <img
-                        className={styles["mood-icon"]}
+                        className={styles["mood-icon-2"]}
                         src={findMoodIcon(selectedMood)}
                         alt=""
                     />
