@@ -26,7 +26,7 @@ const MoodChart = ({ moodChartData }) => {
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
         data={processedData}
-        margin={{ top: 0, right: 0, left: 0, bottom: 20 }}
+        margin={{ top: 10, right: 10, left: 30, bottom: 20 }}
       >
         <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
         <XAxis

@@ -8,23 +8,27 @@
 
 .mood-dashboard {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto minmax(400px, auto) minmax(400px, auto) minmax(400px, auto) auto;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 0.5rem;
     grid-template-areas:
-        'streak stability'
-        'moodChart moodChart'
-        'dailyMoodAvg dailyMoodAvg'
-        'activityPatterns moodDistribution'
-        'productivityImpact productivityImpact'
-        'wordCloud moodWordAssociations'
-        'text text'
-    ;
-    width: calc(100vw - 8rem);
-    gap: 1.5rem;
+        'streak'
+        'stability'
+        'moodChart'
+        'dailyMoodAvg'
+        'activityPatterns'
+        'moodDistribution'
+        'productivityImpact'
+        'wordCloud'
+        'moodWordAssociations'
+        'text';
 }
 
 .days-in-a-row {
     grid-area: streak;
+    padding: 0.8rem 1.6rem;
 }
 
 .mood-stability {
@@ -33,18 +37,23 @@
 
 .mood-chart {
     grid-area: moodChart;
+    min-height: 25rem;
 }
 
 .daily-mood-avg {
     grid-area: dailyMoodAvg;
+    min-height: 20rem;
 }
 
 .activity-patterns {
     grid-area: activityPatterns;
+    min-height: 20rem;
+    padding-bottom: 1rem;
 }
 
 .mood-distribution {
     grid-area: moodDistribution;
+    min-height: 18rem;
 }
 
 .productivity-impact {
@@ -71,30 +80,70 @@
     background-color: var(--bg-color);
     border: 1px solid var(--primary-color);
     border-radius: 10px;
-    padding: 1rem 4rem;
+    padding: 1rem 2rem;
     text-align: center;
+}
+
+.dashboard-item h3 {
+    align-self: center;
+    font-size: clamp(1rem, 4vw, 1.4rem);
+    color: var(--font-color);
+}
+
+
+
+@media screen and (min-width: 59rem) {
+    .mood-dashboard {
+        padding: 0 0.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto minmax(400px, auto) minmax(400px, auto) minmax(400px, auto) auto;
+        grid-template-areas:
+            'streak stability'
+            'moodChart moodChart'
+            'dailyMoodAvg dailyMoodAvg'
+            'activityPatterns moodDistribution'
+            'productivityImpact productivityImpact'
+            'wordCloud moodWordAssociations'
+            'text text'
+        ;
+        gap: 1.5rem;
+    }
+}
+ 
+
+@media screen and (min-width: 35rem) {
+    .mood-dashboard {
+        padding: 0 2rem;
+    }
+    
+}
+
+@media screen and (min-width: 40rem) {
+    .mood-dashboard {
+        padding: 0 4rem;
+    }
+    
+}
+
+@media screen and (min-width: 80rem) {
+    .mood-dashboard {
+        padding: 0 12rem;
+    }
 }
 
 /* days in a row streak */
 
-.days-in-a-row h3,
-.mood-stability h3,
-.mood-chart h3,
-.daily-mood-avg h3,
-.activity-patterns h3,
-.mood-distribution h3,
-.productivity-impact h3,
-.word-cloud h3 {
-    align-self: start;
-    font-size: clamp(1rem, 4vw, 1.4rem);
-    color: var(--font-color);
+.dashboard-item {
+    padding: 0.25rem 0.75rem;
+    font-size: 1rem;
 }
 
 .progress-indicator {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: 0.7rem;
     position: relative;
 }
 
@@ -107,13 +156,13 @@
     background-color: var(--font-color-40);
     position: absolute;
     top: 50%;
-    right: 1.5rem;
+    right: 0.6rem;
     z-index: 1;
 }
 
 .circle {
-    width: 2.5rem;
-    height: 2.5rem;
+    height: 2rem;
+    width: 2rem;
     border: 1px solid var(--font-color-40);
     background-color: var(--bg-color);
     border-radius: 50%;
@@ -141,58 +190,29 @@
     color: var(--primary-color);
     margin-left: 10px;
     border: 1px solid var(--font-color-40);
-    padding: 0.5rem 2rem;
+    padding: 0.25rem 1rem;
     border-radius: 20px;
     background-color: var(--bg-color);
     z-index: 2;
 }
 
-@media screen and (max-width: 59rem) {
-    .mood-dashboard {
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto minmax(400px, auto) minmax(400px, auto) minmax(400px, auto) minmax(400px, auto) auto;
-        grid-template-areas:
-            'streak'
-            'stability'
-            'moodChart'
-            'dailyMoodAvg'
-            'activityPatterns'
-            'moodDistribution'
-            'productivityImpact';
-        gap: 1rem;
-    }
 
-}
 
-@media screen and (max-width: 40rem) {
-    .mood-dashboard {
-        width: 100vw;
-        margin: 0 0.25rem;
-    }
-
-    .dashboard-container {
-        align-items: center;
-        justify-content: center;
-    }
-
-}
-
-@media screen and (max-width: 30rem) {
+@media screen and (min-width: 32rem) and (max-width: 59rem) {
     .days-in-a-row {
         padding: 0.8rem 1.6rem;
     }
 
     .progress-indicator {
-        gap: 0.7rem;
+        gap: 1rem;
     }
 
     .circle {
-        height: 2rem;
-        width: 2rem;
+        height: 2.5rem;
+        width: 2.5rem;
     }
 
-    .streak-count {
+    .dashboard-item {
         padding: 0.25rem 0.75rem;
         font-size: 1rem;
     }
@@ -202,15 +222,39 @@
     }
 }
 
-@media screen and (max-width: 21rem) {
+@media screen and (min-width: 21rem) and (max-width: 59rem) {
     .progress-indicator::before {
-        right: 0.6rem;
+        right: 1.5rem;
+    }
+}
+@media screen and (min-width: 71.5rem) {
+    .days-in-a-row {
+        padding: 0.8rem 1.6rem;
+    }
+
+    .progress-indicator {
+        gap: 1rem;
+    }
+
+    .circle {
+        height: 2.5rem;
+        width: 2.5rem;
+    }
+
+    .dashboard-item {
+        padding: 0.25rem 0.75rem;
+        font-size: 1rem;
+    }
+
+    .progress-indicator::before {
+        right: 1rem;
+    }
+    .progress-indicator::before {
+        right: 1.5rem;
     }
 }
 
 /* activity patterns */
-.activity-patterns {}
-
 .select-mood {
     border-radius: 10px;
 }
@@ -255,26 +299,30 @@
 
 .mood-icon {
     position: absolute;
-    top: -0.9rem;
-    right: 4.8rem;
-    height: 4rem;
+    top: -0.5rem;
+    right: 5rem;
+    height: 3.2rem;
     width: auto;
 }
 
 .activity-icon {
-    height: 1.5rem;
+    height: 1.3rem;
     width: auto;
 }
 
-@media screen and (max-width: 30rem) {
+@media screen and (min-width: 30rem) {
     .mood-icon {
-        height: 3.2rem;
-        right: 5rem;
-        top: -0.5rem;
+        height: 4rem;
+        right: 4.8rem;
+        top: -0.9rem;
     }
 
     .activity-icon {
-        height: 1.3rem;
+        height: 1.5rem;
+    }
+
+    .activity-patterns {
+        padding-bottom: 1rem;
     }
 }
 
@@ -288,16 +336,17 @@
 /* word mood associations */
 .mood-word-controls {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    width: 100%;
-}
-.select-mood {
+    flex-direction: column;
     position: relative;
 }
+
+
 .mood-icon-2 {
     position: absolute;
+    height: 3.2rem;
+    width: auto;
+    top: -0.4rem;
+    left: 1.5rem;
 }
 
 .view-toggle {
@@ -306,13 +355,15 @@
 }
 
 .view-button {
-    padding: 0.3rem 0.8rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
     border-radius: 20px;
     border: 1px solid var(--font-color-40);
     background-color: var(--bg-color);
     color: var(--font-color);
     cursor: pointer;
     transition: all 0.2s ease;
+    min-width: 7rem;
 }
 
 .view-button-active {
