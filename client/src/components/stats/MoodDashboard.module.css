@@ -95,6 +95,7 @@
 @media screen and (min-width: 59rem) {
     .mood-dashboard {
         padding: 0 0.5rem;
+        max-width: 60rem;
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto minmax(400px, auto) minmax(400px, auto) minmax(400px, auto) auto;
@@ -124,12 +125,6 @@
         padding: 0 4rem;
     }
     
-}
-
-@media screen and (min-width: 80rem) {
-    .mood-dashboard {
-        padding: 0 12rem;
-    }
 }
 
 /* days in a row streak */
