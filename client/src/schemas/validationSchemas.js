@@ -1,7 +1,6 @@
 import * as Yup from "yup";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
 
 const identifierYup = Yup.string()
@@ -54,3 +53,14 @@ export const signupSchema = Yup.object().shape({
     .oneOf([Yup.ref("password"), null], "Passwords do not match.")
     .required("Please repeat your password"),
 });
+
+export const profileUpdateSchema = Yup.object().shape({
+  username: signupSchema.fields.username,
+  email: signupSchema.fields.email,
+  password: passwordYup
+})
+
+//individual field schemas for single field validation
+export const usernameSchema = signupSchema.fields.username;
+export const emailSchema = signupSchema.fields.email;
+export const passwordSchema = passwordYup;

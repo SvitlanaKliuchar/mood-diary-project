@@ -58,6 +58,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 1rem;
 }
 
 .settings-list {
@@ -91,14 +92,14 @@
 .profile li,
 .toggle-container label,
 .notifications li {
-   color: var(--font-color-80);
-   transition: color 0.3s ease;
+    color: var(--font-color-80);
+    transition: color 0.3s ease;
 }
 
 .profile li:hover,
 .toggle-container label:hover,
 .notifications li:hover {
-   color: var(--font-color);
+    color: var(--font-color);
 }
 
 .profile::after,
@@ -110,4 +111,182 @@
     background-color: var(--font-color-40);
     opacity: 0.5;
     margin-left: -0.1rem;
+}
+
+/* delete account modal */
+.delete-account-container,
+.export-data-container,
+.profile-container,
+.push-notifications-container {
+    background-color: var(--bg-color);
+    border: 1px solid var(--primary-color);
+    width: 20rem;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    position: relative;
+}
+
+.text-two,
+.tip,
+.main-text {
+    font-size: 0.6rem;
+    text-align: center;
+}
+
+.main-text,
+.input-label {
+    font-size: 0.8rem;
+}
+
+.tip {
+    margin-top: 1rem;
+}
+
+.delete-account-btn,
+.export-data-btn,
+.save-btn {
+    padding: 0.8rem 2rem;
+    background-color: var(--accent-color-blue);
+    color: var(--bg-color);
+    border: 1px solid var(--font-color-80);
+    font-size: 0.9rem;
+    border-radius: 20px;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease, transform 0.3s ease-in;
+}
+
+.delete-account-btn:hover {
+    background-color: var(--font-color-80);
+    transform: scale(1.1);
+}
+
+.close-btn {
+    font-size: 1.5rem;
+    color: var(--font-color-60);
+    transition: color 0.3s ease, transform 0.3s ease-in;
+    position: absolute;
+    top: 0;
+    right: 0.5rem;
+}
+
+.close-btn:hover {
+    color: var(--font-color);
+    transform: scale(1.1);
+}
+
+/* export data modal */
+
+.export-data-btn,
+.save-btn {
+    background-color: var(--accent-color-blue);
+    border: 1px solid var(--accent-color-blue);
+}
+
+.export-data-btn:hover,
+.save-btn:hover {
+    background-color: var(--bg-color);
+    border: 1px solid var(--accent-color-blue);
+    color: var(--accent-color-blue);
+}
+
+/* push notifs */
+.push-notifications-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.time-input {
+    font-size: 0.8rem;
+    border: none;
+    padding: 0 0;
+}
+
+.time-input:focus {
+    border-radius: 10px;
+}
+
+.save-btn {
+    padding: 0.5rem 2rem;
+}
+
+/* profile info */
+.profile-container {
+    font-size: 0.9rem;
+    width: 25rem;
+}
+
+.editable-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.editable-field-container {
+    display: flex;
+    flex-direction: column;
+    padding: 0.8rem;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.field-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.field-label {
+    font-weight: 600;
+}
+
+.editable-false,
+.editable-true {
+    width: 100%;
+    font-size: 0.9rem;
+    
+}
+
+.editable-field-container:hover {
+    background-color: var(--bg-color-darkened-1);
+}
+
+.editable-true {
+    flex: 1;
+    min-width: 13rem;
+    font-size: 0.9em;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+.editable-false {
+    width: 14rem;
+}
+
+.edit-btn {
+    border: 1px solid var(--font-color-40);
+    border-radius: 10px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
+    background: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.edit-btn:hover {
+    background-color: var(--primary-color);
 }
