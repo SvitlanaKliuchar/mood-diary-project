@@ -1,6 +1,10 @@
 import styles from './SettingsList.module.css'
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import DeleteAccount from './modals/DeleteAccount.jsx';
+import ExportData from './modals/ExportData.jsx';
+import PushNotifications from './modals/PushNotifications.jsx';
+import ProfileInfo from './modals/ProfileInfo.jsx';
 
 const SettingsList = () => {
     const [darkMode, setDarkMode] = useState(false)
@@ -31,11 +35,10 @@ const SettingsList = () => {
                 <li>
                     <h2>Theme & Appearance</h2>
                     <div className={styles['toggle-container']}>
-                        <label htmlFor="dark-mode-toggle" className={styles['toggle-label']}>Dark Mode
+                        <label className={styles['toggle-label']}>
+                            Dark Mode
                             <input
                                 type="checkbox"
-                                id='dark-mode-toggle'
-                                name='dark-mode-toggle'
                                 checked={darkMode}
                                 onChange={handleToggle}
                                 className={styles['toggle-input']}
@@ -50,13 +53,12 @@ const SettingsList = () => {
                         <li>
                             <Link to="/notifications/push">Push Notifications</Link>
                         </li>
-                        <li>
-                            <Link to="/notifications/reminders">Custom Reminder Times</Link>
-                        </li>
                     </ul>
                 </li>
 
             </ul>
+          
+            <ProfileInfo />
         </nav>
     );
 };
