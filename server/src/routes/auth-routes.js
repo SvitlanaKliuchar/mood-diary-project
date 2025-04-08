@@ -5,9 +5,9 @@ import {
   logout,
   me
 } from "../controllers/auth-controller.js";
-import express from "express";
+import { Router } from "express";
 
-const authRouter = express.Router();
+const authRouter = Router();
 
 authRouter.post("/register", register);
 

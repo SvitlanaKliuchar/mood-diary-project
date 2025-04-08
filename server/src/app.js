@@ -13,7 +13,8 @@ import githubOAuthRouter from "./routes/github-oauth-routes.js";
 import './config/passport.js'
 import passport from "passport";
 import passwordResetRouter from "./routes/password-reset-routes.js";
-
+import settingsRouter from "./routes/settings-routes.js";
+import profileRouter from "./routes/profile-routes.js"
 
 const app = express();
 
@@ -40,7 +41,9 @@ app.use("/auth", googleOAuthRouter);
 app.use("/auth", githubOAuthRouter);
 app.use("/auth", passwordResetRouter)
 app.use("/moods", moodsRouter);
-app.use("/stats", statsRouter)
+app.use("/stats", statsRouter);
+app.use("/settings", settingsRouter);
+app.use("/profile", profileRouter)
 
 //error handling middlewares
 app.use(errorHandler);

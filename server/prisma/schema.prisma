@@ -26,16 +26,18 @@ model moods {
 }
 
 model users {
-  id             Int     @id @default(autoincrement())
-  username       String  @unique @db.VarChar(50)
-  email          String  @unique @db.VarChar(100)
-  password_hash  String
-  moods          moods[]
-  refreshTokens  refreshTokens[] 
-  googleId       String?   @unique
-  githubId       String?   @unique
+  id                   Int     @id @default(autoincrement())
+  username             String  @unique @db.VarChar(50)
+  email                String  @unique @db.VarChar(100)
+  password_hash        String
+  moods                moods[]
+  refreshTokens        refreshTokens[] 
+  googleId             String?   @unique
+  githubId             String?   @unique
   resetPasswordToken   String?  
   resetPasswordExpires DateTime?
+
+  settings             userSettings?
 }
 
 model refreshTokens {
@@ -49,4 +51,14 @@ model refreshTokens {
 
   @@index([userId])
   @@index([token])
+}
+
+model userSettings {
+  id                    Int      @id @default(autoincrement())
+  user                  users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               Int      @unique
+
+  darkMode              Boolean  @default(false)
+  notificationsEnabled  Boolean  @default(false)
+  notifyTime            String?
 }
