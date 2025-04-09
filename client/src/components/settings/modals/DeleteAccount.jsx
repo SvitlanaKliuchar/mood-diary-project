@@ -1,28 +1,37 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import styles from '../SettingsList.module.css';
+import axiosInstance from '../../../utils/axiosInstance.js'
+import { AuthContext } from '../../../contexts/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const DeleteAccount = ({ onClose }) => {
   const [password, setPassword] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const { user } = useContext(AuthContext)
+  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsDeleting(true);
+    try {
+      const response = await axiosInstance.delete(`/profile/${user.id}`, { data: { password } })
+      console.log(response)
 
-    // call api
-
-    //simulate deletion delay
-    setTimeout(() => {
       setIsDeleting(false);
-      onClose(); //close modal after action completes
-    }, 1000);
+      onClose();  
+      navigate('/')
+    } catch (err) {
+      console.error("Failed to delele account: ", err);
+      setIsDeleting(false);
+    }
+
   };
 
   return (
-   <div className={styles['settings-list']}>
-           <button onClick={onClose} className={styles['back-btn']} aria-label="Back">
-               ←
-           </button>
+    <div className={styles['settings-list']}>
+      <button onClick={onClose} className={styles['back-btn']} aria-label="Back">
+        ←
+      </button>
       <div className={styles['delete-account-container']}>
         <p id="delete-account-title" className={styles['main-text']}>
           Are you sure you want to delete your account?

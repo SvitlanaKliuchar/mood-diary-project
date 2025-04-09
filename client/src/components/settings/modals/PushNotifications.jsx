@@ -1,11 +1,37 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styles from '../SettingsList.module.css';
+import axiosInstance from '../../../utils/axiosInstance';
+import { AuthContext } from '../../../contexts/AuthContext';
 
 const PushNotifications = ({ onClose }) => {
   const [notificationsSettings, setNotificationsSettings] = useState({
     enabled: true,
     reminderTime: '20:00',
   });
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null);
+  const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchCurrentSettings = async () => {
+      try {
+        const response = await axiosInstance.get(`/settings/${user.id}`);
+        setNotificationsSettings({
+          enabled: response.data?.notificationsEnabled ?? false,
+          reminderTime: response.data?.notifyTime ?? '20:00',
+        });
+      } catch (err) {
+        console.error('Failed to fetch settings:', err);
+        setError('Could not load settings');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.id) {
+      fetchCurrentSettings();
+    }
+  }, [user]);
 
   const handleToggle = () => {
     setNotificationsSettings((prev) => ({
@@ -21,16 +47,28 @@ const PushNotifications = ({ onClose }) => {
     }));
   };
 
-  const handleSave = () => {
-    //  call the API here
-    onClose(); 
+  const handleSave = async () => {
+    try {
+      const response = await axiosInstance.patch(`/settings/${user.id}`, {
+        notificationsEnabled: notificationsSettings.enabled,
+        notifyTime: notificationsSettings.reminderTime,
+      });
+      console.log('Settings updated:', response.data);
+      onClose();
+    } catch (err) {
+      console.error('Error updating settings:', err);
+      setError('Error updating settings');
+    }
   };
+
+  if (loading) return <p>Loading settings...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className={styles['settings-list']}>
-            <button onClick={onClose} className={styles['back-btn']} aria-label="Back">
-                ←
-            </button>
+      <button onClick={onClose} className={styles['back-btn']} aria-label="Back">
+        ←
+      </button>
       <div className={styles['push-notifications-container']}>
         <p id="push-notifications-title" className={styles['main-text']}>
           Let us remind you to check in with your feelings each day

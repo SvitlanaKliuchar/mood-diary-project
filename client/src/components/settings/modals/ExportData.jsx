@@ -9,7 +9,7 @@ const ExportData = ({ onClose }) => {
     e.preventDefault();
     setIsExporting(true);
 
-    // await exportData(password);
+    // await exportData(password); TODO
 
     //simulate export delay
     setTimeout(() => {

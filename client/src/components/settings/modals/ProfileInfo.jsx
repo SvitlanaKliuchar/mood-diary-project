@@ -3,13 +3,14 @@ import styles from '../SettingsList.module.css';
 import EditableField from './EditableField.jsx';
 import { AuthContext } from '../../../contexts/AuthContext.jsx';
 import { profileUpdateSchema } from '../../../schemas/validationSchemas.js';
+import axiosInstance from '../../../utils/axiosInstance.js';
 
 const ProfileInfo = ({ onClose }) => {
-    const { user } = useContext(AuthContext);
+    const { user, setUser } = useContext(AuthContext);
 
     const [username, setUsername] = useState(user.username);
     const [email, setEmail] = useState(user.email);
-    const [password, setPassword] = useState(user.password);
+    const [password, setPassword] = useState(''); //for security reasons
     const [errors, setErrors] = useState({
         username: '',
         email: '',
@@ -25,7 +26,20 @@ const ProfileInfo = ({ onClose }) => {
             if (field === 'email') setEmail(newValue);
             if (field === 'password') setPassword(newValue);
 
-            //  send to backend here
+            //build the payload with only the updated field
+            const payload = { [field]: newValue };
+    
+            const response = await axiosInstance.patch(`/profile/update/${user.id}`, payload);
+            console.log('Profile updated:', response.data)
+
+            // Optionally, update the AuthContext if the user profile changes
+            if (field === 'username') setUsername(response.data.username);
+            if (field === 'email') setEmail(response.data.email);
+            if (field === 'password') setPassword(''); // Clear password after successful update
+
+            //update the user context with new profile data
+            setUser(response.data);
+
             return true;
         } catch (error) {
             setErrors(prev => ({ ...prev, [field]: error.message }));
@@ -35,9 +49,9 @@ const ProfileInfo = ({ onClose }) => {
 
     return (<div className={styles['settings-list']}>
         <div className={styles['profile-container']}>
-        <button onClick={onClose} className={styles['back-btn']} aria-label="Back">
-            ←
-        </button>
+            <button onClick={onClose} className={styles['back-btn']} aria-label="Back">
+                ←
+            </button>
 
 
             <p id="profile-info-title" className={styles['main-text']}>
