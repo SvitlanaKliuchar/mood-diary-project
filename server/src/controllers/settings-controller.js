@@ -4,9 +4,20 @@ import prisma from "../config/db.js";
 export const getUserSettings = async (req, res, next) => {
     try {
         const userId = parseInt(req.params.userId, 10) //'/user-settings/:userId'
-        const settings = await prisma.userSettings.findUnique({
+        let settings = await prisma.userSettings.findUnique({
             where: { userId }
         })
+        if (!settings) {
+            //if no settings exist, create a default record.
+            settings = await prisma.userSettings.create({
+                data: {
+                    userId,
+                    darkMode: false,               // default value
+                    notificationsEnabled: false,   // default value
+                    notifyTime: '20:00',           // default value
+                },
+            });
+        }
         res.json(settings)
     } catch (err) {
         next(err)
@@ -18,7 +29,7 @@ export const updateUserSettings = async (req, res, next) => {
     try {
         const userId = parseInt(req.params.userId, 10)
         // destructure only the possible settings fields
-        const { darkMode, notificationsEnabled, notifyTime } = req.body
+        const { notificationsEnabled, notifyTime } = req.body
 
         //retrieve the current settings for default values
         const currentSettings = await prisma.userSettings.findUnique({
@@ -32,8 +43,6 @@ export const updateUserSettings = async (req, res, next) => {
         const updatedSettings = await prisma.userSettings.update({
             where: { userId },
             data: {
-                darkMode:
-                    darkMode === undefined ? currentSettings.darkMode : darkMode,
                 notificationsEnabled:
                     notificationsEnabled === undefined
                         ? currentSettings.notificationsEnabled

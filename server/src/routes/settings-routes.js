@@ -5,9 +5,9 @@ import { Router } from "express";
 const settingsRouter = Router()
 
 //get user settings
-settingsRouter.get('/:userId', authenticate, getUserSettings)
+settingsRouter.get('/:userId', getUserSettings)
 
 //update user settings partially (patch)
-settingsRouter.patch('/:userId', authenticate, updateUserSettings)
+settingsRouter.patch('/:userId', updateUserSettings)
 
 export default settingsRouter
