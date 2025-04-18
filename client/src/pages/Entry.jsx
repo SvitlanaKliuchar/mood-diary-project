@@ -2,7 +2,7 @@ import NavBar from "../components/landing/NavBar.jsx";
 import EntryForm from "../components/entry/EntryForm.jsx";
 import Footer from "../components/landing/Footer.jsx";
 
-const Login = () => {
+const Entry = () => {
   return (
     <>
       <NavBar />
@@ -12,4 +12,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Entry;

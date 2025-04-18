@@ -3,7 +3,7 @@ import Header from "../components/home/Header.jsx";
 import Entries from "../components/home/Entries.jsx";
 import Footer from "../components/landing/Footer.jsx";
 
-const Login = () => {
+const Home = () => {
   return (
     <>
       <NavBar />
@@ -14,4 +14,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Home;

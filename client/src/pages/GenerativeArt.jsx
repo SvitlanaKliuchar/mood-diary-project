@@ -1,15 +1,15 @@
 import NavBar from "../components/landing/NavBar.jsx";
-import MoodCalendar from "../components/calendar/MoodCalendar.jsx";
 import Footer from "../components/landing/Footer.jsx";
+import TestGenArt from "../components/gen-art/TestGenArt.jsx";
 
-const Calendar = () => {
+const GenArtPage = () => {
   return (
     <>
       <NavBar />
-      <MoodCalendar />
+      <TestGenArt />
       <Footer />
     </>
   );
 };
 
-export default Calendar;
+export default GenArtPage;

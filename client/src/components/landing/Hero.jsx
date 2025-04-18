@@ -19,6 +19,10 @@ const Hero = () => {
           Why Track?
         </a>
       </div>
+      <div>
+      <h1>Generative Art Test</h1>
+      <GenerativeArt moodLogs={mockMoodLogs} />
+    </div>
     </section>
   );
 };

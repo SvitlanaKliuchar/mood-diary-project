@@ -2,7 +2,7 @@ import NavBar from "../components/landing/NavBar.jsx";
 import MoodDashboard from "../components/stats/MoodDashboard.jsx";
 import Footer from "../components/landing/Footer.jsx";
 
-const Login = () => {
+const Stats = () => {
   return (
     <>
       <NavBar />
@@ -12,4 +12,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Stats;
