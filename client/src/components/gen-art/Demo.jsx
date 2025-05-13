@@ -1,37 +1,31 @@
 import React, { useState } from 'react';
-import EtherealGenerativeArt from './EtherealGenArt';
+import EtherealGenArt from './EtherealGenArt';
+import { mockMoodEntries } from '@/data/mockMoodEntries.js';
 
 export default function DemoComponent() {
-  //sample mood data
-  const [moodLogs, setMoodLogs] = useState([
-    { 
-      date: '2025-05-06', 
-      mood: 'great',
-      notes: 'Had a wonderful day, feeling inspired and energetic.'
-    },
-    { 
-      date: '2025-05-05', 
-      mood: 'good',
-      notes: 'Productive day at work, made progress on my projects.'
-    },
-    { 
-      date: '2025-05-04', 
-      mood: 'meh',
-      notes: 'Nothing particularly memorable today.'
-    }
-  ]);
-
-  //function to add a new mood entry
-  const addMood = (mood) => {
-    const today = new Date().toISOString().split('T')[0];
-    const newMood = {
-      date: today,
-      mood: mood,
-      notes: `Added ${mood} mood from demo`
-    };
-    
-    setMoodLogs([newMood, ...moodLogs]);
+  // initialize state with the mock rows
+  const [moodLogs, setMoodLogs] = useState(
+    mockMoodEntries.map(e => ({
+      ...e,
+      date: typeof e.date === 'string'
+        ? e.date
+        : e.date.toISOString().slice(0,10)
+    }))
+  );
+  // helper to add a new entry
+  const addMood = (mood, emotions = []) => {
+    setMoodLogs(prev => [
+      {
+        id: crypto.randomUUID(),                 // unique key
+        date: new Date().toISOString().split('T')[0],
+        mood,
+        emotions,                               
+        notes: `added ${mood} mood from demo`
+      },
+      ...prev
+    ]);
   };
+
 
   return (
     <div className="demo-container" style={{
@@ -137,7 +131,7 @@ export default function DemoComponent() {
         overflow: "hidden",
         boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
       }}>
-        <EtherealGenerativeArt moodLogs={moodLogs} />
+        <EtherealGenArt moodLogs={moodLogs} />
       </div>
       
       {/* mood log display */}

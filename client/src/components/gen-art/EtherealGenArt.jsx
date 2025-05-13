@@ -1,78 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import { buildArtConfig } from "@/data/gen-art-mapping.js"
 
-// helper function to generate art configuration based on mood data
-const generateArtFromMood = (moodLogs) => {
-  if (!moodLogs || moodLogs.length === 0) {
-    return [{
-      mood: "good",
-      color: "#58D68D",
-      secondaryColor: "#B3E6D1",
-      intensity: 0.7,
-      flow: 0.5,
-      complexity: 0.6
-    }];
-  }
-
-  // map moods to art configurations
-  return moodLogs.map(log => {
-    // base configurations for different moods
-    const moodConfigs = {
-      great: {
-        color: "#7574E1", //purple
-        secondaryColor: "#B6DCFF", //light blue
-        intensity: 0.8,
-        flow: 0.7,
-        complexity: 0.6
-      },
-      good: {
-        color: "#58D68D", // green
-        secondaryColor: "#D3F8EC", // light mint
-        intensity: 0.7,
-        flow: 0.6,
-        complexity: 0.5
-      },
-      meh: {
-        color: "#AEB6BF", // gray
-        secondaryColor: "#E5E8E8", // light gray
-        intensity: 0.5,
-        flow: 0.4,
-        complexity: 0.3
-      },
-      bad: {
-        color: "#E59866", // orange
-        secondaryColor: "#FADBD8", // light pink
-        intensity: 0.6,
-        flow: 0.3,
-        complexity: 0.7
-      },
-      awful: {
-        color: "#EC7063", // red
-        secondaryColor: "#F5B7B1", // light red
-        intensity: 0.5,
-        flow: 0.2,
-        complexity: 0.8
-      }
-    };
-
-    // get base config for the mood, defaulting to "meh" if not found
-    const baseConfig = moodConfigs[log.mood] || moodConfigs.meh;
-    
-    // combine with additional data from the log
-    return {
-      mood: log.mood,
-      date: log.date,
-      notes: log.notes || "",
-      ...baseConfig
-    };
-  });
-};
-
-export default function EtherealGenerativeArt({ moodLogs }) {
+const EtherealGenArt = ({ moodLogs }) => {
   const canvasRef = useRef(null);
   const [isAnimating, setIsAnimating] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const animationRef = useRef(null);
-  const artConfigs = useRef(generateArtFromMood(moodLogs));
+  const artConfigs = useRef(moodLogs.map(buildArtConfig));
 
   // animation state
   const animationState = useRef({
@@ -85,15 +19,17 @@ export default function EtherealGenerativeArt({ moodLogs }) {
 
   useEffect(() => {
     // update art configurations when moodLogs change
-    artConfigs.current = generateArtFromMood(moodLogs);
-    
+    const cfg = moodLogs.map(buildArtConfig);
+    // console.table(cfg);
+    artConfigs.current = cfg;
+
     // initialize canvas
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext("2d");
     const container = canvas.parentElement;
-    
+
     // set canvas dimensions with higher resolution for better quality
     const dpr = window.devicePixelRatio || 1;
     canvas.width = (container.clientWidth || 800) * dpr;
@@ -101,15 +37,15 @@ export default function EtherealGenerativeArt({ moodLogs }) {
     canvas.style.width = `${container.clientWidth || 800}px`;
     canvas.style.height = "500px";
     ctx.scale(dpr, dpr);
-    
+
     // initialize the art
     setupArt(artConfigs.current);
-    
+
     // start animation loop
     if (isAnimating) {
       startAnimationLoop();
     }
-    
+
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -120,10 +56,10 @@ export default function EtherealGenerativeArt({ moodLogs }) {
   const setupArt = (configs) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const width = canvas.width / (window.devicePixelRatio || 1);
     const height = canvas.height / (window.devicePixelRatio || 1);
-    
+
     // reset animation state
     animationState.current = {
       time: 0,
@@ -132,20 +68,20 @@ export default function EtherealGenerativeArt({ moodLogs }) {
       particles: [],
       lastFrameTime: 0
     };
-    
+
     // generate flow fields based on moods
     animationState.current.flowFields = createFlowFields(configs, width, height);
-    
+
     // create background layers
     animationState.current.layers = createLayers(configs, width, height);
-    
+
     // generate particles for motion
     animationState.current.particles = createParticles(configs, width, height);
   };
 
   const createFlowFields = (configs, width, height) => {
     const flowFields = [];
-    
+
     // create flow fields based on mood configurations
     configs.forEach(config => {
       const field = {
@@ -158,7 +94,7 @@ export default function EtherealGenerativeArt({ moodLogs }) {
         noiseScale: 0.003 + (config.complexity * 0.005), // affects flow complexity
         noiseSpeed: 0.0005 + (config.flow * 0.001) // affects flow movement speed
       };
-      
+
       // initialize flow field grid
       for (let y = 0; y < height; y += field.resolution) {
         for (let x = 0; x < width; x += field.resolution) {
@@ -169,22 +105,23 @@ export default function EtherealGenerativeArt({ moodLogs }) {
           });
         }
       }
-      
+
       flowFields.push(field);
     });
-    
+
     return flowFields;
   };
 
   const createLayers = (configs, width, height) => {
     const layers = [];
-    
+
     // create background gradient layers
     configs.forEach((config, index) => {
       // create a few organic shapes for each mood
       for (let i = 0; i < 3; i++) {
         layers.push({
-          type: "organicBlob",
+          //type: "organicBlob",
+          type: config.shape || "organicBlob",
           x: Math.random() * width,
           y: Math.random() * height,
           size: 100 + Math.random() * 200,
@@ -196,7 +133,7 @@ export default function EtherealGenerativeArt({ moodLogs }) {
           offset: Math.random() * Math.PI * 2
         });
       }
-      
+
       // create flowing lines
       for (let i = 0; i < 5; i++) {
         layers.push({
@@ -213,17 +150,17 @@ export default function EtherealGenerativeArt({ moodLogs }) {
         });
       }
     });
-    
+
     return layers;
   };
 
   const createParticles = (configs, width, height) => {
     const particles = [];
-    
+
     configs.forEach(config => {
       // create floating particles
       const particleCount = Math.floor(30 + (config.intensity * 50));
-      
+
       for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: Math.random() * width,
@@ -238,54 +175,54 @@ export default function EtherealGenerativeArt({ moodLogs }) {
         });
       }
     });
-    
+
     return particles;
   };
 
   const startAnimationLoop = () => {
     const animate = (timestamp) => {
       if (!isAnimating) return;
-      
+
       const deltaTime = timestamp - (animationState.current.lastFrameTime || timestamp);
       animationState.current.lastFrameTime = timestamp;
       animationState.current.time += deltaTime;
-      
+
       renderFrame(deltaTime / 1000); // convert to seconds
-      
+
       animationRef.current = requestAnimationFrame(animate);
     };
-    
+
     animationRef.current = requestAnimationFrame(animate);
   };
 
   const renderFrame = (deltaTime) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext("2d");
     const width = canvas.width / (window.devicePixelRatio || 1);
     const height = canvas.height / (window.devicePixelRatio || 1);
-    
+
     // clear with fading effect
     ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
     ctx.fillRect(0, 0, width, height);
-    
+
     // update flow fields
     updateFlowFields(deltaTime);
-    
+
     // render base layers
     renderLayers(ctx, width, height, deltaTime);
-    
+
     // update and render particles
     updateAndRenderParticles(ctx, width, height, deltaTime);
-    
+
     // apply final effects
     applyFinalEffects(ctx, width, height);
   };
 
   const updateFlowFields = (deltaTime) => {
     const time = animationState.current.time;
-    
+
     // update all flow fields
     animationState.current.flowFields.forEach(field => {
       field.grid.forEach(point => {
@@ -294,7 +231,7 @@ export default function EtherealGenerativeArt({ moodLogs }) {
         const xOffset = point.x * field.noiseScale;
         const yOffset = point.y * field.noiseScale;
         const timeOffset = time * field.noiseSpeed;
-        
+
         const noiseValue = Math.sin(xOffset + timeOffset) * Math.cos(yOffset - timeOffset);
         point.angle = noiseValue * Math.PI * 2;
       });
@@ -303,125 +240,196 @@ export default function EtherealGenerativeArt({ moodLogs }) {
 
   const renderLayers = (ctx, width, height, deltaTime) => {
     const time = animationState.current.time;
-    
+
     animationState.current.layers.forEach(layer => {
       ctx.save();
-      
+
       switch (layer.type) {
-        case "organicBlob":
-          // render organic blob shape
-          ctx.globalAlpha = layer.alpha;
-          ctx.fillStyle = layer.color;
-          
-          // create a pulsating blob
-          const phase = time * layer.speed + layer.offset;
-          
-          ctx.beginPath();
-          
-          // calculate points around the center
-          for (let i = 0; i <= layer.points * 2; i++) {
-            const angle = (i / (layer.points * 2)) * Math.PI * 2;
-            const radius = layer.size + 
-              Math.sin(angle * layer.points + phase) * layer.amplitude + 
-              Math.cos(angle * (layer.points / 2) + phase) * (layer.amplitude / 2);
-            
-            const x = layer.x + Math.cos(angle) * radius;
-            const y = layer.y + Math.sin(angle) * radius;
-            
-            if (i === 0) {
-              ctx.moveTo(x, y);
-            } else {
-              ctx.lineTo(x, y);
-            }
-          }
-          
-          ctx.closePath();
-          ctx.fill();
-          break;
-          
-        case "flowingLine":
-          // render flowing line
-          ctx.globalAlpha = layer.alpha;
-          ctx.strokeStyle = layer.color;
-          ctx.lineWidth = layer.thickness;
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          
-          // find the nearest flow field
-          const flowField = animationState.current.flowFields[0]; // just use the first one for simplicity
-          
-          // starting point
-          let x = layer.startX;
-          let y = layer.startY;
-          
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          
-          // draw the line following the flow field
-          for (let i = 0; i < layer.segments; i++) {
-            // get flow direction at this point
-            const flowAngle = getFlowAngleAt(x, y, flowField);
-            
-            // calculate next point based on flow
-            const length = layer.length / layer.segments;
-            const nextX = x + Math.cos(flowAngle) * length * layer.flowScale;
-            const nextY = y + Math.sin(flowAngle) * length * layer.flowScale;
-            
-            // add some gentle curves with control points
-            const controlX = x + Math.cos(flowAngle + 0.2) * length * 0.8;
-            const controlY = y + Math.sin(flowAngle + 0.2) * length * 0.8;
-            
-            ctx.quadraticCurveTo(controlX, controlY, nextX, nextY);
-            
-            x = nextX;
-            y = nextY;
-          }
-          
-          ctx.stroke();
-          break;
+        case "organicBlob":   renderBlob(ctx, layer, time);    break;
+        case "flowingLine":   renderFlowLine(ctx, layer, time);break;
+        case "spike":         renderSpike(ctx, layer, time);   break;
+        case "burst":         renderBurst(ctx, layer, time);   break;
+        case "ripple":        renderRipple(ctx, layer, time);  break;
+        case "drip":          renderDrip(ctx, layer, time);    break;
+        default:              renderBlob(ctx, layer, time);    break;
       }
       
       ctx.restore();
     });
   };
 
+  // Define the missing render functions
+  const renderBlob = (ctx, l, t) => {
+    ctx.globalAlpha = l.alpha;
+    ctx.fillStyle = l.color;
+    
+    ctx.beginPath();
+    const points = l.points || 5;
+    
+    for (let i = 0; i <= points; i++) {
+      const angle = (i / points) * Math.PI * 2;
+      const radius = l.size + Math.sin(angle * 3 + t * l.speed + l.offset) * l.amplitude;
+      const x = l.x + Math.cos(angle) * radius;
+      const y = l.y + Math.sin(angle) * radius;
+      
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    }
+    
+    ctx.closePath();
+    ctx.fill();
+  };
+
+  const renderFlowLine = (ctx, l, t) => {
+    ctx.globalAlpha = l.alpha;
+    ctx.strokeStyle = l.color;
+    ctx.lineWidth = l.thickness;
+    
+    // Create flowing line with segments
+    ctx.beginPath();
+    let x = l.startX;
+    let y = l.startY;
+    ctx.moveTo(x, y);
+    
+    const segmentLength = l.length / l.segments;
+    
+    for (let i = 0; i < l.segments; i++) {
+      const angle = Math.sin(t * l.speed + i * 0.5) * Math.PI * l.flowScale;
+      x += Math.cos(angle) * segmentLength;
+      y += Math.sin(angle) * segmentLength;
+      ctx.lineTo(x, y);
+    }
+    
+    ctx.stroke();
+  };
+
+  const renderDrip = (ctx, l, t) => {
+    ctx.globalAlpha = l.alpha;
+    ctx.fillStyle = l.color;
+    
+    // Draw a dripping effect
+    const drips = 5;
+    const maxLength = l.size;
+    
+    for (let i = 0; i < drips; i++) {
+      const angle = (i / drips) * Math.PI * 2;
+      const xBase = l.x + Math.cos(angle) * l.size * 0.5;
+      const yBase = l.y + Math.sin(angle) * l.size * 0.5;
+      
+      const dripLength = maxLength * (0.3 + Math.sin(t * l.speed + i) * 0.7);
+      
+      ctx.beginPath();
+      ctx.moveTo(xBase, yBase);
+      ctx.quadraticCurveTo(
+        xBase + Math.cos(angle) * dripLength * 0.5,
+        yBase + Math.sin(angle) * dripLength * 1.5,
+        xBase + Math.cos(angle) * dripLength,
+        yBase + Math.sin(angle) * dripLength
+      );
+      ctx.lineTo(xBase, yBase);
+      ctx.fill();
+    }
+  };
+
+  function renderSpike(ctx,l,t){
+    ctx.globalAlpha = l.alpha;
+    ctx.fillStyle   = l.color;
+    const pts = 24;                     // sharp star
+    ctx.beginPath();
+    for(let i=0;i<=pts;i++){
+      const a = (i/pts)*Math.PI*2;
+      const r = l.size + Math.sin(a*pts + t*l.speed)*l.amplitude;
+      ctx.lineTo(l.x + Math.cos(a)*r, l.y + Math.sin(a)*r);
+    }
+    ctx.closePath(); ctx.fill();
+  }
+  
+  function renderBurst(ctx,l,t){
+    ctx.globalAlpha = l.alpha;
+    ctx.strokeStyle = l.color;
+    ctx.lineWidth   = 1;
+    const rays = 40;
+    ctx.beginPath();
+    for(let i=0;i<rays;i++){
+      const a = (i/rays)*Math.PI*2;
+      const r = l.size + Math.sin(t*l.speed+i)*l.amplitude;
+      ctx.moveTo(l.x, l.y);
+      ctx.lineTo(l.x + Math.cos(a)*r, l.y + Math.sin(a)*r);
+    }
+    ctx.stroke();
+  }
+  
+  function renderRipple(ctx,l,t){
+    ctx.globalAlpha = l.alpha;
+    ctx.strokeStyle = l.color;
+    ctx.lineWidth   = 1;
+    const rings = 4;
+    for(let i=1;i<=rings;i++){
+      const r = l.size*i*0.4 + Math.sin(t*l.speed+i)*l.amplitude*0.1;
+      ctx.beginPath();
+      ctx.arc(l.x, l.y, r, 0, Math.PI*2);
+      ctx.stroke();
+    }
+  }
+  
   const updateAndRenderParticles = (ctx, width, height, deltaTime) => {
     const time = animationState.current.time;
-    
+
     // get the first flow field for particle movement
     const flowField = animationState.current.flowFields[0];
-    
+
     animationState.current.particles.forEach(particle => {
       // get flow direction at particle position
       const flowAngle = getFlowAngleAt(particle.x, particle.y, flowField);
-      
+
       // update particle position based on flow field
       const flowInfluence = particle.flowInfluence;
       const combinedAngle = (flowAngle * flowInfluence) + (particle.angle * (1 - flowInfluence));
-      
+
       particle.x += Math.cos(combinedAngle) * particle.speed * deltaTime;
       particle.y += Math.sin(combinedAngle) * particle.speed * deltaTime;
-      
+
       // wrap around edges
       if (particle.x < 0) particle.x = width;
       if (particle.x > width) particle.x = 0;
       if (particle.y < 0) particle.y = height;
       if (particle.y > height) particle.y = 0;
-      
+
       // pulsating size effect
       const pulseSize = particle.size * (0.8 + Math.sin(time * particle.pulse) * 0.2);
-      
+
       // render particle
       ctx.globalAlpha = particle.alpha;
+
+      // Create transparent color properly
+      let baseColor = particle.color;
+      let transparentColor;
       
+      // Check if the color is an RGB/RGBA string
+      if (baseColor.startsWith('rgb')) {
+        // Extract RGB values and create transparent version
+        const rgbMatch = baseColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/);
+        if (rgbMatch) {
+          transparentColor = `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, 0)`;
+        } else {
+          transparentColor = 'rgba(255, 255, 255, 0)'; // Fallback
+        }
+      } else {
+        // For hex or named colors, use rgba with opacity 0
+        transparentColor = 'rgba(255, 255, 255, 0)'; // Fallback
+      }
+
       // use a gradient for soft particles
       const gradient = ctx.createRadialGradient(
         particle.x, particle.y, 0,
         particle.x, particle.y, pulseSize * 2
       );
-      gradient.addColorStop(0, particle.color);
-      gradient.addColorStop(1, particle.color + "00"); // transparent
-      
+      gradient.addColorStop(0, baseColor);
+      gradient.addColorStop(1, transparentColor);
+
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(particle.x, particle.y, pulseSize * 2, 0, Math.PI * 2);
@@ -433,20 +441,34 @@ export default function EtherealGenerativeArt({ moodLogs }) {
     if (!flowField || !flowField.grid || flowField.grid.length === 0) {
       return 0;
     }
-    
-    // find the closest grid point
+
+    // find the closest grid point more efficiently
     const res = flowField.resolution;
     const gridX = Math.floor(x / res);
     const gridY = Math.floor(y / res);
     
-    // find the index in the grid array
+    // Calculate index directly instead of linear search
+    // This assumes grid points are laid out in a regular grid
+    const canvas = canvasRef.current;
+    if (!canvas) return 0;
+    
+    const width = Math.ceil(canvas.width / (window.devicePixelRatio || 1) / res);
+    
+    if (gridX >= 0 && gridY >= 0 && gridX < width) {
+      const index = gridY * width + gridX;
+      if (index < flowField.grid.length) {
+        return flowField.grid[index].angle;
+      }
+    }
+
+    // Fallback to linear search if direct indexing fails
     for (let i = 0; i < flowField.grid.length; i++) {
       const point = flowField.grid[i];
       if (Math.floor(point.x / res) === gridX && Math.floor(point.y / res) === gridY) {
         return point.angle;
       }
     }
-    
+
     // if not found, return a default angle
     return 0;
   };
@@ -459,11 +481,11 @@ export default function EtherealGenerativeArt({ moodLogs }) {
     );
     gradient.addColorStop(0, 'transparent');
     gradient.addColorStop(1, 'rgba(250, 250, 250, 0.2)');
-    
+
     ctx.globalAlpha = 0.3;
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
-    
+
     // add very subtle grain texture
     ctx.globalAlpha = 0.01;
     for (let i = 0; i < width * height * 0.0003; i++) {
@@ -483,15 +505,19 @@ export default function EtherealGenerativeArt({ moodLogs }) {
     }
     setIsAnimating(!isAnimating);
   };
-  
+
   // function to export the current canvas as an image
   const exportAsImage = () => {
     setIsExporting(true);
-    
+
     try {
       const canvas = canvasRef.current;
-      const dataUrl = canvas.toDataURL("image/png");
+      if (!canvas) {
+        throw new Error("Canvas not available");
+      }
       
+      const dataUrl = canvas.toDataURL("image/png");
+
       // create temporary link to download the image
       const link = document.createElement('a');
       link.href = dataUrl;
@@ -501,6 +527,7 @@ export default function EtherealGenerativeArt({ moodLogs }) {
       document.body.removeChild(link);
     } catch (error) {
       console.error('error exporting image:', error);
+      // Could add user notification here
     } finally {
       setIsExporting(false);
     }
@@ -508,16 +535,16 @@ export default function EtherealGenerativeArt({ moodLogs }) {
 
   return (
     <div className="ethereal-art-container" style={{ width: "100%", height: "500px", position: "relative" }}>
-      <canvas 
+      <canvas
         ref={canvasRef}
-        style={{ 
-          width: "100%", 
-          height: "100%", 
+        style={{
+          width: "100%",
+          height: "100%",
           borderRadius: "8px",
           boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
         }}
       />
-      <div 
+      <div
         className="art-controls"
         style={{
           position: "absolute",
@@ -527,8 +554,8 @@ export default function EtherealGenerativeArt({ moodLogs }) {
           gap: "10px"
         }}
       >
-        <button 
-          onClick={toggleAnimation} 
+        <button
+          onClick={toggleAnimation}
           className="art-control-btn"
           style={{
             padding: "8px 16px",
@@ -542,8 +569,8 @@ export default function EtherealGenerativeArt({ moodLogs }) {
         >
           {isAnimating ? 'Pause' : 'Play'}
         </button>
-        <button 
-          onClick={exportAsImage} 
+        <button
+          onClick={exportAsImage}
           className="art-control-btn"
           disabled={isExporting}
           style={{
@@ -561,4 +588,6 @@ export default function EtherealGenerativeArt({ moodLogs }) {
       </div>
     </div>
   );
-}
+};
+
+export default EtherealGenArt;
