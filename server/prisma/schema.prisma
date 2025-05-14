@@ -31,6 +31,7 @@ model users {
   email                String  @unique @db.VarChar(100)
   password_hash        String
   moods                moods[]
+  arts                 arts[]
   refreshTokens        refreshTokens[] 
   googleId             String?   @unique
   githubId             String?   @unique
@@ -56,9 +57,20 @@ model refreshTokens {
 model userSettings {
   id                    Int      @id @default(autoincrement())
   user                  users    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId               Int      @unique
+  userId                Int      @unique
 
   darkMode              Boolean  @default(false)
   notificationsEnabled  Boolean  @default(false)
   notifyTime            String?
+}
+
+model arts {
+  id          Int        @id @default(autoincrement())
+  user        users       @relation(fields: [userId], references: [id])
+  userId      Int    
+  imageUrl    String
+  title       String?
+  createdAt   DateTime   @default(now())
+
+  @@index([userId])
 }
