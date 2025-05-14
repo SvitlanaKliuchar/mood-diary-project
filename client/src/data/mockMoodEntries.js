@@ -1,4 +1,3 @@
-// mockData.js
 export const mockMoodEntries = [
     {
       id: 1,

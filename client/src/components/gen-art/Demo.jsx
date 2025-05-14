@@ -1,31 +1,46 @@
 import React, { useState } from 'react';
 import EtherealGenArt from './EtherealGenArt';
-import { mockMoodEntries } from '@/data/mockMoodEntries.js';
+import { mockMoodEntries } from '../../data/mockMoodEntries.js';
+import { recordCanvasAsGif } from '../../utils/recordCanvasAsGif.js'; // make sure this path matches your project
 
 export default function DemoComponent() {
-  // initialize state with the mock rows
   const [moodLogs, setMoodLogs] = useState(
     mockMoodEntries.map(e => ({
       ...e,
       date: typeof e.date === 'string'
         ? e.date
-        : e.date.toISOString().slice(0,10)
+        : e.date.toISOString().slice(0, 10)
     }))
   );
-  // helper to add a new entry
+  const [isGeneratingGif, setIsGeneratingGif] = useState(false);
+
+
   const addMood = (mood, emotions = []) => {
     setMoodLogs(prev => [
       {
-        id: crypto.randomUUID(),                 // unique key
+        id: crypto.randomUUID(),
         date: new Date().toISOString().split('T')[0],
         mood,
-        emotions,                               
+        emotions,
         notes: `added ${mood} mood from demo`
       },
       ...prev
     ]);
   };
 
+  const handleSaveGif = () => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) {
+      alert('No canvas found. Make sure the art has rendered.');
+      return;
+    }
+
+    setIsGeneratingGif(true);
+
+    recordCanvasAsGif(canvas, 5000, 24, () => {
+      setIsGeneratingGif(false);
+    });
+  };
 
   return (
     <div className="demo-container" style={{
@@ -40,7 +55,7 @@ export default function DemoComponent() {
         color: "#333",
         fontWeight: "500"
       }}>Ethereal Mood Art</h1>
-      
+
       <div style={{
         marginBottom: "20px",
         padding: "16px",
@@ -50,90 +65,61 @@ export default function DemoComponent() {
         <p style={{ marginBottom: "12px" }}>
           Visualize your emotions through flowing, organic art. Add different moods to see how the visualization changes.
         </p>
-        
+
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-          <button 
-            onClick={() => addMood('great')}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#7574E1",
-              color: "white",
-              border: "none",
-              borderRadius: "20px",
-              cursor: "pointer"
-            }}
-          >
-            Add Great Mood
-          </button>
-          
-          <button 
-            onClick={() => addMood('good')}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#58D68D",
-              color: "white",
-              border: "none",
-              borderRadius: "20px",
-              cursor: "pointer"
-            }}
-          >
-            Add Good Mood
-          </button>
-          
-          <button 
-            onClick={() => addMood('meh')}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#AEB6BF",
-              color: "white",
-              border: "none",
-              borderRadius: "20px",
-              cursor: "pointer"
-            }}
-          >
-            Add Meh Mood
-          </button>
-          
-          <button 
-            onClick={() => addMood('bad')}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#E59866",
-              color: "white",
-              border: "none",
-              borderRadius: "20px",
-              cursor: "pointer"
-            }}
-          >
-            Add Bad Mood
-          </button>
-          
-          <button 
-            onClick={() => addMood('awful')}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#EC7063",
-              color: "white",
-              border: "none",
-              borderRadius: "20px",
-              cursor: "pointer"
-            }}
-          >
-            Add Awful Mood
-          </button>
+          {['great', 'good', 'meh', 'bad', 'awful'].map(mood => (
+            <button
+              key={mood}
+              onClick={() => addMood(mood)}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: {
+                  great: "#7574E1",
+                  good: "#58D68D",
+                  meh: "#AEB6BF",
+                  bad: "#E59866",
+                  awful: "#EC7063"
+                }[mood],
+                color: "white",
+                border: "none",
+                borderRadius: "20px",
+                cursor: "pointer"
+              }}
+            >
+              Add {mood.charAt(0).toUpperCase() + mood.slice(1)} Mood
+            </button>
+          ))}
         </div>
       </div>
-      
+
       {/* the art visualization */}
       <div style={{
-        marginBottom: "20px",
+        marginBottom: "12px",
         borderRadius: "8px",
         overflow: "hidden",
         boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
       }}>
         <EtherealGenArt moodLogs={moodLogs} />
       </div>
-      
+
+      <button
+        onClick={handleSaveGif}
+        disabled={isGeneratingGif}
+        style={{
+          marginBottom: "30px",
+          padding: "10px 20px",
+          backgroundColor: isGeneratingGif ? "#ccc" : "#FF6F61",
+          color: "white",
+          border: "none",
+          borderRadius: "20px",
+          fontWeight: "bold",
+          cursor: isGeneratingGif ? "not-allowed" : "pointer"
+        }}
+      >
+        {isGeneratingGif ? "Generating GIF..." : "Save as GIF"}
+      </button>
+
+
       {/* mood log display */}
       <div>
         <h2 style={{
@@ -141,7 +127,7 @@ export default function DemoComponent() {
           marginBottom: "12px",
           color: "#555"
         }}>Mood History</h2>
-        
+
         <div style={{
           display: "flex",
           flexDirection: "column",
@@ -152,12 +138,11 @@ export default function DemoComponent() {
               padding: "12px",
               backgroundColor: "#f9f9f9",
               borderRadius: "6px",
-              borderLeft: `4px solid ${
-                log.mood === 'great' ? '#7574E1' :
-                log.mood === 'good' ? '#58D68D' :
-                log.mood === 'meh' ? '#AEB6BF' :
-                log.mood === 'bad' ? '#E59866' : '#EC7063'
-              }`
+              borderLeft: `4px solid ${log.mood === 'great' ? '#7574E1' :
+                  log.mood === 'good' ? '#58D68D' :
+                    log.mood === 'meh' ? '#AEB6BF' :
+                      log.mood === 'bad' ? '#E59866' : '#EC7063'
+                }`
             }}>
               <div style={{
                 display: "flex",

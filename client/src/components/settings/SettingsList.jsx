@@ -4,6 +4,7 @@ import DeleteAccount from './modals/DeleteAccount.jsx';
 import ExportData from './modals/ExportData.jsx';
 import PushNotifications from './modals/PushNotifications.jsx';
 import ProfileInfo from './modals/ProfileInfo.jsx';
+import Gallery from './modals/Gallery.jsx';
 
 const SettingsList = () => {
     const [darkMode, setDarkMode] = useState(false)
@@ -24,6 +25,7 @@ const SettingsList = () => {
                             <li><button onClick={() => setActivePanel('profile')}>Personal Info</button></li>
                             <li><button onClick={() => setActivePanel('delete')}>Delete Account</button></li>
                             <li><button onClick={() => setActivePanel('export')}>Export/Import Data</button></li>
+                            <li><button onClick={() => setActivePanel('gallery')}>Gallery</button></li>
                         </ul>
                     </li>
                     <li>
@@ -54,6 +56,8 @@ const SettingsList = () => {
             {activePanel === 'delete' && <DeleteAccount onClose={() => setActivePanel(null)} />}
             {activePanel === 'export' && <ExportData onClose={() => setActivePanel(null)} />}
             {activePanel === 'push' && <PushNotifications onClose={() => setActivePanel(null)} />}
+            {activePanel === 'gallery' && <Gallery onClose={() => setActivePanel(null)} />}
+
         </div>
     );
     

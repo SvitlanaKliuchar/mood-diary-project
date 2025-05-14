@@ -49,65 +49,6 @@ export const EMOTION_MODIFIERS = {
   anxious:  { hueShift: 40, intensity: +0.20, flow: -0.10, complexity: +0.15, shape: 'ripple', shapePriority: 2 }
 };
 
-export function buildArtConfig(entry) {
-  const { mood = 'meh', emotions = [] } = entry;
-
-  // clone base config and fill optional color parameters
-  const cfg = { ...MOOD_BASE[mood] };
-  cfg.saturation = cfg.saturation ?? 60;
-  cfg.lightness = cfg.lightness ?? 60;
-  cfg.secSaturation = cfg.secSaturation ?? 70;
-  cfg.secLightness = cfg.secLightness ?? 85;
-
-  let currentShape = cfg.shape;
-  let currentPriority = 0;
-
-  // apply each emotion delta
-  emotions.forEach(em => {
-    const mod = EMOTION_MODIFIERS[em];
-    if (!mod) return;
-
-    // shape priority override system
-    const priority = mod.shapePriority ?? 0;
-    if (mod.shape && priority >= currentPriority) {
-      currentShape = mod.shape;
-      currentPriority = priority;
-    }
-
-    cfg.hue = (cfg.hue + (mod.hueShift ?? 0) + 360) % 360;
-    cfg.secHue = (cfg.secHue + (mod.hueShift ?? 0) + 360) % 360;
-
-    cfg.intensity = clamp(cfg.intensity + (mod.intensity ?? 0));
-    cfg.flow = clamp(cfg.flow + (mod.flow ?? 0));
-    cfg.complexity = clamp(cfg.complexity + (mod.complexity ?? 0));
-
-    cfg.saturation = clamp(cfg.saturation + (mod.saturationShift ?? 0), 0, 100);
-    cfg.lightness = clamp(cfg.lightness + (mod.lightnessShift ?? 0), 0, 100);
-    cfg.secSaturation = clamp(cfg.secSaturation + (mod.secSaturationShift ?? 0), 0, 100);
-    cfg.secLightness = clamp(cfg.secLightness + (mod.secLightnessShift ?? 0), 0, 100);
-  });
-
-  cfg.shape = currentShape;
-
-  // convert to HSL color strings
-  const color = `hsl(${cfg.hue}, ${cfg.saturation}%, ${cfg.lightness}%)`;
-  const secondaryColor = `hsl(${cfg.secHue}, ${cfg.secSaturation}%, ${cfg.secLightness}%)`;
-
-  return Object.freeze({
-    color,
-    secondaryColor,
-    intensity: cfg.intensity,
-    flow: cfg.flow,
-    complexity: cfg.complexity,
-    shape: cfg.shape,
-    mood,
-    emotions: [...emotions],
-    date: entry.date ?? null
-  });
-}
-
-
-//v2 - shape blending approach (more of a steven universe vibe)
 // export function buildArtConfig(entry) {
 //   const { mood = 'meh', emotions = [] } = entry;
 
@@ -118,16 +59,19 @@ export function buildArtConfig(entry) {
 //   cfg.secSaturation = cfg.secSaturation ?? 70;
 //   cfg.secLightness = cfg.secLightness ?? 85;
 
-//   const shapeCounts = {};
-//   shapeCounts[cfg.shape] = 1; // start with base shape weighted once
+//   let currentShape = cfg.shape;
+//   let currentPriority = 0;
 
 //   // apply each emotion delta
 //   emotions.forEach(em => {
 //     const mod = EMOTION_MODIFIERS[em];
 //     if (!mod) return;
 
-//     if (mod.shape) {
-//       shapeCounts[mod.shape] = (shapeCounts[mod.shape] ?? 0) + 1;
+//     // shape priority override system
+//     const priority = mod.shapePriority ?? 0;
+//     if (mod.shape && priority >= currentPriority) {
+//       currentShape = mod.shape;
+//       currentPriority = priority;
 //     }
 
 //     cfg.hue = (cfg.hue + (mod.hueShift ?? 0) + 360) % 360;
@@ -143,18 +87,9 @@ export function buildArtConfig(entry) {
 //     cfg.secLightness = clamp(cfg.secLightness + (mod.secLightnessShift ?? 0), 0, 100);
 //   });
 
-//   // Resolve shape blending
-//   const sortedShapes = Object.entries(shapeCounts)
-//     .sort((a, b) => b[1] - a[1]) // sort by count descending
-//     .map(([shape]) => shape);
+//   cfg.shape = currentShape;
 
-//   // Blend shape names with hyphen or slash
-//   const blendedShape = sortedShapes.length === 1
-//     ? sortedShapes[0]
-//     : sortedShapes.slice(0, 3).join('/'); // limit blend to top 3 to avoid explosion
-
-//   cfg.shape = blendedShape;
-
+//   // convert to HSL color strings
 //   const color = `hsl(${cfg.hue}, ${cfg.saturation}%, ${cfg.lightness}%)`;
 //   const secondaryColor = `hsl(${cfg.secHue}, ${cfg.secSaturation}%, ${cfg.secLightness}%)`;
 
@@ -170,3 +105,68 @@ export function buildArtConfig(entry) {
 //     date: entry.date ?? null
 //   });
 // }
+
+
+//v2 - shape blending approach (more of a steven universe vibe)
+export function buildArtConfig(entry) {
+  const { mood = 'meh', emotions = [] } = entry;
+
+  // clone base config and fill optional color parameters
+  const cfg = { ...MOOD_BASE[mood] };
+  cfg.saturation = cfg.saturation ?? 60;
+  cfg.lightness = cfg.lightness ?? 60;
+  cfg.secSaturation = cfg.secSaturation ?? 70;
+  cfg.secLightness = cfg.secLightness ?? 85;
+
+  const shapeCounts = {};
+  shapeCounts[cfg.shape] = 1; // start with base shape weighted once
+
+  // apply each emotion delta
+  emotions.forEach(em => {
+    const mod = EMOTION_MODIFIERS[em];
+    if (!mod) return;
+
+    if (mod.shape) {
+      shapeCounts[mod.shape] = (shapeCounts[mod.shape] ?? 0) + 1;
+    }
+
+    cfg.hue = (cfg.hue + (mod.hueShift ?? 0) + 360) % 360;
+    cfg.secHue = (cfg.secHue + (mod.hueShift ?? 0) + 360) % 360;
+
+    cfg.intensity = clamp(cfg.intensity + (mod.intensity ?? 0));
+    cfg.flow = clamp(cfg.flow + (mod.flow ?? 0));
+    cfg.complexity = clamp(cfg.complexity + (mod.complexity ?? 0));
+
+    cfg.saturation = clamp(cfg.saturation + (mod.saturationShift ?? 0), 0, 100);
+    cfg.lightness = clamp(cfg.lightness + (mod.lightnessShift ?? 0), 0, 100);
+    cfg.secSaturation = clamp(cfg.secSaturation + (mod.secSaturationShift ?? 0), 0, 100);
+    cfg.secLightness = clamp(cfg.secLightness + (mod.secLightnessShift ?? 0), 0, 100);
+  });
+
+  // Resolve shape blending
+  const sortedShapes = Object.entries(shapeCounts)
+    .sort((a, b) => b[1] - a[1]) // sort by count descending
+    .map(([shape]) => shape);
+
+  // Blend shape names with hyphen or slash
+  const blendedShape = sortedShapes.length === 1
+    ? sortedShapes[0]
+    : sortedShapes.slice(0, 3).join('/'); // limit blend to top 3 to avoid explosion
+
+  cfg.shape = blendedShape;
+
+  const color = `hsl(${cfg.hue}, ${cfg.saturation}%, ${cfg.lightness}%)`;
+  const secondaryColor = `hsl(${cfg.secHue}, ${cfg.secSaturation}%, ${cfg.secLightness}%)`;
+
+  return Object.freeze({
+    color,
+    secondaryColor,
+    intensity: cfg.intensity,
+    flow: cfg.flow,
+    complexity: cfg.complexity,
+    shape: cfg.shape,
+    mood,
+    emotions: [...emotions],
+    date: entry.date ?? null
+  });
+}
