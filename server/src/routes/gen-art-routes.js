@@ -1,9 +1,6 @@
-//i need to add gen art pieces to db (urls to be precise)
-//i also need to delete them
-//and i need to fetch them
-
 import { Router } from "express";
 import authenticate from "../middleware/auth-middleware.js";
+import { fetchArtPieces, addArtPiece, deleteArtPiece } from "../controllers/gen-art-controller.js";
 
 const genArtRouter = Router()
 
