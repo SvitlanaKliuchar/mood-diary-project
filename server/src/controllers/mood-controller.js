@@ -1,7 +1,5 @@
-import { raw } from "@prisma/client/runtime/library";
 import prisma from "../config/db.js";
 import { createMoodSchema } from "../validation/moods/moods-validation.js";
-import { me } from "./auth-controller.js";
 
 export const createMood = async (req, res, next) => {
   try {

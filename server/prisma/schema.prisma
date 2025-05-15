@@ -65,12 +65,13 @@ model userSettings {
 }
 
 model arts {
-  id          Int        @id @default(autoincrement())
-  user        users       @relation(fields: [userId], references: [id])
-  userId      Int    
-  imageUrl    String
-  title       String?
-  createdAt   DateTime   @default(now())
+  id            Int         @id @default(autoincrement())
+  user          users       @relation(fields: [userId], references: [id])
+  userId        Int    
+  gifUrl        String
+  thumbnailUrl  String
+  title         String?
+  createdAt     DateTime    @default(now())
 
   @@index([userId])
 }
