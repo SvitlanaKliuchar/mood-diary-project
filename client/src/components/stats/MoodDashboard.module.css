@@ -23,6 +23,7 @@
         'productivityImpact'
         'wordCloud'
         'moodWordAssociations'
+        'genArt'
         'text';
 }
 
@@ -68,6 +69,13 @@
     grid-area: moodWordAssociations;
 }
 
+.gen-art-section {
+    grid-area: genArt;
+    /* background-image: url('../../assets/images/footer-star.png');
+    background-position: center;
+    background-size: contain; */
+}
+
 .dashboard-text {
     grid-area: text;
 }
@@ -106,25 +114,26 @@
             'activityPatterns moodDistribution'
             'productivityImpact productivityImpact'
             'wordCloud moodWordAssociations'
+            'genArt genArt'
             'text text'
         ;
         gap: 1.5rem;
     }
 }
- 
+
 
 @media screen and (min-width: 35rem) {
     .mood-dashboard {
         padding: 0 2rem;
     }
-    
+
 }
 
 @media screen and (min-width: 40rem) {
     .mood-dashboard {
         padding: 0 4rem;
     }
-    
+
 }
 
 /* days in a row streak */
@@ -222,6 +231,7 @@
         right: 1.5rem;
     }
 }
+
 @media screen and (min-width: 71.5rem) {
     .days-in-a-row {
         padding: 0.8rem 1.6rem;
@@ -244,6 +254,7 @@
     .progress-indicator::before {
         right: 1rem;
     }
+
     .progress-indicator::before {
         right: 1.5rem;
     }
@@ -457,6 +468,117 @@
     text-align: center;
     color: var(--font-color-70);
 }
+
+.gen-art-section {
+    gap: 1.5rem;
+    position: relative;
+    transition: box-shadow 0.5s ease-in-out;
+
+}
+
+.sparkle-left,
+.sparkle-right {
+    position: absolute;
+    animation: sparklePulse 2s ease-in-out infinite alternate;
+    width: clamp(5rem, 7vw, 10rem);
+    height: auto;
+}
+
+.sparkle-left {
+    top: 0;
+    left: 0;
+}
+
+.sparkle-right {
+    top: 0;
+    right: 0;
+}
+
+@keyframes sparklePulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+.gen-art-subtext {
+    font-family: var(--body-font);
+    font-size: 1rem;
+    color: var(--font-color-60);
+
+    padding: 0.1rem 0.2rem;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.gen-art-btn {
+    padding: 1rem clamp(2rem, 6vw, 8rem);
+    font-size: clamp(1rem, 2vw + 0.5rem, 1.4rem);
+    background: linear-gradient(135deg,
+            var(--accent-color-blue),
+            var(--accent-color-pink-pale),
+            var(--primary-color),
+            var(--secondary-color));
+    background-size: 400% 400%;
+    border-radius: 40px;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+    color: var(--font-color-80);
+    /* unified gradient animation */
+    animation: gradient-flow 12s ease infinite;
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        color 0.3s ease,
+        animation-duration 0.6s ease;
+}
+
+.gen-art-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 25px rgba(186, 183, 245, 0.4),
+        0 4px 12px rgba(84, 79, 191, 0.3);
+
+    /* faster gradient animation */
+    animation-duration: 2s;
+    color: var(--bg-color);
+}
+
+.gen-art-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: -1;
+    background: inherit;
+    filter: blur(15px);
+    opacity: 0.4;
+    transform: scale(1.05);
+    transition: opacity 0.3s ease;
+}
+
+.gen-art-btn:hover::after {
+    opacity: 0.7;
+}
+
+@keyframes gradient-flow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 
 @media screen and (max-width: 40rem) {
     .mood-word-controls {

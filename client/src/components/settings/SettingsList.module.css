@@ -240,7 +240,7 @@
 .editable-false,
 .editable-true {
     font-size: 0.9rem;
-    
+
 }
 
 .editable-field-container:hover {
@@ -255,6 +255,7 @@
     border: 1px solid #ccc;
     border-radius: 6px;
 }
+
 .editable-false {
     width: 14rem;
 }
@@ -295,3 +296,4 @@
     color: var(--font-color);
     transform: scale(1.1);
 }
+

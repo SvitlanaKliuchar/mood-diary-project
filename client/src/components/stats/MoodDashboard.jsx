@@ -12,6 +12,7 @@ import ProductivityScore from "./stats-elements/ProductivityCorrelation.jsx";
 import ActivityPatterns from "./stats-elements/ActivityPatterns.jsx";
 import WordCloud from "./stats-elements/WordCloud.jsx";
 import MoodWordAssociations from "./stats-elements/MoodWordAssociations.jsx";
+import GenerateArtButton from "./stats-elements/GenerateArtButton.jsx";
 
 const MoodDashboard = () => {
   const [streak, setStreak] = useState(0);
@@ -120,6 +121,15 @@ const MoodDashboard = () => {
           <h3>Mood Word Patterns</h3>
           <MoodWordAssociations moodWordAssociations={moodWordAssociations} />
         </div>
+        <div
+          className={`${styles["gen-art-section"]} ${styles["dashboard-item"]}`}
+        >
+          <img className={styles['sparkle-left']} src="src/assets/images/footer-star.png" alt="" />
+          <img className={styles['sparkle-right']} src="src/assets/images/footer-star.png" alt="" />
+          <h3>You've unlocked something special</h3>
+          <GenerateArtButton />
+        </div>
+
         <p className={styles['dashboard-text']}>
         Keep up the good work! The more entries we have to analyze, the more insightful the stats data will be for you.
         </p>
