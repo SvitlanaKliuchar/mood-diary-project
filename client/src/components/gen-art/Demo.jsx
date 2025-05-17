@@ -1,18 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import EtherealGenArt from './EtherealGenArt';
-import { mockMoodEntries } from '../../data/mockMoodEntries.js';
-import { recordCanvasAsGif } from '../../utils/recordCanvasAsGif.js'; // make sure this path matches your project
+import { recordCanvasAsGif } from '../../utils/recordCanvasAsGif.js'; 
+import axiosInstance from '../../utils/axiosInstance.js';
+import { uploadToSupabase } from '../../utils/uploadToSupabase';
+import { AuthContext } from '../../contexts/AuthContext.jsx';
+import { saveAs } from 'file-saver'; 
 
 export default function DemoComponent() {
-  const [moodLogs, setMoodLogs] = useState(
-    mockMoodEntries.map(e => ({
-      ...e,
-      date: typeof e.date === 'string'
-        ? e.date
-        : e.date.toISOString().slice(0, 10)
-    }))
-  );
+  const [moodLogs, setMoodLogs] = useState([]);
   const [isGeneratingGif, setIsGeneratingGif] = useState(false);
+  const [isSaving, setIsSaving] = useState(false)
+  const { user } = useContext(AuthContext)
+
+  useEffect(() => {
+    const fetchMoodEntries = async () => {
+      try {
+        const { data } = await axiosInstance.get('/moods');
+
+        const normalized = data.map(e => ({
+          ...e,
+          date: typeof e.date === 'string'
+            ? e.date
+            : new Date(e.date).toISOString().slice(0, 10),
+        }));
+
+        setMoodLogs(normalized);
+      } catch (error) {
+        console.error('Error fetching mood entries:', error);
+      }
+    };
+
+    fetchMoodEntries();
+  }, []);
 
 
   const addMood = (mood, emotions = []) => {
@@ -28,18 +47,53 @@ export default function DemoComponent() {
     ]);
   };
 
-  const handleSaveGif = () => {
+  const handleSaveGif = async () => {
     const canvas = document.querySelector('canvas');
-    if (!canvas) {
-      alert('No canvas found. Make sure the art has rendered.');
-      return;
-    }
+    if (!canvas) return alert('No canvas found');
 
     setIsGeneratingGif(true);
-
-    recordCanvasAsGif(canvas, 5000, 24, () => {
+    try {
+      const blob = await recordCanvasAsGif(canvas);
+      saveAs(blob, 'generated_art.gif');
+    } finally {
       setIsGeneratingGif(false);
-    });
+    }
+  };
+
+  const handleSaveToGallery = async () => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas)          return alert('No canvas found');
+    if (!user?.id)        return alert('User not authenticated');
+
+    setIsSaving(true);
+    try {
+      const ts  = Date.now();
+      const uid = user.id;
+
+      const thumbnailBlob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      const thumbnailUrl  = await uploadToSupabase(
+        thumbnailBlob, `user_${uid}/thumb-${ts}.png`
+      );
+
+      const gifBlob = await recordCanvasAsGif(canvas);
+      const gifUrl  = await uploadToSupabase(
+        gifBlob, `user_${uid}/art-${ts}.gif`
+      );
+
+      // metadata
+      await axiosInstance.post('/gen-art', {
+        title: `Art ${new Date().toLocaleDateString()}`,
+        gifUrl,
+        thumbnailUrl,
+      });
+
+      alert('Saved to gallery!');
+    } catch (err) {
+      console.error(err);
+      alert(err.message ?? 'Upload failed');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -118,6 +172,22 @@ export default function DemoComponent() {
       >
         {isGeneratingGif ? "Generating GIF..." : "Save as GIF"}
       </button>
+      <button
+        onClick={handleSaveToGallery}
+        disabled={isSaving}
+        style={{
+          marginBottom: "30px",
+          padding: "10px 20px",
+          backgroundColor: isSaving ? "#ccc" : "#FF6F61",
+          color: "white",
+          border: "none",
+          borderRadius: "20px",
+          fontWeight: "bold",
+          cursor: isGeneratingGif ? "not-allowed" : "pointer"
+        }}
+      >
+        {isSaving ? "Saving..." : "Save to Gallery"}
+      </button>
 
 
       {/* mood log display */}
@@ -139,9 +209,9 @@ export default function DemoComponent() {
               backgroundColor: "#f9f9f9",
               borderRadius: "6px",
               borderLeft: `4px solid ${log.mood === 'great' ? '#7574E1' :
-                  log.mood === 'good' ? '#58D68D' :
-                    log.mood === 'meh' ? '#AEB6BF' :
-                      log.mood === 'bad' ? '#E59866' : '#EC7063'
+                log.mood === 'good' ? '#58D68D' :
+                  log.mood === 'meh' ? '#AEB6BF' :
+                    log.mood === 'bad' ? '#E59866' : '#EC7063'
                 }`
             }}>
               <div style={{
