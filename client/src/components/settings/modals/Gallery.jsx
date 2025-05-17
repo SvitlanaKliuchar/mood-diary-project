@@ -37,7 +37,7 @@ const Gallery = ({ onClose }) => {
       <button onClick={onClose} className={styles['back-btn']} aria-label="back">←</button>
 
       <div className={styles['gallery-container']}>
-        <p className={styles['main-text']}>weekly gallery</p>
+        <p className={styles['main-text']}>Your Gallery</p>
 
         {loading && <p>loading…</p>}
         {err && <p className={styles.error}>{err}</p>}
