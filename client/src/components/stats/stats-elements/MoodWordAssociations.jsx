@@ -78,7 +78,7 @@ const MoodWordAssociations = ({ moodWordAssociations }) => {
     return (
         <>
             <div className={styles["mood-word-controls"]}>
-                <div className={styles["select-mood-icon"]}>
+                <div className={`${styles["select-mood-icon"]} ${styles['select-mood-icon-2']}`}>
                     <select
                         name="mood-select"
                         id="mood-select"

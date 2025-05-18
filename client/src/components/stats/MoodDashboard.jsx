@@ -54,6 +54,7 @@ const MoodDashboard = () => {
         setWordCloudData(data.wordCloudData)
         setMoodWordAssociations(data.moodWordAssociations)
         setError(null);
+
       } catch (error) {
         console.error("Failed to fetch stats: ", error);
         setError("Failed to fetch stats");
@@ -64,9 +65,11 @@ const MoodDashboard = () => {
     fetchStats();
   }, [user]);
 
+
   return (
     <div className={styles["dashboard-container"]}>
       <div className={styles["mood-dashboard"]}>
+
         <div
           className={`${styles["days-in-a-row"]} ${styles["dashboard-item"]}`}
         >
@@ -131,8 +134,9 @@ const MoodDashboard = () => {
         </div>
 
         <p className={styles['dashboard-text']}>
-        Keep up the good work! The more entries we have to analyze, the more insightful the stats data will be for you.
+          Keep up the good work! The more entries we have to analyze, the more insightful the stats data will be for you.
         </p>
+
       </div>
     </div>
   );
