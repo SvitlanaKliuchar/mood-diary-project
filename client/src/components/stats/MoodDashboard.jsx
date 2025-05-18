@@ -24,6 +24,7 @@ const MoodDashboard = () => {
   const [productivityCorrelation, setProductivityCorrelation] = useState(0);
   const [wordCloudData, setWordCloudData] = useState([])
   const [moodWordAssociations, setMoodWordAssociations] = useState({})
+  const [entryCount, setEntryCount] = useState(0);
 
   const { user } = useContext(AuthContext);
   const { startLoading, finishLoading } = useContext(LoadingContext);
@@ -53,7 +54,9 @@ const MoodDashboard = () => {
         setProductivityCorrelation(data.productivityCorrelation);
         setWordCloudData(data.wordCloudData)
         setMoodWordAssociations(data.moodWordAssociations)
+        setEntryCount(data.moodChartData.length);
         setError(null);
+
 
       } catch (error) {
         console.error("Failed to fetch stats: ", error);
@@ -130,7 +133,16 @@ const MoodDashboard = () => {
           <img className={styles['sparkle-left']} src="src/assets/images/footer-star.png" alt="" />
           <img className={styles['sparkle-right']} src="src/assets/images/footer-star.png" alt="" />
           <h3>You've unlocked something special</h3>
-          <GenerateArtButton />
+          {/* overlay if fewer than 5 entries */}
+          {entryCount < 5 && (
+            <div className={styles["gen-art-lock"]}>
+              <span className={styles["lock-icon"]} aria-hidden="true">🔒</span>
+              <p className={styles["lock-text"]}>
+                Unlocks after{5 - entryCount} more {5 - entryCount === 1 ? "entry" : "entries"}
+              </p>
+            </div>
+          )}
+          <GenerateArtButton locked={entryCount < 5} />
         </div>
 
         <p className={styles['dashboard-text']}>
