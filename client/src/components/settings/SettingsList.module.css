@@ -346,7 +346,6 @@
     object-fit: cover;
     transition: opacity .15s ease;
     border-radius: 0;
-    /* inherit rounding from parent */
 }
 
 .gif-img {

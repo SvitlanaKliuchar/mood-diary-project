@@ -82,7 +82,7 @@
     box-shadow: 0 12px 25px rgba(186, 183, 245, 0.4),
         0 4px 12px rgba(84, 79, 191, 0.3);
 
-    
+
 }
 
 .dashboard-text {
@@ -366,14 +366,14 @@
     width: auto;
     top: -0.4rem;
     left: 1.5rem;
-    
+
 }
 
 
 .view-toggle {
     display: flex;
     gap: 0.5rem;
-    
+
 }
 
 .view-button {
@@ -439,7 +439,7 @@
     backdrop-filter: blur(8px);
     border-radius: 12px;
     margin-bottom: 0.5rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -465,8 +465,8 @@
 
 
 .pair-count {
-  font-weight: bold;
-  color: #888;
+    font-weight: bold;
+    color: #888;
 }
 
 
@@ -505,7 +505,7 @@
 .sparkle-right {
     position: absolute;
     animation: sparklePulse 2s ease-in-out infinite alternate;
-    width: clamp(5rem, 7vw, 10rem);
+    width: clamp(4rem, 7vw, 10rem);
     height: auto;
 }
 
@@ -518,6 +518,31 @@
     top: 0;
     right: 0;
 }
+
+@media screen and (max-width:27rem) {
+    .sparkle-left {
+        top: 0rem;
+        left: -1.2rem;
+    }
+
+    .sparkle-right {
+        top: 0rem;
+        right: -1.2rem;
+    }
+}
+
+@media screen and (min-width: 40rem) and (max-width: 45rem) {
+    .sparkle-left {
+        top: 0rem;
+        left: -1rem;
+    }
+
+    .sparkle-right {
+        top: 0rem;
+        right: -1rem;
+    }
+}
+
 
 @keyframes sparklePulse {
     0% {
@@ -568,7 +593,6 @@
     box-shadow: 0 12px 25px rgba(186, 183, 245, 0.4),
         0 4px 12px rgba(84, 79, 191, 0.3);
 
-    /* faster gradient animation */
     animation-duration: 2s;
     color: var(--bg-color);
 }
@@ -591,30 +615,32 @@
 }
 
 
-.gen-art-section { 
-    position: relative; 
+.gen-art-section {
+    position: relative;
 }
 
-.gen-art-lock{
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  backdrop-filter:blur(4px);
-  background:rgba(0,0,0,.45);
-  border-radius:inherit;
-  z-index:2;
-  text-align:center;
-  pointer-events:none;
+.gen-art-lock {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, .45);
+    border-radius: inherit;
+    z-index: 2;
+    text-align: center;
+    pointer-events: none;
 }
-.lock-icon { 
-    font-size:2rem; 
-    color:#fff; 
+
+.lock-icon {
+    font-size: 2rem;
+    color: #fff;
 }
-.lock-text { 
-    font-size:2rem; 
+
+.lock-text {
+    font-size: 2rem;
     color: var(--bg-color);
     font-family: var(--h1-font);
     font-weight: 600;
@@ -652,4 +678,3 @@
         text-align: center;
     }
 }
-
