@@ -217,10 +217,17 @@
     text-align: center;
 }
 
-@media screen and (max-width: 21rem) {
+@media screen and (max-width: 25rem) and (min-width: 20rem) {
+    .all-entries-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+    }
     .entry-container {
-        margin-left: 1.25rem;
-        margin-right: 1.25rem;
+        width: 100%;
     }
 }
 

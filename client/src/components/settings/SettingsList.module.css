@@ -231,6 +231,7 @@
 .field-input-wrapper {
     display: flex;
     gap: 0.5rem;
+    width: 100%;
 }
 
 .field-label {
@@ -243,13 +244,25 @@
 
 }
 
+.editable-false {
+    max-width: 100%;
+    flex: 1;
+    overflow-wrap: break-word;
+    word-break: break-all;
+}
+
+.editable-true {
+    flex: 1;
+    width: 100%;
+}
+
 .editable-field-container:hover {
     background-color: var(--bg-color-darkened-1);
 }
 
 .editable-true {
     flex: 1;
-    min-width: 13rem;
+    min-width: 8rem;
     font-size: 0.9em;
     padding: 0.2rem 0.4rem;
     border: 1px solid #ccc;
@@ -371,3 +384,154 @@
     text-overflow: ellipsis;
 }
 
+.pagination-controls {
+    display: flex;
+    flex-direction: row !important;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    gap: 1rem;
+    width: 100%;
+}
+
+.pagination-button {
+    padding: 0.4rem 0.8rem;
+    background-color: var(--accent-color-blue);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    min-width: 2.5rem;
+    height: 2.5rem;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.pagination-button:disabled {
+    background-color: var(--font-color-20);
+    color: var(--font-color-60);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.page-indicator {
+    font-size: 0.9rem;
+    color: var(--font-color-70);
+    padding: 0 0.4rem;
+}
+
+/* 200 ms fade both ways */
+@keyframes fade-out {
+    to {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+}
+
+.gallery-grid {
+    animation: fade-in 200ms ease forwards;
+}
+
+.fadingOut {
+    animation: fade-out 200ms ease forwards;
+}
+
+@media screen and (max-width: 35rem) and (min-width:22.5rem) {
+
+    .delete-account-container,
+    .export-data-container,
+    .push-notifications-container,
+    .gallery-container,
+    .profile-container {
+        width: 100%;
+    }
+
+    .settings-list {
+        width: calc(100vw - 4rem);
+    }
+
+    .settings-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 22.5rem) and (min-width:20rem) {
+    .delete-account-container,
+    .export-data-container,
+    .push-notifications-container,
+    .gallery-container,
+    .profile-container {
+        padding: 0rem;
+        width: 100%;
+    }
+
+    .settings-list {
+        width: calc(100vw - 1rem);
+        font-size: 0.9rem;
+    }
+
+    .settings-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile *,
+    .toggle-container,
+    .notifications * {
+        font-size: 0.8rem;
+    }
+
+    .gallery-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .gallery-item {
+        width: 8rem;
+    }
+
+    .editable-field-container {
+        padding: 0.5rem;
+    }
+
+    .editable-true,
+    .editable-false {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.3rem;
+    }
+
+    .edit-btn {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .editable-false {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .back-btn {
+        font-size: 0.9rem;
+    }
+}

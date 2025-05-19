@@ -93,6 +93,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width: 100%;
+
     gap: 1rem;
     background-color: var(--bg-color);
     border: 1px solid var(--primary-color);
@@ -265,9 +267,7 @@
         right: 1rem;
     }
 
-    .progress-indicator::before {
-        right: 1.5rem;
-    }
+
 }
 
 /* activity patterns */
@@ -556,9 +556,13 @@
     }
 }
 
+.gen-art-heading {
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+}
+
 .gen-art-subtext {
     font-family: var(--body-font);
-    font-size: 1rem;
+    font-size: clamp(0.8rem, 4vw, 1rem);
     color: var(--font-color-60);
 
     padding: 0.1rem 0.2rem;
@@ -676,5 +680,59 @@
     .view-button {
         flex: 1;
         text-align: center;
+    }
+}
+
+@media screen and (min-width: 20rem) and (max-width: 27rem) {
+    .progress-indicator::before {
+        right: 0.5rem;
+    }
+    .dashboard-container {
+        padding: 1rem 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mood-dashboard {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .dashboard-item {
+        padding: 0.1rem 0.1rem;
+    }
+
+    .days-in-a-row,
+    .mood-stability,
+    .mood-chart,
+    .daily-mood-avg,
+    .activity-patterns,
+    .mood-distribution,
+    .productivity-impact,
+    .word-cloud,
+    .mood-word-associations,
+    .gen-art-section,
+    .gen-art-preview {
+        width: 100%;
+        max-width: 100%;
+
+    }
+
+    .dashboard-item h3,
+    .lock-text,
+    .streak-count,
+    .pair-word {
+        font-size: clamp(0.8rem, 4vw, 1rem);
+    }
+
+    .gen-art-btn {
+        font-size: 0.9rem;
+        padding: 0.8rem 1rem;
+    }
+    .word-cloud-inline {
+        margin-bottom: 0.5rem;
     }
 }

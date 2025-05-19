@@ -155,7 +155,7 @@ const handleGenerateArtClick = () => {
         >
           <img className={styles['sparkle-left']} src="src/assets/images/footer-star.png" alt="" />
           <img className={styles['sparkle-right']} src="src/assets/images/footer-star.png" alt="" />
-          <h3>You've unlocked something special</h3>
+          <h3 className={styles['gen-art-heading']}>You've unlocked something special</h3>
           {/* overlay if fewer than 5 entries */}
           {entryCount < 5 && (
             <div className={styles["gen-art-lock"]}>
