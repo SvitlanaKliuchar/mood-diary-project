@@ -1,6 +1,5 @@
-import React from "react";
 import styles from "./Landing.module.css";
-import DemoComponent from "../gen-art/Demo";
+
 
 const Hero = () => {
   return (
@@ -21,8 +20,6 @@ const Hero = () => {
         </a>
       </div>
       <div>
-      <h1>Generative Art Test</h1>
-      <DemoComponent />
     </div>
     </section>
   );

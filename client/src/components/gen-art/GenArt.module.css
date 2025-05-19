@@ -1,0 +1,56 @@
+.container {
+    width: 100%;
+    padding: 2rem 1.25rem;
+    border-radius: 12px;
+
+}
+
+.heading {
+    font-size: clamp(1.5rem, 3vw + .5rem, 2.5rem);
+    font-weight: 600;
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+}
+
+.canvas-wrapper {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.button {
+
+    padding: 0.5rem;
+    border: none;
+    border-radius: 20px;
+    text-align: center;
+    color: #fff;
+    background: var(--secondary-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover:not(.disabled) {
+    background: var(--accent-color-pink, );
+}
+
+.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+@media screen and (max-width: 43rem) {
+    .canvas-wrapper {
+        max-height: 10rem;
+    }
+
+}

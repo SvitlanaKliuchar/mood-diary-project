@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { buildArtConfig } from "@/data/gen-art-mapping.js"
+import { buildArtConfig } from "@/data/gen-art-mapping.js";
+import { fitCanvasToContainer, createFlowFields, createLayers, createParticles} from "../../utils/gen-art-helpers";
 
 const EtherealGenArt = ({ moodLogs }) => {
-  const canvasRef = useRef(null);
-  const [isAnimating, setIsAnimating] = useState(true);
-  const [isExporting, setIsExporting] = useState(false);
+  const canvasRef    = useRef(null);
   const animationRef = useRef(null);
-  const artConfigs = useRef(moodLogs.map(buildArtConfig));
+  const artConfigs   = useRef(moodLogs.map(buildArtConfig));
 
-  // animation state
+  const [isAnimating, setIsAnimating] = useState(true);
+
   const animationState = useRef({
     time: 0,
     flowFields: [],
@@ -17,268 +17,155 @@ const EtherealGenArt = ({ moodLogs }) => {
     lastFrameTime: 0
   });
 
+  //mount + mood updates
   useEffect(() => {
-    // update art configurations when moodLogs change
-    const cfg = moodLogs.map(buildArtConfig);
-    // console.table(cfg);
-    artConfigs.current = cfg;
+    artConfigs.current = moodLogs.map(buildArtConfig);
 
-    // initialize canvas
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
-    const container = canvas.parentElement;
-
-    // set canvas dimensions with higher resolution for better quality
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = (container.clientWidth || 800) * dpr;
-    canvas.height = 500 * dpr;
-    canvas.style.width = `${container.clientWidth || 800}px`;
-    canvas.style.height = "500px";
-    ctx.scale(dpr, dpr);
-
-    // initialize the art
+    fitCanvasToContainer(canvas);
     setupArt(artConfigs.current);
+    if (isAnimating) startLoop();
 
-    // start animation loop
-    if (isAnimating) {
-      startAnimationLoop();
-    }
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
+    return () => cancelAnimationFrame(animationRef.current);
   }, [moodLogs, isAnimating]);
 
-  const setupArt = (configs) => {
+  //resize observer
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const ro = new ResizeObserver(() => {
+      if (fitCanvasToContainer(canvas)) setupArt(artConfigs.current);
+    });
+    ro.observe(canvas.parentElement);
+    return () => ro.disconnect();
+  }, []);
 
-    const width = canvas.width / (window.devicePixelRatio || 1);
-    const height = canvas.height / (window.devicePixelRatio || 1);
 
-    // reset animation state
+  //setup
+  const setupArt = cfgs => {
+    const canvas = canvasRef.current;
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+
     animationState.current = {
       time: 0,
-      flowFields: [],
-      layers: [],
-      particles: [],
+      flowFields: createFlowFields(cfgs, w, h),
+      layers:     createLayers(cfgs, w, h),
+      particles:  createParticles(cfgs, w, h),
       lastFrameTime: 0
     };
-
-    // generate flow fields based on moods
-    animationState.current.flowFields = createFlowFields(configs, width, height);
-
-    // create background layers
-    animationState.current.layers = createLayers(configs, width, height);
-
-    // generate particles for motion
-    animationState.current.particles = createParticles(configs, width, height);
   };
 
-  const createFlowFields = (configs, width, height) => {
-    const flowFields = [];
-
-    // create flow fields based on mood configurations
-    configs.forEach(config => {
-      const field = {
-        resolution: 20, // grid size for the flow field
-        grid: [],
-        color: config.color,
-        secondaryColor: config.secondaryColor,
-        intensity: config.intensity,
-        flow: config.flow,
-        noiseScale: 0.003 + (config.complexity * 0.005), // affects flow complexity
-        noiseSpeed: 0.0005 + (config.flow * 0.001) // affects flow movement speed
-      };
-
-      // initialize flow field grid
-      for (let y = 0; y < height; y += field.resolution) {
-        for (let x = 0; x < width; x += field.resolution) {
-          field.grid.push({
-            x: x,
-            y: y,
-            angle: Math.random() * Math.PI * 2
-          });
-        }
-      }
-
-      flowFields.push(field);
-    });
-
-    return flowFields;
-  };
-
-  const createLayers = (configs, width, height) => {
-    const layers = [];
-
-    // create background gradient layers
-    configs.forEach((config, index) => {
-      // create a few organic shapes for each mood
-      for (let i = 0; i < 3; i++) {
-        layers.push({
-          //type: "organicBlob",
-          type: config.shape || "organicBlob",
-          x: Math.random() * width,
-          y: Math.random() * height,
-          size: 100 + Math.random() * 200,
-          color: i % 2 === 0 ? config.color : config.secondaryColor,
-          alpha: 0.05 + (Math.random() * 0.1),
-          points: 5 + Math.floor(Math.random() * 3),
-          amplitude: 20 + (Math.random() * 40),
-          speed: 0.0003 + (Math.random() * 0.0005),
-          offset: Math.random() * Math.PI * 2
-        });
-      }
-
-      // create flowing lines
-      for (let i = 0; i < 5; i++) {
-        layers.push({
-          type: "flowingLine",
-          startX: Math.random() * width,
-          startY: Math.random() * height,
-          length: 200 + Math.random() * 300,
-          segments: 10 + Math.floor(Math.random() * 15),
-          thickness: 0.5 + (Math.random() * 1.5),
-          color: i % 2 === 0 ? config.color : config.secondaryColor,
-          alpha: 0.1 + (Math.random() * 0.2),
-          speed: 0.0002 + (config.flow * 0.0006),
-          flowScale: 0.5 + (config.flow * 0.5)
-        });
-      }
-    });
-
-    return layers;
-  };
-
-  const createParticles = (configs, width, height) => {
-    const particles = [];
-
-    configs.forEach(config => {
-      // create floating particles
-      const particleCount = Math.floor(30 + (config.intensity * 50));
-
-      for (let i = 0; i < particleCount; i++) {
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          size: 1 + Math.random() * 3,
-          color: Math.random() > 0.5 ? config.color : config.secondaryColor,
-          alpha: 0.3 + Math.random() * 0.4,
-          speed: 0.2 + (config.flow * 0.8),
-          flowInfluence: 0.5 + (config.flow * 0.5),
-          angle: Math.random() * Math.PI * 2,
-          pulse: 0.01 + (Math.random() * 0.03)
-        });
-      }
-    });
-
-    return particles;
-  };
-
-  const startAnimationLoop = () => {
-    const animate = (timestamp) => {
+  //animation loop
+  const startLoop = () => {
+    const animate = ts => {
       if (!isAnimating) return;
-
-      const deltaTime = timestamp - (animationState.current.lastFrameTime || timestamp);
-      animationState.current.lastFrameTime = timestamp;
-      animationState.current.time += deltaTime;
-
-      renderFrame(deltaTime / 1000); // convert to seconds
-
+      const prev = animationState.current.lastFrameTime || ts;
+      const dt   = ts - prev;
+      animationState.current.lastFrameTime = ts;
+      animationState.current.time         += dt;
+      renderFrame(dt / 1000);
       animationRef.current = requestAnimationFrame(animate);
     };
-
     animationRef.current = requestAnimationFrame(animate);
   };
 
-  const renderFrame = (deltaTime) => {
+  //frame render
+  const renderFrame = dt => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const ctx    = canvas.getContext("2d");
+    const w      = canvas.width  / (window.devicePixelRatio || 1);
+    const h      = canvas.height / (window.devicePixelRatio || 1);
 
-    const ctx = canvas.getContext("2d");
-    const width = canvas.width / (window.devicePixelRatio || 1);
-    const height = canvas.height / (window.devicePixelRatio || 1);
+    //fade clear
+    ctx.fillStyle = "rgba(255,255,255,0.03)";
+    ctx.fillRect(0, 0, w, h);
 
-    // clear with fading effect
-    ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
-    ctx.fillRect(0, 0, width, height);
-
-    // update flow fields
-    updateFlowFields(deltaTime);
-
-    // render base layers
-    renderLayers(ctx, width, height, deltaTime);
-
-    // update and render particles
-    updateAndRenderParticles(ctx, width, height, deltaTime);
-
-    // apply final effects
-    applyFinalEffects(ctx, width, height);
+    updateFlowFields(dt);
+    renderLayers(ctx, w, h);
+    updateAndRenderParticles(ctx, w, h, dt);
+    applyFinalEffects(ctx, w, h);
   };
 
-  const updateFlowFields = (deltaTime) => {
-    const time = animationState.current.time;
-
-    // update all flow fields
-    animationState.current.flowFields.forEach(field => {
-      field.grid.forEach(point => {
-        // use noise to evolve the flow field over time
-        // this simplified version just uses sine waves as a replacement for perlin noise
-        const xOffset = point.x * field.noiseScale;
-        const yOffset = point.y * field.noiseScale;
-        const timeOffset = time * field.noiseSpeed;
-
-        const noiseValue = Math.sin(xOffset + timeOffset) * Math.cos(yOffset - timeOffset);
-        point.angle = noiseValue * Math.PI * 2;
+  //simulation helpers
+  const updateFlowFields = dt => {
+    const { time, flowFields } = animationState.current;
+    flowFields.forEach(f => {
+      f.grid.forEach(p => {
+        const n =
+          Math.sin(p.x * f.noiseScale + time * f.noiseSpeed) *
+          Math.cos(p.y * f.noiseScale - time * f.noiseSpeed);
+        p.angle = n * Math.PI * 2;
       });
     });
   };
 
-  const renderLayers = (ctx, width, height, deltaTime) => {
-    const time = animationState.current.time;
-
-    animationState.current.layers.forEach(layer => {
+  const renderLayers = (ctx, w, h) => {
+    const t = animationState.current.time;
+    animationState.current.layers.forEach(l => {
       ctx.save();
-
-      switch (layer.type) {
-        case "organicBlob":   renderBlob(ctx, layer, time);    break;
-        case "flowingLine":   renderFlowLine(ctx, layer, time);break;
-        case "spike":         renderSpike(ctx, layer, time);   break;
-        case "burst":         renderBurst(ctx, layer, time);   break;
-        case "ripple":        renderRipple(ctx, layer, time);  break;
-        case "drip":          renderDrip(ctx, layer, time);    break;
-        default:              renderBlob(ctx, layer, time);    break;
+      switch (l.type) {
+        case "organicBlob": renderBlob(ctx, l, t); break;
+        case "flowingLine": renderFlowLine(ctx, l, t); break;
+        case "spike":       renderSpike(ctx, l, t);    break;
+        case "burst":       renderBurst(ctx, l, t);    break;
+        case "ripple":      renderRipple(ctx, l, t);   break;
+        case "drip":        renderDrip(ctx, l, t);     break;
+        default:            renderBlob(ctx, l, t);     break;
       }
-      
       ctx.restore();
     });
   };
 
-  // Define the missing render functions
+  const updateAndRenderParticles = (ctx, w, h, dt) => {
+    const t   = animationState.current.time;
+    const fld = animationState.current.flowFields[0];
+
+    animationState.current.particles.forEach(p => {
+      //move
+      const res   = fld.resolution;
+      const gx    = Math.floor(p.x / res);
+      const gy    = Math.floor(p.y / res);
+      const cols  = Math.ceil(w / res);
+      const idx   = gy * cols + gx;
+      const flowA = fld.grid[idx]?.angle || 0;
+      const ang   = flowA * p.flowInfluence + p.angle * (1 - p.flowInfluence);
+
+      p.x += Math.cos(ang) * p.speed * dt;
+      p.y += Math.sin(ang) * p.speed * dt;
+
+      if (p.x < 0) p.x = w;
+      if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h;
+      if (p.y > h) p.y = 0;
+
+      //draw
+      const pulse = p.size * (0.8 + Math.sin(t * p.pulse) * 0.2);
+      const grad  = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, pulse * 2);
+      grad.addColorStop(0, p.color);
+      grad.addColorStop(1, "rgba(255,255,255,0)");
+
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle   = grad;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, pulse * 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  };
+
+  //tiny render primitives
   const renderBlob = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
-    ctx.fillStyle = l.color;
-    
+    ctx.fillStyle   = l.color;
+    const pts = l.points || 5;
     ctx.beginPath();
-    const points = l.points || 5;
-    
-    for (let i = 0; i <= points; i++) {
-      const angle = (i / points) * Math.PI * 2;
-      const radius = l.size + Math.sin(angle * 3 + t * l.speed + l.offset) * l.amplitude;
-      const x = l.x + Math.cos(angle) * radius;
-      const y = l.y + Math.sin(angle) * radius;
-      
-      if (i === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
+    for (let i = 0; i <= pts; i++) {
+      const a = (i / pts) * Math.PI * 2;
+      const r = l.size + Math.sin(a * 3 + t * l.speed + l.offset) * l.amplitude;
+      ctx[i ? "lineTo" : "moveTo"](l.x + Math.cos(a) * r, l.y + Math.sin(a) * r);
     }
-    
     ctx.closePath();
     ctx.fill();
   };
@@ -286,255 +173,105 @@ const EtherealGenArt = ({ moodLogs }) => {
   const renderFlowLine = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
     ctx.strokeStyle = l.color;
-    ctx.lineWidth = l.thickness;
-    
-    // Create flowing line with segments
+    ctx.lineWidth   = l.thickness;
+    const seg = l.length / l.segments;
+    let x = l.startX, y = l.startY;
     ctx.beginPath();
-    let x = l.startX;
-    let y = l.startY;
     ctx.moveTo(x, y);
-    
-    const segmentLength = l.length / l.segments;
-    
     for (let i = 0; i < l.segments; i++) {
-      const angle = Math.sin(t * l.speed + i * 0.5) * Math.PI * l.flowScale;
-      x += Math.cos(angle) * segmentLength;
-      y += Math.sin(angle) * segmentLength;
+      const a = Math.sin(t * l.speed + i * 0.5) * Math.PI * l.flowScale;
+      x += Math.cos(a) * seg;
+      y += Math.sin(a) * seg;
       ctx.lineTo(x, y);
     }
-    
     ctx.stroke();
   };
 
-  const renderDrip = (ctx, l, t) => {
-    ctx.globalAlpha = l.alpha;
-    ctx.fillStyle = l.color;
-    
-    // Draw a dripping effect
-    const drips = 5;
-    const maxLength = l.size;
-    
-    for (let i = 0; i < drips; i++) {
-      const angle = (i / drips) * Math.PI * 2;
-      const xBase = l.x + Math.cos(angle) * l.size * 0.5;
-      const yBase = l.y + Math.sin(angle) * l.size * 0.5;
-      
-      const dripLength = maxLength * (0.3 + Math.sin(t * l.speed + i) * 0.7);
-      
-      ctx.beginPath();
-      ctx.moveTo(xBase, yBase);
-      ctx.quadraticCurveTo(
-        xBase + Math.cos(angle) * dripLength * 0.5,
-        yBase + Math.sin(angle) * dripLength * 1.5,
-        xBase + Math.cos(angle) * dripLength,
-        yBase + Math.sin(angle) * dripLength
-      );
-      ctx.lineTo(xBase, yBase);
-      ctx.fill();
-    }
-  };
-
-  function renderSpike(ctx,l,t){
+  const renderSpike = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
     ctx.fillStyle   = l.color;
-    const pts = 24;                     // sharp star
+    const n = 24;
     ctx.beginPath();
-    for(let i=0;i<=pts;i++){
-      const a = (i/pts)*Math.PI*2;
-      const r = l.size + Math.sin(a*pts + t*l.speed)*l.amplitude;
-      ctx.lineTo(l.x + Math.cos(a)*r, l.y + Math.sin(a)*r);
+    for (let i = 0; i <= n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const r = l.size + Math.sin(a * n + t * l.speed) * l.amplitude;
+      ctx.lineTo(l.x + Math.cos(a) * r, l.y + Math.sin(a) * r);
     }
-    ctx.closePath(); ctx.fill();
-  }
-  
-  function renderBurst(ctx,l,t){
+    ctx.closePath();
+    ctx.fill();
+  };
+
+  const renderBurst = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
     ctx.strokeStyle = l.color;
     ctx.lineWidth   = 1;
     const rays = 40;
     ctx.beginPath();
-    for(let i=0;i<rays;i++){
-      const a = (i/rays)*Math.PI*2;
-      const r = l.size + Math.sin(t*l.speed+i)*l.amplitude;
+    for (let i = 0; i < rays; i++) {
+      const a = (i / rays) * Math.PI * 2;
+      const r = l.size + Math.sin(t * l.speed + i) * l.amplitude;
       ctx.moveTo(l.x, l.y);
-      ctx.lineTo(l.x + Math.cos(a)*r, l.y + Math.sin(a)*r);
+      ctx.lineTo(l.x + Math.cos(a) * r, l.y + Math.sin(a) * r);
     }
     ctx.stroke();
-  }
-  
-  function renderRipple(ctx,l,t){
+  };
+
+  const renderRipple = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
     ctx.strokeStyle = l.color;
     ctx.lineWidth   = 1;
-    const rings = 4;
-    for(let i=1;i<=rings;i++){
-      const r = l.size*i*0.4 + Math.sin(t*l.speed+i)*l.amplitude*0.1;
+    for (let i = 1; i <= 4; i++) {
+      const r = l.size * i * 0.4 + Math.sin(t * l.speed + i) * l.amplitude * 0.1;
       ctx.beginPath();
-      ctx.arc(l.x, l.y, r, 0, Math.PI*2);
+      ctx.arc(l.x, l.y, r, 0, Math.PI * 2);
       ctx.stroke();
     }
-  }
-  
-  const updateAndRenderParticles = (ctx, width, height, deltaTime) => {
-    const time = animationState.current.time;
+  };
 
-    // get the first flow field for particle movement
-    const flowField = animationState.current.flowFields[0];
-
-    animationState.current.particles.forEach(particle => {
-      // get flow direction at particle position
-      const flowAngle = getFlowAngleAt(particle.x, particle.y, flowField);
-
-      // update particle position based on flow field
-      const flowInfluence = particle.flowInfluence;
-      const combinedAngle = (flowAngle * flowInfluence) + (particle.angle * (1 - flowInfluence));
-
-      particle.x += Math.cos(combinedAngle) * particle.speed * deltaTime;
-      particle.y += Math.sin(combinedAngle) * particle.speed * deltaTime;
-
-      // wrap around edges
-      if (particle.x < 0) particle.x = width;
-      if (particle.x > width) particle.x = 0;
-      if (particle.y < 0) particle.y = height;
-      if (particle.y > height) particle.y = 0;
-
-      // pulsating size effect
-      const pulseSize = particle.size * (0.8 + Math.sin(time * particle.pulse) * 0.2);
-
-      // render particle
-      ctx.globalAlpha = particle.alpha;
-
-      // Create transparent color properly
-      let baseColor = particle.color;
-      let transparentColor;
-      
-      // Check if the color is an RGB/RGBA string
-      if (baseColor.startsWith('rgb')) {
-        // Extract RGB values and create transparent version
-        const rgbMatch = baseColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/);
-        if (rgbMatch) {
-          transparentColor = `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, 0)`;
-        } else {
-          transparentColor = 'rgba(255, 255, 255, 0)'; // Fallback
-        }
-      } else {
-        // For hex or named colors, use rgba with opacity 0
-        transparentColor = 'rgba(255, 255, 255, 0)'; // Fallback
-      }
-
-      // use a gradient for soft particles
-      const gradient = ctx.createRadialGradient(
-        particle.x, particle.y, 0,
-        particle.x, particle.y, pulseSize * 2
-      );
-      gradient.addColorStop(0, baseColor);
-      gradient.addColorStop(1, transparentColor);
-
-      ctx.fillStyle = gradient;
+  const renderDrip = (ctx, l, t) => {
+    ctx.globalAlpha = l.alpha;
+    ctx.fillStyle   = l.color;
+    const drips = 5;
+    for (let i = 0; i < drips; i++) {
+      const a  = (i / drips) * Math.PI * 2;
+      const xb = l.x + Math.cos(a) * l.size * 0.5;
+      const yb = l.y + Math.sin(a) * l.size * 0.5;
+      const len = l.size * (0.3 + Math.sin(t * l.speed + i) * 0.7);
       ctx.beginPath();
-      ctx.arc(particle.x, particle.y, pulseSize * 2, 0, Math.PI * 2);
+      ctx.moveTo(xb, yb);
+      ctx.quadraticCurveTo(
+        xb + Math.cos(a) * len * 0.5,
+        yb + Math.sin(a) * len * 1.5,
+        xb + Math.cos(a) * len,
+        yb + Math.sin(a) * len
+      );
+      ctx.closePath();
       ctx.fill();
-    });
+    }
   };
 
-  const getFlowAngleAt = (x, y, flowField) => {
-    if (!flowField || !flowField.grid || flowField.grid.length === 0) {
-      return 0;
-    }
-
-    // find the closest grid point more efficiently
-    const res = flowField.resolution;
-    const gridX = Math.floor(x / res);
-    const gridY = Math.floor(y / res);
-    
-    // Calculate index directly instead of linear search
-    // This assumes grid points are laid out in a regular grid
-    const canvas = canvasRef.current;
-    if (!canvas) return 0;
-    
-    const width = Math.ceil(canvas.width / (window.devicePixelRatio || 1) / res);
-    
-    if (gridX >= 0 && gridY >= 0 && gridX < width) {
-      const index = gridY * width + gridX;
-      if (index < flowField.grid.length) {
-        return flowField.grid[index].angle;
-      }
-    }
-
-    // Fallback to linear search if direct indexing fails
-    for (let i = 0; i < flowField.grid.length; i++) {
-      const point = flowField.grid[i];
-      if (Math.floor(point.x / res) === gridX && Math.floor(point.y / res) === gridY) {
-        return point.angle;
-      }
-    }
-
-    // if not found, return a default angle
-    return 0;
-  };
-
-  const applyFinalEffects = (ctx, width, height) => {
-    // add subtle vignette for depth
-    const gradient = ctx.createRadialGradient(
-      width / 2, height / 2, Math.min(width, height) * 0.3,
-      width / 2, height / 2, Math.min(width, height) * 0.8
+  const applyFinalEffects = (ctx, w, h) => {
+    //vignette
+    const g = ctx.createRadialGradient(
+      w / 2, h / 2, Math.min(w, h) * 0.3,
+      w / 2, h / 2, Math.min(w, h) * 0.8
     );
-    gradient.addColorStop(0, 'transparent');
-    gradient.addColorStop(1, 'rgba(250, 250, 250, 0.2)');
-
+    g.addColorStop(0, "transparent");
+    g.addColorStop(1, "rgba(250,250,250,0.2)");
     ctx.globalAlpha = 0.3;
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle   = g;
+    ctx.fillRect(0, 0, w, h);
 
-    // add very subtle grain texture
+    //grain
     ctx.globalAlpha = 0.01;
-    for (let i = 0; i < width * height * 0.0003; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
+    for (let i = 0; i < w * h * 0.0003; i++) {
       ctx.fillStyle = Math.random() > 0.5 ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.3)";
-      ctx.fillRect(x, y, 1, 1);
-    }
-  };
-
-  // function to toggle pause/play animation
-  const toggleAnimation = () => {
-    if (isAnimating) {
-      cancelAnimationFrame(animationRef.current);
-    } else {
-      startAnimationLoop();
-    }
-    setIsAnimating(!isAnimating);
-  };
-
-  // function to export the current canvas as an image
-  const exportAsImage = () => {
-    setIsExporting(true);
-
-    try {
-      const canvas = canvasRef.current;
-      if (!canvas) {
-        throw new Error("Canvas not available");
-      }
-      
-      const dataUrl = canvas.toDataURL("image/png");
-
-      // create temporary link to download the image
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = 'ethereal-mood-art.png';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error('error exporting image:', error);
-      // Could add user notification here
-    } finally {
-      setIsExporting(false);
+      ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
     }
   };
 
   return (
-    <div className="ethereal-art-container" style={{ width: "100%", height: "500px", position: "relative" }}>
+    <div style={{ width: "100%", height: "500px", position: "relative" }}>
       <canvas
         ref={canvasRef}
         style={{
@@ -544,48 +281,6 @@ const EtherealGenArt = ({ moodLogs }) => {
           boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
         }}
       />
-      <div
-        className="art-controls"
-        style={{
-          position: "absolute",
-          bottom: "16px",
-          right: "16px",
-          display: "flex",
-          gap: "10px"
-        }}
-      >
-        <button
-          onClick={toggleAnimation}
-          className="art-control-btn"
-          style={{
-            padding: "8px 16px",
-            borderRadius: "20px",
-            backgroundColor: isAnimating ? "#f0f0f0" : "#e0e0e0",
-            border: "none",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            cursor: "pointer",
-            transition: "all 0.2s ease"
-          }}
-        >
-          {isAnimating ? 'Pause' : 'Play'}
-        </button>
-        <button
-          onClick={exportAsImage}
-          className="art-control-btn"
-          disabled={isExporting}
-          style={{
-            padding: "8px 16px",
-            borderRadius: "20px",
-            backgroundColor: isExporting ? "#e0e0e0" : "#f0f0f0",
-            border: "none",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            cursor: isExporting ? "default" : "pointer",
-            transition: "all 0.2s ease"
-          }}
-        >
-          {isExporting ? 'Exporting...' : 'Save as Image'}
-        </button>
-      </div>
     </div>
   );
 };

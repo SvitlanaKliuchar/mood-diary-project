@@ -22,7 +22,7 @@ const Footer = () => {
             <a href="#">Privacy</a>
           </div>
         </div>
-        <p>&copy; 2025 Harmonia. All rights reserved. Made with love.</p>
+        <p>&copy; 2025 Harmonia. All rights reserved.</p>
       </div>
     </footer>
   );

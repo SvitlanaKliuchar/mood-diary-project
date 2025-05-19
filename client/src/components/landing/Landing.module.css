@@ -247,7 +247,7 @@ footer {
 }
 .footer-content p {
     position: absolute;
-    bottom: 10px;
+    bottom: 6px;
     left: 50%;
     transform: translateX(-50%);
     color: var(--bg-color);

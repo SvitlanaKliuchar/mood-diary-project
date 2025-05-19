@@ -24,6 +24,7 @@
         'wordCloud'
         'moodWordAssociations'
         'genArt'
+        'genArtPreview'
         'text';
 }
 
@@ -76,6 +77,14 @@
     background-size: contain; */
 }
 
+.gen-art-preview {
+    grid-area: genArtPreview;
+    box-shadow: 0 12px 25px rgba(186, 183, 245, 0.4),
+        0 4px 12px rgba(84, 79, 191, 0.3);
+
+    
+}
+
 .dashboard-text {
     grid-area: text;
 }
@@ -115,6 +124,7 @@
             'productivityImpact productivityImpact'
             'wordCloud moodWordAssociations'
             'genArt genArt'
+            'genArtPreview genArtPreview'
             'text text'
         ;
         gap: 1.5rem;
@@ -608,9 +618,8 @@
     color: var(--bg-color);
     font-family: var(--h1-font);
     font-weight: 600;
+    padding: 0 1rem;
 }
-
-
 
 @keyframes gradient-flow {
     0% {

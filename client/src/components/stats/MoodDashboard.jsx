@@ -13,6 +13,8 @@ import ActivityPatterns from "./stats-elements/ActivityPatterns.jsx";
 import WordCloud from "./stats-elements/WordCloud.jsx";
 import MoodWordAssociations from "./stats-elements/MoodWordAssociations.jsx";
 import GenerateArtButton from "./stats-elements/GenerateArtButton.jsx";
+import EtherealGenArt from "../gen-art/EtherealGenArt.jsx";
+import GenArtWrapper from "../gen-art/GenArtWrapper.jsx";
 
 const MoodDashboard = () => {
   const [streak, setStreak] = useState(0);
@@ -25,14 +27,14 @@ const MoodDashboard = () => {
   const [wordCloudData, setWordCloudData] = useState([])
   const [moodWordAssociations, setMoodWordAssociations] = useState({})
   const [entryCount, setEntryCount] = useState(0);
+  const [showArt, setShowArt] = useState(false);
+  const [moodLogs, setMoodLogs] = useState([]);
 
   const { user } = useContext(AuthContext);
   const { startLoading, finishLoading } = useContext(LoadingContext);
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-
-  const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#0088fe"];
 
   useEffect(() => {
     if (!user?.id) return;
@@ -55,9 +57,19 @@ const MoodDashboard = () => {
         setWordCloudData(data.wordCloudData)
         setMoodWordAssociations(data.moodWordAssociations)
         setEntryCount(data.moodChartData.length);
+
+
+        // fetch mood logs 
+        const moodRes = await axiosInstance.get(`/moods`);
+        const normalized = moodRes.data.map(e => ({
+          ...e,
+          date: typeof e.date === 'string'
+            ? e.date
+            : new Date(e.date).toISOString().slice(0, 10),
+        }));
+        setMoodLogs(normalized);
+
         setError(null);
-
-
       } catch (error) {
         console.error("Failed to fetch stats: ", error);
         setError("Failed to fetch stats");
@@ -67,6 +79,11 @@ const MoodDashboard = () => {
     };
     fetchStats();
   }, [user]);
+
+  const handleGenerateArtClick = () => {
+    setShowArt(true);
+
+  };
 
 
   return (
@@ -142,13 +159,22 @@ const MoodDashboard = () => {
               </p>
             </div>
           )}
-          <GenerateArtButton locked={entryCount < 5} />
+          <GenerateArtButton locked={entryCount < 5} onClick={handleGenerateArtClick} />
         </div>
+        {showArt && (
+          <div
+          className={`${styles["gen-art-preview"]} ${styles["dashboard-item"]}`}
+        >
+            <GenArtWrapper />
+          </div>
+        )}
 
+        {!showArt && (
         <p className={styles['dashboard-text']}>
           Keep up the good work! The more entries we have to analyze, the more insightful the stats data will be for you.
         </p>
-
+      )
+      }
       </div>
     </div>
   );
