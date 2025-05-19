@@ -6,7 +6,7 @@
 }
 
 .heading {
-    font-size: clamp(1.5rem, 3vw + .5rem, 2.5rem);
+    font-size: clamp(1.2rem, 3vw + .5rem, 2.5rem);
     font-weight: 600;
     text-align: center;
     color: #333;
@@ -53,4 +53,276 @@
         max-height: 10rem;
     }
 
+}
+
+/* notification modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    background-color: var(--bg-color);
+    background-image: url('../../assets/images/star.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 1.5rem;
+    box-shadow: 0 12px 25px rgba(186, 183, 245, 0.4),
+        0 4px 12px rgba(84, 79, 191, 0.3);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 520px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent-color-blue);
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+}
+
+.close-button:hover {
+    color: var(--secondary-color);
+}
+
+.modal-body {
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-button {
+    padding: 0.6rem 1.5rem;
+    border: none;
+    border-radius: 30px;
+    background: var(--accent-color-blue);
+    color: var(--bg-color);
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.action-button:hover {
+    background: var(--secondary-color);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* art generation animation */
+.generation-container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f7fb, #e6f7ff); /* Light pastel background */
+  box-shadow: 0 10px 25px rgba(186, 183, 245, 0.6);
+}
+
+.generation-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.progress-container {
+  width: 70%;
+  max-width: 350px;
+  background: rgba(255, 255, 255, 0.5);
+  height: 12px;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 15px rgba(134, 109, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(135deg, #a6c1ee, #fbc2eb, #a1c4fd, #c2e9fb);
+  background-size: 300% 300%;
+  animation: gradientFlow 3s ease infinite;
+  transition: width 0.3s ease-out;
+}
+
+.generation-text {
+  font-size: 1.3rem;
+  color: #7e6fd9;
+  margin-top: 0.8rem;
+  font-weight: 600;
+  text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8);
+}
+
+.grid-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(to right, rgba(173, 216, 230, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(173, 216, 230, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: gridMove 15s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(20px, 20px); }
+}
+
+.line {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.6);
+  transform-origin: center;
+  animation: lineGrow 3s ease-in-out infinite;
+}
+
+.line-h {
+  height: 2px;
+  width: 0;
+  transform-origin: left center;
+}
+
+.line-v {
+  width: 2px;
+  height: 0;
+  transform-origin: center top;
+}
+
+@keyframes lineGrow {
+  0% { transform: scaleX(0) scaleY(0); }
+  50% { transform: scaleX(1) scaleY(1); }
+  100% { transform: scaleX(0) scaleY(0); }
+}
+
+.geo-shape {
+  position: absolute;
+  border-radius: 2px;
+  opacity: 0;
+  animation: fadeInOut 4s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: scale(0); }
+  25% { opacity: 0.7; transform: scale(1); }
+  75% { opacity: 0.7; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0); }
+}
+
+.light-beam {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(to right, 
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0) 100%);
+  animation: beamSweep 4s ease-in-out infinite;
+  z-index: 5;
+}
+
+@keyframes beamSweep {
+  0% { transform: translateX(-100%) rotate(45deg) scale(1); opacity: 0; }
+  25% { transform: translateX(-50%) rotate(45deg) scale(2); opacity: 1; }
+  75% { transform: translateX(50%) rotate(45deg) scale(2); opacity: 1; }
+  100% { transform: translateX(100%) rotate(45deg) scale(1); opacity: 0; }
+}
+.dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: rgba(173, 216, 230, 0.8);
+  animation: pulse 2s ease-in-out infinite alternate;
+}
+
+.connector {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    rgba(173, 216, 230, 0.5),
+    rgba(173, 216, 230, 0)
+  );
+  transform-origin: left center;
+  animation: connectGrow 3s ease-in-out infinite;
+}
+
+@keyframes connectGrow {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1.02); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }

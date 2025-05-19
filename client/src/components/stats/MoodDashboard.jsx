@@ -80,10 +80,16 @@ const MoodDashboard = () => {
     fetchStats();
   }, [user]);
 
-  const handleGenerateArtClick = () => {
-    setShowArt(true);
-
-  };
+const handleGenerateArtClick = () => {
+  setShowArt(true);
+  
+  // Use the global function instead of attributes
+  setTimeout(() => {
+    if (window.startArtGeneration) {
+      window.startArtGeneration();
+    }
+  }, 300);
+};
 
 
   return (
@@ -163,18 +169,19 @@ const MoodDashboard = () => {
         </div>
         {showArt && (
           <div
-          className={`${styles["gen-art-preview"]} ${styles["dashboard-item"]}`}
-        >
+            id="genArtWrapper"
+            className={`${styles["gen-art-preview"]} ${styles["dashboard-item"]}`}
+          >
             <GenArtWrapper />
           </div>
         )}
 
         {!showArt && (
-        <p className={styles['dashboard-text']}>
-          Keep up the good work! The more entries we have to analyze, the more insightful the stats data will be for you.
-        </p>
-      )
-      }
+          <p className={styles['dashboard-text']}>
+            Keep up the good work! The more entries we have to analyze, the more insightful the stats data will be for you.
+          </p>
+        )
+        }
       </div>
     </div>
   );

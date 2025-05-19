@@ -4,6 +4,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 import moods from "../../data/moods.js";
 import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 import { LoadingContext } from "../../contexts/LoadingContext.jsx";
+import NotificationModal from "../gen-art/NotificationModal.jsx";
 import { useNavigate } from "react-router-dom";
 
 const Entries = () => {
@@ -16,6 +17,9 @@ const Entries = () => {
     useContext(LoadingContext);
 
   const isLoading = loadingCount > 0;
+
+  const [showUnlockNotification, setShowUnlockNotification] = useState(false);
+  const [previousEntryCount, setPreviousEntryCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,6 +45,27 @@ const Entries = () => {
       fetchEntries();
     }
   }, [authLoading, user, displayedDate]);
+
+  useEffect(() => {
+    // check if entries count just reached/passed 5
+    if (previousEntryCount < 5 && entries.length >= 5) {
+      setShowUnlockNotification(true);
+      // store in localStorage that notification was shown
+      localStorage.setItem('artFeatureUnlockNotificationShown', 'true');
+    }
+
+    // update the previous entry count
+    setPreviousEntryCount(entries.length);
+  }, [entries.length]);
+
+  const handleCloseNotification = () => {
+    setShowUnlockNotification(false);
+  };
+
+  const navigateToArtFeature = () => {
+    setShowUnlockNotification(false);
+    navigate('/stats');
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -148,6 +173,14 @@ const Entries = () => {
           })}
         </div>
       )}
+      <NotificationModal
+        isOpen={showUnlockNotification}
+        onClose={handleCloseNotification}
+        title="Art Generation Unlocked!"
+        message="Great job! You've logged 5 moods and unlocked something magical—your very own Art Piece! Go check it out on your dashboard. 🌟"
+        actionText="View Now"
+        onAction={navigateToArtFeature}
+      />
 
       {/* if loading is done but no entries were returned, show a fallback message */}
       {!isLoading && entries.length === 0 && (
