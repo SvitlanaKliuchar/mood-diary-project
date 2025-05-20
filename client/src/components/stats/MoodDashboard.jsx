@@ -14,7 +14,7 @@ import WordCloud from "./stats-elements/WordCloud.jsx";
 import MoodWordAssociations from "./stats-elements/MoodWordAssociations.jsx";
 import GenerateArtButton from "./stats-elements/GenerateArtButton.jsx";
 import GenArtWrapper from "../gen-art/GenArtWrapper.jsx";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
 const MoodDashboard = () => {
   const [streak, setStreak] = useState(0);
@@ -24,15 +24,14 @@ const MoodDashboard = () => {
   const [activityPatterns, setActivityPatterns] = useState([]);
   const [dayOfWeekAvg, setDayOfWeekAvg] = useState({});
   const [productivityCorrelation, setProductivityCorrelation] = useState(0);
-  const [wordCloudData, setWordCloudData] = useState([])
-  const [moodWordAssociations, setMoodWordAssociations] = useState({})
+  const [wordCloudData, setWordCloudData] = useState([]);
+  const [moodWordAssociations, setMoodWordAssociations] = useState({});
   const [entryCount, setEntryCount] = useState(0);
   const [showArt, setShowArt] = useState(false);
   const [moodLogs, setMoodLogs] = useState([]);
 
   const location = useLocation();
   const genArtSectionRef = useRef(null);
-
 
   const { user } = useContext(AuthContext);
   const { startLoading, finishLoading } = useContext(LoadingContext);
@@ -57,18 +56,18 @@ const MoodDashboard = () => {
         setActivityPatterns(data.activityPatterns);
         setDayOfWeekAvg(data.dayOfWeekAverages);
         setProductivityCorrelation(data.productivityCorrelation);
-        setWordCloudData(data.wordCloudData)
-        setMoodWordAssociations(data.moodWordAssociations)
+        setWordCloudData(data.wordCloudData);
+        setMoodWordAssociations(data.moodWordAssociations);
         setEntryCount(data.moodChartData.length);
 
-
-        // fetch mood logs 
+        // fetch mood logs
         const moodRes = await axiosInstance.get(`/moods`);
-        const normalized = moodRes.data.map(e => ({
+        const normalized = moodRes.data.map((e) => ({
           ...e,
-          date: typeof e.date === 'string'
-            ? e.date
-            : new Date(e.date).toISOString().slice(0, 10),
+          date:
+            typeof e.date === "string"
+              ? e.date
+              : new Date(e.date).toISOString().slice(0, 10),
         }));
         setMoodLogs(normalized);
 
@@ -83,11 +82,13 @@ const MoodDashboard = () => {
     fetchStats();
   }, [user]);
 
-
   useEffect(() => {
-    if (location.hash === '#gen-art-section' && genArtSectionRef.current) {
+    if (location.hash === "#gen-art-section" && genArtSectionRef.current) {
       setTimeout(() => {
-        genArtSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        genArtSectionRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
       }, 300); // wait a bit in case data or DOM isn't ready yet
     }
   }, [location.hash]);
@@ -103,11 +104,9 @@ const MoodDashboard = () => {
     }, 300);
   };
 
-
   return (
     <div className={styles["dashboard-container"]}>
       <div className={styles["mood-dashboard"]}>
-
         <div
           className={`${styles["days-in-a-row"]} ${styles["dashboard-item"]}`}
         >
@@ -150,9 +149,7 @@ const MoodDashboard = () => {
           <h3>Productivity Impact</h3>
           <ProductivityScore correlation={productivityCorrelation} />
         </div>
-        <div
-          className={`${styles["word-cloud"]} ${styles["dashboard-item"]}`}
-        >
+        <div className={`${styles["word-cloud"]} ${styles["dashboard-item"]}`}>
           <h3>Word Cloud</h3>
           <WordCloud data={wordCloudData} />
         </div>
@@ -166,19 +163,35 @@ const MoodDashboard = () => {
           className={`${styles["gen-art-section"]} ${styles["dashboard-item"]}`}
           ref={genArtSectionRef}
         >
-          <img className={styles['sparkle-left']} src="src/assets/images/footer-star.png" alt="" />
-          <img className={styles['sparkle-right']} src="src/assets/images/footer-star.png" alt="" />
-          <h3 className={styles['gen-art-heading']}>You've unlocked something special</h3>
+          <img
+            className={styles["sparkle-left"]}
+            src="src/assets/images/footer-star.png"
+            alt=""
+          />
+          <img
+            className={styles["sparkle-right"]}
+            src="src/assets/images/footer-star.png"
+            alt=""
+          />
+          <h3 className={styles["gen-art-heading"]}>
+            You've unlocked something special
+          </h3>
           {/* overlay if fewer than 5 entries */}
           {entryCount < 5 && (
             <div className={styles["gen-art-lock"]}>
-              <span className={styles["lock-icon"]} aria-hidden="true">🔒</span>
+              <span className={styles["lock-icon"]} aria-hidden="true">
+                🔒
+              </span>
               <p className={styles["lock-text"]}>
-                Unlocks after{5 - entryCount} more {5 - entryCount === 1 ? "entry" : "entries"}
+                Unlocks after{5 - entryCount} more{" "}
+                {5 - entryCount === 1 ? "entry" : "entries"}
               </p>
             </div>
           )}
-          <GenerateArtButton locked={entryCount < 5} onClick={handleGenerateArtClick} />
+          <GenerateArtButton
+            locked={entryCount < 5}
+            onClick={handleGenerateArtClick}
+          />
         </div>
         {showArt && (
           <div
@@ -190,11 +203,11 @@ const MoodDashboard = () => {
         )}
 
         {!showArt && (
-          <p className={styles['dashboard-text']}>
-            Keep up the good work! The more entries we have to analyze, the more insightful the stats data will be for you.
+          <p className={styles["dashboard-text"]}>
+            Keep up the good work! The more entries we have to analyze, the more
+            insightful the stats data will be for you.
           </p>
-        )
-        }
+        )}
       </div>
     </div>
   );

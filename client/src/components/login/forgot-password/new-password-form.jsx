@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import styles from "../Login.module.css";
 import axiosInstance from "../../../utils/axiosInstance.js";
 import { useNavigate, useParams } from "react-router-dom";
-import openEyeIcon from '../../../assets/icons/login/eye-open.svg'
-import closedEyeIcon from '../../../assets/icons/login/eye-closed.svg'
+import openEyeIcon from "../../../assets/icons/login/eye-open.svg";
+import closedEyeIcon from "../../../assets/icons/login/eye-closed.svg";
 
 const NewPasswordForm = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -81,15 +81,9 @@ const NewPasswordForm = () => {
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <img
-                  src={closedEyeIcon}
-                  alt="Hide password"
-                />
+                <img src={closedEyeIcon} alt="Hide password" />
               ) : (
-                <img
-                  src={openEyeIcon}
-                  alt="Show password"
-                />
+                <img src={openEyeIcon} alt="Show password" />
               )}
             </button>
           </div>
@@ -111,15 +105,9 @@ const NewPasswordForm = () => {
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <img
-                  src={closedEyeIcon}
-                  alt="Hide password"
-                />
+                <img src={closedEyeIcon} alt="Hide password" />
               ) : (
-                <img
-                  src={openEyeIcon}
-                  alt="Show password"
-                />
+                <img src={openEyeIcon} alt="Show password" />
               )}
             </button>
           </div>
@@ -127,7 +115,7 @@ const NewPasswordForm = () => {
         <button
           type="submit"
           disabled={!newPassword.trim() || !repeatNewPassword.trim()}
-          className={`${styles["reset-btn"]} ${styles['login-btn']}`}
+          className={`${styles["reset-btn"]} ${styles["login-btn"]}`}
         >
           Change my password
         </button>

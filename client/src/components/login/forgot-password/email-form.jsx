@@ -44,7 +44,11 @@ const EmailForm = () => {
             required
           />
         </div>
-        <button type="submit" disabled={!email.trim()} className={`${styles["reset-btn"]} ${styles['login-btn']}`}>
+        <button
+          type="submit"
+          disabled={!email.trim()}
+          className={`${styles["reset-btn"]} ${styles["login-btn"]}`}
+        >
           Send reset link
         </button>
       </form>

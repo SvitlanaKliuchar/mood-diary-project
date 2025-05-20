@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import styles from '../SettingsList.module.css';
+import { useState } from "react";
+import styles from "../SettingsList.module.css";
 
 const ExportData = ({ onClose }) => {
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [isExporting, setIsExporting] = useState(false);
 
   const handleSubmit = (e) => {
@@ -19,17 +19,22 @@ const ExportData = ({ onClose }) => {
   };
 
   return (
-    <div className={styles['settings-list']}>
-            <button onClick={onClose} className={styles['back-btn']} aria-label="Back">
-                ←
-            </button>
-      <div className={styles['export-data-container']}>
-        <p id="export-data-title" className={styles['main-text']}>
-          Download a copy of your data for backup or to transfer to another service
+    <div className={styles["settings-list"]}>
+      <button
+        onClick={onClose}
+        className={styles["back-btn"]}
+        aria-label="Back"
+      >
+        ←
+      </button>
+      <div className={styles["export-data-container"]}>
+        <p id="export-data-title" className={styles["main-text"]}>
+          Download a copy of your data for backup or to transfer to another
+          service
         </p>
 
-        <form onSubmit={handleSubmit} className={styles['modal-form']}>
-          <label htmlFor="password" className={styles['input-label']}>
+        <form onSubmit={handleSubmit} className={styles["modal-form"]}>
+          <label htmlFor="password" className={styles["input-label"]}>
             Enter password:
           </label>
           <input
@@ -41,12 +46,12 @@ const ExportData = ({ onClose }) => {
             required
           />
           <button
-            className={styles['export-data-btn']}
+            className={styles["export-data-btn"]}
             aria-label="Export Data Button"
             type="submit"
             disabled={isExporting}
           >
-            {isExporting ? 'Exporting...' : 'Export Data'}
+            {isExporting ? "Exporting..." : "Export Data"}
           </button>
         </form>
 

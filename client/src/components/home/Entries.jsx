@@ -47,14 +47,11 @@ const Entries = () => {
   }, [authLoading, user, displayedDate]);
 
   useEffect(() => {
-    // check if entries count just reached/passed 5
     if (previousEntryCount < 5 && entries.length >= 5) {
       setShowUnlockNotification(true);
       // store in localStorage that notification was shown
-      localStorage.setItem('artFeatureUnlockNotificationShown', 'true');
+      localStorage.setItem("artFeatureUnlockNotificationShown", "true");
     }
-
-    // update the previous entry count
     setPreviousEntryCount(entries.length);
   }, [entries.length]);
 
@@ -64,7 +61,7 @@ const Entries = () => {
 
   const navigateToArtFeature = () => {
     setShowUnlockNotification(false);
-    navigate('/stats#gen-art-section');
+    navigate("/stats#gen-art-section");
   };
 
   const handleDelete = async (id) => {
@@ -105,6 +102,7 @@ const Entries = () => {
 
   return (
     <div className={styles.wrapper}>
+      <LoadingSpinner delay={500} />
       {/* if loading is done and we have entries, display them */}
       {!isLoading && entries.length > 0 && (
         <div className={styles["all-entries-container"]}>
@@ -184,7 +182,7 @@ const Entries = () => {
 
       {/* if loading is done but no entries were returned, show a fallback message */}
       {!isLoading && entries.length === 0 && (
-        <div className={styles['no-entries']}>No entries found.</div>
+        <div className={styles["no-entries"]}>No entries found.</div>
       )}
 
       {entries.length > 0 ? (

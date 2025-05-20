@@ -57,8 +57,8 @@ export const signupSchema = Yup.object().shape({
 export const profileUpdateSchema = Yup.object().shape({
   username: signupSchema.fields.username,
   email: signupSchema.fields.email,
-  password: passwordYup
-})
+  password: passwordYup,
+});
 
 //individual field schemas for single field validation
 export const usernameSchema = signupSchema.fields.username;

@@ -1,6 +1,6 @@
 export const createFlowFields = (configs, w, h) => {
   const res = 20;
-  return configs.map(cfg => {
+  return configs.map((cfg) => {
     const grid = [];
     for (let y = 0; y < h; y += res) {
       for (let x = 0; x < w; x += res) {
@@ -15,14 +15,14 @@ export const createFlowFields = (configs, w, h) => {
       intensity: cfg.intensity,
       flow: cfg.flow,
       noiseScale: 0.003 + cfg.complexity * 0.005,
-      noiseSpeed: 0.0005 + cfg.flow * 0.001
+      noiseSpeed: 0.0005 + cfg.flow * 0.001,
     };
   });
 };
 
 export const createLayers = (configs, w, h) => {
   const layers = [];
-  configs.forEach(cfg => {
+  configs.forEach((cfg) => {
     /* organic blobs */
     for (let i = 0; i < 3; i++) {
       layers.push({
@@ -35,7 +35,7 @@ export const createLayers = (configs, w, h) => {
         points: 5 + Math.floor(Math.random() * 3),
         amplitude: 20 + Math.random() * 40,
         speed: 0.0003 + Math.random() * 0.0005,
-        offset: Math.random() * Math.PI * 2
+        offset: Math.random() * Math.PI * 2,
       });
     }
     /* flowing lines */
@@ -50,7 +50,7 @@ export const createLayers = (configs, w, h) => {
         color: i % 2 ? cfg.color : cfg.secondaryColor,
         alpha: 0.1 + Math.random() * 0.2,
         speed: 0.0002 + cfg.flow * 0.0006,
-        flowScale: 0.5 + cfg.flow * 0.5
+        flowScale: 0.5 + cfg.flow * 0.5,
       });
     }
   });
@@ -59,7 +59,7 @@ export const createLayers = (configs, w, h) => {
 
 export const createParticles = (configs, w, h) => {
   const particles = [];
-  configs.forEach(cfg => {
+  configs.forEach((cfg) => {
     const n = Math.floor(30 + cfg.intensity * 50);
     for (let i = 0; i < n; i++) {
       particles.push({
@@ -71,7 +71,7 @@ export const createParticles = (configs, w, h) => {
         speed: 0.2 + cfg.flow * 0.8,
         flowInfluence: 0.5 + cfg.flow * 0.5,
         angle: Math.random() * Math.PI * 2,
-        pulse: 0.01 + Math.random() * 0.03
+        pulse: 0.01 + Math.random() * 0.03,
       });
     }
   });
@@ -82,17 +82,17 @@ export const createParticles = (configs, w, h) => {
 export function fitCanvasToContainer(canvas, fixedHeight = 500) {
   if (!canvas) return false;
 
-  const dpr       = window.devicePixelRatio || 1;
-  const parent    = canvas.parentElement;
-  const cssWidth  = parent?.clientWidth || 800;
+  const dpr = window.devicePixelRatio || 1;
+  const parent = canvas.parentElement;
+  const cssWidth = parent?.clientWidth || 800;
   const cssHeight = fixedHeight;
 
   if (canvas.style.width !== `${cssWidth}px`) {
     const ctx = canvas.getContext("2d");
 
-    canvas.width       = cssWidth  * dpr;   // bitmap
-    canvas.height      = cssHeight * dpr;
-    canvas.style.width  = `${cssWidth}px`;  // css
+    canvas.width = cssWidth * dpr; // bitmap
+    canvas.height = cssHeight * dpr;
+    canvas.style.width = `${cssWidth}px`; // css
     canvas.style.height = `${cssHeight}px`;
 
     ctx.resetTransform?.();

@@ -1,6 +1,5 @@
 import styles from "./Landing.module.css";
 
-
 const Hero = () => {
   return (
     <section id={styles.hero}>
@@ -19,8 +18,7 @@ const Hero = () => {
           Why Track?
         </a>
       </div>
-      <div>
-    </div>
+      <div></div>
     </section>
   );
 };

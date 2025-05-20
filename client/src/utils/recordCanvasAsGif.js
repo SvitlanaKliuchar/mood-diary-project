@@ -1,7 +1,7 @@
-import GIF from 'gif.js';
+import GIF from "gif.js";
 
 export function recordCanvasAsGif(canvas, { duration = 2000, fps = 24 } = {}) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     // get the canvas dimensions to maintain aspect ratio
     const width = canvas.width;
     const height = canvas.height;
@@ -10,9 +10,9 @@ export function recordCanvasAsGif(canvas, { duration = 2000, fps = 24 } = {}) {
     const gif = new GIF({
       workers: 2,
       quality: 10,
-      width: width, 
+      width: width,
       height: height,
-      workerScript: '/gif.worker.js'
+      workerScript: "/gif.worker.js",
     });
 
     const delay = 1000 / fps;
@@ -22,7 +22,7 @@ export function recordCanvasAsGif(canvas, { duration = 2000, fps = 24 } = {}) {
       t += delay;
       if (t >= duration) {
         clearInterval(id);
-        gif.on('finished', blob => resolve(blob));
+        gif.on("finished", (blob) => resolve(blob));
         gif.render();
       }
     }, delay);

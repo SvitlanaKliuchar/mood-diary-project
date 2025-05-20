@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { buildArtConfig } from "@/data/gen-art-mapping.js";
-import { fitCanvasToContainer, createFlowFields, createLayers, createParticles} from "../../utils/gen-art-helpers";
+import {
+  fitCanvasToContainer,
+  createFlowFields,
+  createLayers,
+  createParticles,
+} from "../../utils/genArtHelpers";
 
 const EtherealGenArt = ({ moodLogs }) => {
-  const canvasRef    = useRef(null);
+  const canvasRef = useRef(null);
   const animationRef = useRef(null);
-  const artConfigs   = useRef(moodLogs.map(buildArtConfig));
+  const artConfigs = useRef(moodLogs.map(buildArtConfig));
 
   const [isAnimating, setIsAnimating] = useState(true);
 
@@ -14,7 +19,7 @@ const EtherealGenArt = ({ moodLogs }) => {
     flowFields: [],
     layers: [],
     particles: [],
-    lastFrameTime: 0
+    lastFrameTime: 0,
   });
 
   //mount + mood updates
@@ -42,9 +47,8 @@ const EtherealGenArt = ({ moodLogs }) => {
     return () => ro.disconnect();
   }, []);
 
-
   //setup
-  const setupArt = cfgs => {
+  const setupArt = (cfgs) => {
     const canvas = canvasRef.current;
     const w = canvas.width / (window.devicePixelRatio || 1);
     const h = canvas.height / (window.devicePixelRatio || 1);
@@ -52,20 +56,20 @@ const EtherealGenArt = ({ moodLogs }) => {
     animationState.current = {
       time: 0,
       flowFields: createFlowFields(cfgs, w, h),
-      layers:     createLayers(cfgs, w, h),
-      particles:  createParticles(cfgs, w, h),
-      lastFrameTime: 0
+      layers: createLayers(cfgs, w, h),
+      particles: createParticles(cfgs, w, h),
+      lastFrameTime: 0,
     };
   };
 
   //animation loop
   const startLoop = () => {
-    const animate = ts => {
+    const animate = (ts) => {
       if (!isAnimating) return;
       const prev = animationState.current.lastFrameTime || ts;
-      const dt   = ts - prev;
+      const dt = ts - prev;
       animationState.current.lastFrameTime = ts;
-      animationState.current.time         += dt;
+      animationState.current.time += dt;
       renderFrame(dt / 1000);
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -73,11 +77,11 @@ const EtherealGenArt = ({ moodLogs }) => {
   };
 
   //frame render
-  const renderFrame = dt => {
+  const renderFrame = (dt) => {
     const canvas = canvasRef.current;
-    const ctx    = canvas.getContext("2d");
-    const w      = canvas.width  / (window.devicePixelRatio || 1);
-    const h      = canvas.height / (window.devicePixelRatio || 1);
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
 
     //fade clear
     ctx.fillStyle = "rgba(255,255,255,0.03)";
@@ -90,10 +94,10 @@ const EtherealGenArt = ({ moodLogs }) => {
   };
 
   //simulation helpers
-  const updateFlowFields = dt => {
+  const updateFlowFields = (dt) => {
     const { time, flowFields } = animationState.current;
-    flowFields.forEach(f => {
-      f.grid.forEach(p => {
+    flowFields.forEach((f) => {
+      f.grid.forEach((p) => {
         const n =
           Math.sin(p.x * f.noiseScale + time * f.noiseSpeed) *
           Math.cos(p.y * f.noiseScale - time * f.noiseSpeed);
@@ -104,34 +108,48 @@ const EtherealGenArt = ({ moodLogs }) => {
 
   const renderLayers = (ctx, w, h) => {
     const t = animationState.current.time;
-    animationState.current.layers.forEach(l => {
+    animationState.current.layers.forEach((l) => {
       ctx.save();
       switch (l.type) {
-        case "organicBlob": renderBlob(ctx, l, t); break;
-        case "flowingLine": renderFlowLine(ctx, l, t); break;
-        case "spike":       renderSpike(ctx, l, t);    break;
-        case "burst":       renderBurst(ctx, l, t);    break;
-        case "ripple":      renderRipple(ctx, l, t);   break;
-        case "drip":        renderDrip(ctx, l, t);     break;
-        default:            renderBlob(ctx, l, t);     break;
+        case "organicBlob":
+          renderBlob(ctx, l, t);
+          break;
+        case "flowingLine":
+          renderFlowLine(ctx, l, t);
+          break;
+        case "spike":
+          renderSpike(ctx, l, t);
+          break;
+        case "burst":
+          renderBurst(ctx, l, t);
+          break;
+        case "ripple":
+          renderRipple(ctx, l, t);
+          break;
+        case "drip":
+          renderDrip(ctx, l, t);
+          break;
+        default:
+          renderBlob(ctx, l, t);
+          break;
       }
       ctx.restore();
     });
   };
 
   const updateAndRenderParticles = (ctx, w, h, dt) => {
-    const t   = animationState.current.time;
+    const t = animationState.current.time;
     const fld = animationState.current.flowFields[0];
 
-    animationState.current.particles.forEach(p => {
+    animationState.current.particles.forEach((p) => {
       //move
-      const res   = fld.resolution;
-      const gx    = Math.floor(p.x / res);
-      const gy    = Math.floor(p.y / res);
-      const cols  = Math.ceil(w / res);
-      const idx   = gy * cols + gx;
+      const res = fld.resolution;
+      const gx = Math.floor(p.x / res);
+      const gy = Math.floor(p.y / res);
+      const cols = Math.ceil(w / res);
+      const idx = gy * cols + gx;
       const flowA = fld.grid[idx]?.angle || 0;
-      const ang   = flowA * p.flowInfluence + p.angle * (1 - p.flowInfluence);
+      const ang = flowA * p.flowInfluence + p.angle * (1 - p.flowInfluence);
 
       p.x += Math.cos(ang) * p.speed * dt;
       p.y += Math.sin(ang) * p.speed * dt;
@@ -143,12 +161,12 @@ const EtherealGenArt = ({ moodLogs }) => {
 
       //draw
       const pulse = p.size * (0.8 + Math.sin(t * p.pulse) * 0.2);
-      const grad  = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, pulse * 2);
+      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, pulse * 2);
       grad.addColorStop(0, p.color);
       grad.addColorStop(1, "rgba(255,255,255,0)");
 
       ctx.globalAlpha = p.alpha;
-      ctx.fillStyle   = grad;
+      ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(p.x, p.y, pulse * 2, 0, Math.PI * 2);
       ctx.fill();
@@ -158,13 +176,16 @@ const EtherealGenArt = ({ moodLogs }) => {
   //tiny render primitives
   const renderBlob = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
-    ctx.fillStyle   = l.color;
+    ctx.fillStyle = l.color;
     const pts = l.points || 5;
     ctx.beginPath();
     for (let i = 0; i <= pts; i++) {
       const a = (i / pts) * Math.PI * 2;
       const r = l.size + Math.sin(a * 3 + t * l.speed + l.offset) * l.amplitude;
-      ctx[i ? "lineTo" : "moveTo"](l.x + Math.cos(a) * r, l.y + Math.sin(a) * r);
+      ctx[i ? "lineTo" : "moveTo"](
+        l.x + Math.cos(a) * r,
+        l.y + Math.sin(a) * r,
+      );
     }
     ctx.closePath();
     ctx.fill();
@@ -173,9 +194,10 @@ const EtherealGenArt = ({ moodLogs }) => {
   const renderFlowLine = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
     ctx.strokeStyle = l.color;
-    ctx.lineWidth   = l.thickness;
+    ctx.lineWidth = l.thickness;
     const seg = l.length / l.segments;
-    let x = l.startX, y = l.startY;
+    let x = l.startX,
+      y = l.startY;
     ctx.beginPath();
     ctx.moveTo(x, y);
     for (let i = 0; i < l.segments; i++) {
@@ -189,7 +211,7 @@ const EtherealGenArt = ({ moodLogs }) => {
 
   const renderSpike = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
-    ctx.fillStyle   = l.color;
+    ctx.fillStyle = l.color;
     const n = 24;
     ctx.beginPath();
     for (let i = 0; i <= n; i++) {
@@ -204,7 +226,7 @@ const EtherealGenArt = ({ moodLogs }) => {
   const renderBurst = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
     ctx.strokeStyle = l.color;
-    ctx.lineWidth   = 1;
+    ctx.lineWidth = 1;
     const rays = 40;
     ctx.beginPath();
     for (let i = 0; i < rays; i++) {
@@ -219,9 +241,10 @@ const EtherealGenArt = ({ moodLogs }) => {
   const renderRipple = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
     ctx.strokeStyle = l.color;
-    ctx.lineWidth   = 1;
+    ctx.lineWidth = 1;
     for (let i = 1; i <= 4; i++) {
-      const r = l.size * i * 0.4 + Math.sin(t * l.speed + i) * l.amplitude * 0.1;
+      const r =
+        l.size * i * 0.4 + Math.sin(t * l.speed + i) * l.amplitude * 0.1;
       ctx.beginPath();
       ctx.arc(l.x, l.y, r, 0, Math.PI * 2);
       ctx.stroke();
@@ -230,10 +253,10 @@ const EtherealGenArt = ({ moodLogs }) => {
 
   const renderDrip = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
-    ctx.fillStyle   = l.color;
+    ctx.fillStyle = l.color;
     const drips = 5;
     for (let i = 0; i < drips; i++) {
-      const a  = (i / drips) * Math.PI * 2;
+      const a = (i / drips) * Math.PI * 2;
       const xb = l.x + Math.cos(a) * l.size * 0.5;
       const yb = l.y + Math.sin(a) * l.size * 0.5;
       const len = l.size * (0.3 + Math.sin(t * l.speed + i) * 0.7);
@@ -243,7 +266,7 @@ const EtherealGenArt = ({ moodLogs }) => {
         xb + Math.cos(a) * len * 0.5,
         yb + Math.sin(a) * len * 1.5,
         xb + Math.cos(a) * len,
-        yb + Math.sin(a) * len
+        yb + Math.sin(a) * len,
       );
       ctx.closePath();
       ctx.fill();
@@ -253,19 +276,24 @@ const EtherealGenArt = ({ moodLogs }) => {
   const applyFinalEffects = (ctx, w, h) => {
     //vignette
     const g = ctx.createRadialGradient(
-      w / 2, h / 2, Math.min(w, h) * 0.3,
-      w / 2, h / 2, Math.min(w, h) * 0.8
+      w / 2,
+      h / 2,
+      Math.min(w, h) * 0.3,
+      w / 2,
+      h / 2,
+      Math.min(w, h) * 0.8,
     );
     g.addColorStop(0, "transparent");
     g.addColorStop(1, "rgba(250,250,250,0.2)");
     ctx.globalAlpha = 0.3;
-    ctx.fillStyle   = g;
+    ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
 
     //grain
     ctx.globalAlpha = 0.01;
     for (let i = 0; i < w * h * 0.0003; i++) {
-      ctx.fillStyle = Math.random() > 0.5 ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.3)";
+      ctx.fillStyle =
+        Math.random() > 0.5 ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.3)";
       ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
     }
   };
@@ -278,7 +306,7 @@ const EtherealGenArt = ({ moodLogs }) => {
           width: "100%",
           height: "100%",
           borderRadius: "8px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
+          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
         }}
       />
     </div>
