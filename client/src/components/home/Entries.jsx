@@ -64,7 +64,7 @@ const Entries = () => {
 
   const navigateToArtFeature = () => {
     setShowUnlockNotification(false);
-    navigate('/stats');
+    navigate('/stats#gen-art-section');
   };
 
   const handleDelete = async (id) => {

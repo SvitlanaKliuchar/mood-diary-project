@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
 import styles from "./MoodDashboard.module.css";
 import axiosInstance from "../../utils/axiosInstance.js";
@@ -13,8 +13,8 @@ import ActivityPatterns from "./stats-elements/ActivityPatterns.jsx";
 import WordCloud from "./stats-elements/WordCloud.jsx";
 import MoodWordAssociations from "./stats-elements/MoodWordAssociations.jsx";
 import GenerateArtButton from "./stats-elements/GenerateArtButton.jsx";
-import EtherealGenArt from "../gen-art/EtherealGenArt.jsx";
 import GenArtWrapper from "../gen-art/GenArtWrapper.jsx";
+import { useLocation } from 'react-router-dom';
 
 const MoodDashboard = () => {
   const [streak, setStreak] = useState(0);
@@ -30,6 +30,10 @@ const MoodDashboard = () => {
   const [showArt, setShowArt] = useState(false);
   const [moodLogs, setMoodLogs] = useState([]);
 
+  const location = useLocation();
+  const genArtSectionRef = useRef(null);
+
+
   const { user } = useContext(AuthContext);
   const { startLoading, finishLoading } = useContext(LoadingContext);
 
@@ -38,7 +42,6 @@ const MoodDashboard = () => {
 
   useEffect(() => {
     if (!user?.id) return;
-    //when fetching stats do :user.id
     const fetchStats = async () => {
       try {
         startLoading();
@@ -80,16 +83,25 @@ const MoodDashboard = () => {
     fetchStats();
   }, [user]);
 
-const handleGenerateArtClick = () => {
-  setShowArt(true);
-  
-  // Use the global function instead of attributes
-  setTimeout(() => {
-    if (window.startArtGeneration) {
-      window.startArtGeneration();
+
+  useEffect(() => {
+    if (location.hash === '#gen-art-section' && genArtSectionRef.current) {
+      setTimeout(() => {
+        genArtSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300); // wait a bit in case data or DOM isn't ready yet
     }
-  }, 300);
-};
+  }, [location.hash]);
+
+  const handleGenerateArtClick = () => {
+    setShowArt(true);
+
+    // Use the global function instead of attributes
+    setTimeout(() => {
+      if (window.startArtGeneration) {
+        window.startArtGeneration();
+      }
+    }, 300);
+  };
 
 
   return (
@@ -152,6 +164,7 @@ const handleGenerateArtClick = () => {
         </div>
         <div
           className={`${styles["gen-art-section"]} ${styles["dashboard-item"]}`}
+          ref={genArtSectionRef}
         >
           <img className={styles['sparkle-left']} src="src/assets/images/footer-star.png" alt="" />
           <img className={styles['sparkle-right']} src="src/assets/images/footer-star.png" alt="" />
