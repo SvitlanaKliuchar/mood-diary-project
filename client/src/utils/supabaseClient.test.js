@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createClient } from "@supabase/supabase-js";
 
-// Mock the Supabase client
 vi.mock("@supabase/supabase-js", () => {
   const mockSession = { user: { id: "test-user-id" } };
 
