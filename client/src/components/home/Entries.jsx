@@ -6,6 +6,7 @@ import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 import { LoadingContext } from "../../contexts/LoadingContext.jsx";
 import NotificationModal from "../gen-art/NotificationModal.jsx";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from '../loading/LoadingSpinner.jsx'
 
 const Entries = () => {
   const { entries, refreshEntries, displayedDate, updateEntry, deleteEntry } =

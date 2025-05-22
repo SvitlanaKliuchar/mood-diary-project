@@ -33,7 +33,6 @@ const MoodCalendar = () => {
       const end = format(lastDay, "yyyy-MM-dd");
       const response = await axiosInstance.get("/moods", {
         params: { start, end },
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const map = {};
       response.data.forEach((entry) => {

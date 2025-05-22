@@ -12,7 +12,6 @@ const AuthProvider = ({ children }) => {
       const res = await axiosInstance.post("/auth/logout");
       if (res.status === 200) {
         setUser(null);
-        localStorage.removeItem("user");
         return true;
       }
       return false;
@@ -25,30 +24,20 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     setupInterceptors({ logout });
 
-    const cachedUser = localStorage.getItem("user");
-    if (cachedUser) {
-      setUser(JSON.parse(cachedUser));
-      setLoading(false);
-    } else {
-      const checkUser = async () => {
-        try {
-          const { data } = await axiosInstance.get("/auth/me");
-          if (data?.user) {
-            setUser(data.user);
-            localStorage.setItem("user", JSON.stringify(data.user));
-          }
-        } catch (err) {
-          if (err.response?.status === 401) {
-            console.log("No user logged in");
-          } else {
-            console.error("Error checking user data:", err.message);
-          }
-        } finally {
-          setLoading(false);
+    (async () => {
+      try {
+        const { data } = await axiosInstance.get("/auth/me");
+        if (data?.user) {
+          setUser(data.user);
         }
-      };
-      checkUser();
-    }
+      } catch (err) {
+        if (err.response?.status !== 401) {
+          console.error("Error fetching user:", err);
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   const login = async (credentials) => {
@@ -56,14 +45,11 @@ const AuthProvider = ({ children }) => {
       const { data, status } = await axiosInstance.post(
         "/auth/login",
         credentials,
-        {
-          headers: { "Content-Type": "application/json" },
-        },
+        { headers: { "Content-Type": "application/json" } }
       );
 
       if (status === 200 && data?.user) {
         setUser(data.user);
-        localStorage.setItem("user", JSON.stringify(data.user));
         return true;
       }
       return false;
@@ -78,13 +64,10 @@ const AuthProvider = ({ children }) => {
       const { data, status } = await axiosInstance.post(
         "/auth/register",
         credentials,
-        {
-          headers: { "Content-Type": "application/json" },
-        },
+        { headers: { "Content-Type": "application/json" } }
       );
       if (status === 201 && data?.user) {
         setUser(data.user);
-        localStorage.setItem("user", JSON.stringify(data.user));
         return true;
       }
       return false;
