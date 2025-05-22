@@ -3,7 +3,8 @@ import {
   login,
   refresh,
   logout,
-  me
+  me,
+  getCsrfToken
 } from "../controllers/auth-controller.js";
 import { Router } from "express";
 
@@ -18,5 +19,7 @@ authRouter.post("/refresh", refresh);
 authRouter.post("/logout", logout);
 
 authRouter.get("/me", me);
+
+authRouter.get("/csrf-token", getCsrfToken);
 
 export default authRouter;

@@ -2,9 +2,10 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: "/api",
-  withCredentials: true,
+  withCredentials: true, // send cookies
 });
 
+// interceptors setup
 export const setupInterceptors = ({ logout }) => {
   console.log("Interceptor attached!");
 
@@ -24,8 +25,22 @@ export const setupInterceptors = ({ logout }) => {
     failedQueue = [];
   };
 
+  axiosInstance.interceptors.request.use(
+    async (config) => {
+      const method = config.method?.toLowerCase();
+      if (["post", "put", "patch", "delete"].includes(method)) {
+        try {
+          const { data } = await axiosInstance.get("/auth/csrf-token");
+          config.headers["X-CSRF-Token"] = data.csrfToken;
+        } catch (err) {
+          console.error("Failed to fetch CSRF token:", err.message);
+        }
+      }
+      return config;
+    },
+    (error) => Promise.reject(error),
+  );
   axiosInstance.interceptors.response.use(
-    // handle successful responses
     (response) => {
       console.log(
         "Response Interceptor (SUCCESS):",
@@ -34,7 +49,6 @@ export const setupInterceptors = ({ logout }) => {
       return response;
     },
 
-    // handle error responses
     async (error) => {
       console.log("Response Interceptor (ERROR) triggered.");
 
@@ -51,55 +65,29 @@ export const setupInterceptors = ({ logout }) => {
       console.warn(`http status => ${status} | url => ${originalRequest.url}`);
 
       if (status === 404) {
-        console.warn("resource not found.");
         return Promise.reject(new Error("Resource not found"));
       }
 
-      // handle unauthorized errors
       if (status === 401 && !originalRequest._retry) {
         console.log("got a 401, attempt refresh =>", originalRequest.url);
 
         if (isRefreshing) {
-          console.log("already refreshing. queueing request...");
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
           })
-            .then(() => {
-              console.log(
-                "retrying original request after refresh =>",
-                originalRequest.url,
-              );
-              return axiosInstance(originalRequest);
-            })
-            .catch((err) => {
-              console.error("failed to retry queued request:", err);
-              return Promise.reject(err);
-            });
+            .then(() => axiosInstance(originalRequest))
+            .catch((err) => Promise.reject(err));
         }
 
         originalRequest._retry = true;
         isRefreshing = true;
 
         try {
-          console.log("calling /auth/refresh now...");
           const { data } = await axiosInstance.post("/auth/refresh");
-
-          console.log(
-            "refresh response =>",
-            data?.message || "no message in response.",
-          );
-
-          console.log("clearing and processing any queued requests...");
           processQueue(null);
-
-          console.log("retrying the original request =>", originalRequest.url);
           return axiosInstance(originalRequest);
         } catch (refreshError) {
-          console.error("refresh token request failed =>", refreshError);
-
           processQueue(refreshError, null);
-
-          console.warn("logging out user due to refresh failure...");
           logout();
           return Promise.reject(refreshError);
         } finally {
@@ -107,11 +95,6 @@ export const setupInterceptors = ({ logout }) => {
         }
       }
 
-      console.error(
-        "unhandled error =>",
-        status,
-        error.response.data || error.message,
-      );
       return Promise.reject(error);
     },
   );

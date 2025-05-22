@@ -22,6 +22,10 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // clear existing interceptors before setting up new ones
+    axiosInstance.interceptors.request.clear();
+    axiosInstance.interceptors.response.clear();
+    
     setupInterceptors({ logout });
 
     (async () => {
@@ -47,7 +51,6 @@ const AuthProvider = ({ children }) => {
         credentials,
         { headers: { "Content-Type": "application/json" } }
       );
-
       if (status === 200 && data?.user) {
         setUser(data.user);
         return true;

@@ -282,3 +282,6 @@ export const me = async (req, res, next) => {
 
 }
 
+export const getCsrfToken = (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+};

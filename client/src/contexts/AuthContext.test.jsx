@@ -17,17 +17,17 @@ const mock = new MockAdapter(axiosInstance);
 function TestConsumer() {
   const { user, loading, login, register, logout } =
     React.useContext(AuthContext);
-  const [protectedData, setProtectedData] = useState(null);
-  const [protectedError, setProtectedError] = useState(null);
+  const [entriesData, setEntriesData] = useState(null);
+  const [entriesError, setEntriesError] = useState(null);
 
-  const fetchProtectedData = async () => {
+  const fetchEntries = async () => {
     try {
-      const response = await axiosInstance.get("/protected");
-      setProtectedData(response.data);
-      setProtectedError(null);
+      const response = await axiosInstance.get("/entries");
+      setEntriesData(response.data);
+      setEntriesError(null);
     } catch (error) {
-      setProtectedError(error.response?.data?.error || "Error fetching data");
-      setProtectedData(null);
+      setEntriesError(error.response?.data?.error || "Error fetching data");
+      setEntriesData(null);
     }
   };
 
@@ -55,13 +55,13 @@ function TestConsumer() {
 
       <button onClick={() => logout()}>Test Logout</button>
 
-      <button onClick={fetchProtectedData}>Fetch Protected Data</button>
+      <button onClick={fetchEntries}>Fetch Entries</button>
 
-      {protectedData && (
-        <p data-testid="protected-data">{JSON.stringify(protectedData)}</p>
+      {entriesData && (
+        <p data-testid="entries-data">{JSON.stringify(entriesData)}</p>
       )}
 
-      {protectedError && <p data-testid="protected-error">{protectedError}</p>}
+      {entriesError && <p data-testid="entries-error">{entriesError}</p>}
     </div>
   );
 }
@@ -69,6 +69,8 @@ function TestConsumer() {
 describe("AuthProvider", () => {
   beforeEach(() => {
     mock.reset();
+    // Mock CSRF token endpoint for all POST requests
+    mock.onGet("/auth/csrf-token").reply(200, { csrfToken: "test-csrf-token" });
   });
 
   it("loads user on init via /auth/me", async () => {
@@ -287,9 +289,10 @@ describe("AuthProvider", () => {
   it("automatically refreshes access token upon 401 and retries the original request", async () => {
     mock.onGet("/auth/me").reply(200, { user: { id: 1, username: "CachedUser" } });
 
-    mock.onGet("/protected").replyOnce(401);
+    // Test token refresh with /entries endpoint (more realistic for mood diary app)
+    mock.onGet("/entries").replyOnce(401);
     mock.onPost("/auth/refresh").replyOnce(200, { message: "Access token refreshed" });
-    mock.onGet("/protected").replyOnce(200, { secretData: "This is protected data." });
+    mock.onGet("/entries").replyOnce(200, { entries: [{ id: 1, mood: "happy", content: "Great day!" }] });
 
     render(
       <AuthProvider>
@@ -302,16 +305,21 @@ describe("AuthProvider", () => {
     });
 
     await act(async () => {
-      fireEvent.click(screen.getByText("Fetch Protected Data"));
+      fireEvent.click(screen.getByText("Fetch Entries"));
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId("protected-data")).toHaveTextContent(
-        JSON.stringify({ secretData: "This is protected data." })
+      expect(screen.getByTestId("entries-data")).toHaveTextContent(
+        JSON.stringify({ entries: [{ id: 1, mood: "happy", content: "Great day!" }] })
       );
     });
 
-    expect(mock.history.get.length).toBe(3);
+    // Updated expectations to account for CSRF token fetch:
+    // 1. /auth/me (initial load)
+    // 2. /entries (401 response) 
+    // 3. /auth/csrf-token (for refresh POST request)
+    // 4. /entries (retry after refresh)
+    expect(mock.history.get.length).toBe(4);
     expect(mock.history.post.length).toBe(1);
     expect(mock.history.post[0].url).toBe("/auth/refresh");
   });
