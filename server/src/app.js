@@ -15,6 +15,7 @@ import passport from "passport";
 import passwordResetRouter from "./routes/password-reset-routes.js";
 import settingsRouter from "./routes/settings-routes.js";
 import profileRouter from "./routes/profile-routes.js"
+import genArtRouter from "./routes/gen-art-routes.js";
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/moods", moodsRouter);
 app.use("/stats", statsRouter);
 app.use("/settings", settingsRouter);
 app.use("/profile", profileRouter)
+app.use("/gen-art", genArtRouter)
 
 //error handling middlewares
 app.use(errorHandler);

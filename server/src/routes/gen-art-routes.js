@@ -9,3 +9,5 @@ genArtRouter.get('/', authenticate, fetchArtPieces)
 genArtRouter.post('/', authenticate, addArtPiece)
 
 genArtRouter.delete('/:id', authenticate, deleteArtPiece)
+
+export default genArtRouter

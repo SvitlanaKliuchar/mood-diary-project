@@ -39,9 +39,6 @@ export const login = async (req, res, next) => {
     const accessToken = signAccessToken({ sub: user.id });
     const refreshToken = signRefreshToken({ sub: user.id });
 
-    console.log("Generated Access Token:", accessToken);
-    console.log("Generated Refresh Token:", refreshToken);
-
     //store refresh token in the db
     await prisma.refreshTokens.create({
       data: {
@@ -54,16 +51,16 @@ export const login = async (req, res, next) => {
     //set cookies: access_token & refresh_token
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
       maxAge: 15 * 60 * 1000, //15min
       path: "/"
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
       path: "/"
     });
@@ -76,10 +73,6 @@ export const login = async (req, res, next) => {
         email: user.email,
       },
     });
-
-    console.log("Set Cookies:");
-    console.log("Access Token:", req.cookies.access_token);
-    console.log("Refresh Token:", req.cookies.refresh_token);
 
   } catch (err) {
     next(err);
@@ -128,16 +121,16 @@ export const register = async (req, res, next) => {
     //set cookies: access_token & refresh_token
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
       maxAge: 15 * 60 * 1000, //15min
       path: "/"
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
       path: "/"
     });
@@ -150,13 +143,6 @@ export const register = async (req, res, next) => {
         email: newUser.email,
       },
     });
-    console.log("New user =>", newUser);
-    console.log("Token =>", accessToken);
-    console.log("Decoded =>", jwt.decode(accessToken));
-
-    console.log("Set Cookies:");
-    console.log("Access Token:", req.cookies.access_token);
-    console.log("Refresh Token:", req.cookies.refresh_token);
   } catch (err) {
     next(err);
   }
@@ -206,16 +192,16 @@ export const refresh = async (req, res, next) => {
     //set new cookies
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
       maxAge: 15 * 60 * 1000,
       path: "/"
     });
 
     res.cookie("refresh_token", newRefreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/"
     });
@@ -242,15 +228,15 @@ export const logout = async (req, res, next) => {
     //clear cookies
     res.clearCookie("access_token", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
       path: "/"
     });
     
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
       path: "/"
     });
 
