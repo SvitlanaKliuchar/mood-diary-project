@@ -37,16 +37,16 @@ export const googleOAuthCallback = async (req, res) => {
     //set tokens in cookies
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "None",
       maxAge: 15 * 60 * 1000,
       path: "/",
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     });

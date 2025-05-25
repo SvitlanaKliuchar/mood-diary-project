@@ -52,7 +52,7 @@ export const login = async (req, res, next) => {
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "None",
       maxAge: 15 * 60 * 1000, //15min
       path: "/",
     });
@@ -60,7 +60,7 @@ export const login = async (req, res, next) => {
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
       path: "/",
     });
@@ -121,7 +121,7 @@ export const register = async (req, res, next) => {
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "None",
       maxAge: 15 * 60 * 1000, //15min
       path: "/",
     });
@@ -129,7 +129,7 @@ export const register = async (req, res, next) => {
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
       path: "/",
     });
@@ -192,7 +192,7 @@ export const refresh = async (req, res, next) => {
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "None",
       maxAge: 15 * 60 * 1000,
       path: "/",
     });
@@ -200,7 +200,7 @@ export const refresh = async (req, res, next) => {
     res.cookie("refresh_token", newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     });
@@ -224,18 +224,18 @@ export const logout = async (req, res, next) => {
       });
     }
 
-    //clear cookies
+    //clear s
     res.clearCookie("access_token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "None",
       path: "/",
     });
 
     res.clearCookie("refresh_token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "None",
       path: "/",
     });
 
