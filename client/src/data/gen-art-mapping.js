@@ -247,12 +247,12 @@ export function buildArtConfig(entry) {
     );
   });
 
-  // Resolve shape blending
+  // resolve shape blending
   const sortedShapes = Object.entries(shapeCounts)
     .sort((a, b) => b[1] - a[1]) // sort by count descending
     .map(([shape]) => shape);
 
-  // Blend shape names with hyphen or slash
+  // blend shape names with hyphen or slash
   const blendedShape =
     sortedShapes.length === 1
       ? sortedShapes[0]

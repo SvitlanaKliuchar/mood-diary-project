@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { buildArtConfig } from "@/data/gen-art-mapping.js";
 import {
   fitCanvasToContainer,
@@ -11,6 +11,7 @@ const EtherealGenArt = ({ moodLogs }) => {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const artConfigs = useRef(moodLogs.map(buildArtConfig));
+  const isMountedRef = useRef(true); // track component mount status
 
   const [isAnimating, setIsAnimating] = useState(true);
 
@@ -21,6 +22,51 @@ const EtherealGenArt = ({ moodLogs }) => {
     particles: [],
     lastFrameTime: 0,
   });
+
+  // safe cleanup function
+  const cleanupAnimation = useCallback(() => {
+    if (animationRef.current !== null) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+  }, []);
+
+  // safe animation loop
+  const startLoop = useCallback(() => {
+    // cancel any existing animation first
+    cleanupAnimation();
+    
+    const animate = (ts) => {
+      // double check: component still mounted AND should animate
+      if (!isMountedRef.current || !isAnimating) {
+        cleanupAnimation();
+        return;
+      }
+
+      const prev = animationState.current.lastFrameTime || ts;
+      const dt = ts - prev;
+      animationState.current.lastFrameTime = ts;
+      animationState.current.time += dt;
+      
+      try {
+        renderFrame(dt / 1000);
+      } catch (error) {
+        console.error('Animation frame error:', error);
+        cleanupAnimation();
+        return;
+      }
+
+      // safe recursive call: only schedule if still mounted and animating
+      if (isMountedRef.current && isAnimating) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    };
+    
+    // initial animation frame
+    if (isMountedRef.current && isAnimating) {
+      animationRef.current = requestAnimationFrame(animate);
+    }
+  }, [isAnimating, cleanupAnimation]);
 
   //mount + mood updates
   useEffect(() => {
@@ -33,23 +79,41 @@ const EtherealGenArt = ({ moodLogs }) => {
     setupArt(artConfigs.current);
     if (isAnimating) startLoop();
 
-    return () => cancelAnimationFrame(animationRef.current);
-  }, [moodLogs, isAnimating]);
+    // cleanup
+    return cleanupAnimation;
+  }, [moodLogs, isAnimating, startLoop, cleanupAnimation]);
 
   //resize observer
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    
     const ro = new ResizeObserver(() => {
-      if (fitCanvasToContainer(canvas)) setupArt(artConfigs.current);
+      if (isMountedRef.current && fitCanvasToContainer(canvas)) {
+        setupArt(artConfigs.current);
+      }
     });
+    
     ro.observe(canvas.parentElement);
-    return () => ro.disconnect();
+    
+    return () => {
+      ro.disconnect();
+    };
   }, []);
+
+  // component unmount cleanup
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false; // mark as unmounted
+      cleanupAnimation(); // clean up animations
+    };
+  }, [cleanupAnimation]);
 
   //setup
   const setupArt = (cfgs) => {
     const canvas = canvasRef.current;
+    if (!canvas || !isMountedRef.current) return;
+
     const w = canvas.width / (window.devicePixelRatio || 1);
     const h = canvas.height / (window.devicePixelRatio || 1);
 
@@ -62,23 +126,11 @@ const EtherealGenArt = ({ moodLogs }) => {
     };
   };
 
-  //animation loop
-  const startLoop = () => {
-    const animate = (ts) => {
-      if (!isAnimating) return;
-      const prev = animationState.current.lastFrameTime || ts;
-      const dt = ts - prev;
-      animationState.current.lastFrameTime = ts;
-      animationState.current.time += dt;
-      renderFrame(dt / 1000);
-      animationRef.current = requestAnimationFrame(animate);
-    };
-    animationRef.current = requestAnimationFrame(animate);
-  };
-
   //frame render
   const renderFrame = (dt) => {
     const canvas = canvasRef.current;
+    if (!canvas || !isMountedRef.current) return;
+
     const ctx = canvas.getContext("2d");
     const w = canvas.width / (window.devicePixelRatio || 1);
     const h = canvas.height / (window.devicePixelRatio || 1);
@@ -95,6 +147,8 @@ const EtherealGenArt = ({ moodLogs }) => {
 
   //simulation helpers
   const updateFlowFields = (dt) => {
+    if (!isMountedRef.current) return;
+    
     const { time, flowFields } = animationState.current;
     flowFields.forEach((f) => {
       f.grid.forEach((p) => {
@@ -107,6 +161,8 @@ const EtherealGenArt = ({ moodLogs }) => {
   };
 
   const renderLayers = (ctx, w, h) => {
+    if (!isMountedRef.current) return;
+    
     const t = animationState.current.time;
     animationState.current.layers.forEach((l) => {
       ctx.save();
@@ -138,6 +194,8 @@ const EtherealGenArt = ({ moodLogs }) => {
   };
 
   const updateAndRenderParticles = (ctx, w, h, dt) => {
+    if (!isMountedRef.current) return;
+    
     const t = animationState.current.time;
     const fld = animationState.current.flowFields[0];
 
@@ -173,7 +231,6 @@ const EtherealGenArt = ({ moodLogs }) => {
     });
   };
 
-  //tiny render primitives
   const renderBlob = (ctx, l, t) => {
     ctx.globalAlpha = l.alpha;
     ctx.fillStyle = l.color;

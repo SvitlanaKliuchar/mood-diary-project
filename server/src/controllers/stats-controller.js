@@ -1,12 +1,13 @@
 
 import { calculateMoodStats } from "../services/stats-services.js";
+import { validateUserId } from "../utils/validation.js";
 
 export const getStats = async (req, res, next) => {
     try {
         const userId = parseInt(req.params.userId, 10)
 
         validateUserId(userId);
-        
+
         if (isNaN(userId)) {
             return res.status(400).json({ error: 'Invalid user ID format' });
         }

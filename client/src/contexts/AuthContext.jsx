@@ -22,9 +22,6 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // clear existing interceptors before setting up new ones
-    axiosInstance.interceptors.request.clear();
-    axiosInstance.interceptors.response.clear();
     
     setupInterceptors({ logout });
 
