@@ -1,6 +1,6 @@
 import prisma from "../config/db.js";
 import bcrypt from "bcrypt";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 import {
   signAccessToken,
   signRefreshToken,
@@ -44,9 +44,9 @@ export const login = async (req, res, next) => {
       data: {
         token: refreshToken,
         userId: user.id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      }
-    })
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
 
     //set cookies: access_token & refresh_token
     res.cookie("access_token", accessToken, {
@@ -54,7 +54,7 @@ export const login = async (req, res, next) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
       maxAge: 15 * 60 * 1000, //15min
-      path: "/"
+      path: "/",
     });
 
     res.cookie("refresh_token", refreshToken, {
@@ -62,7 +62,7 @@ export const login = async (req, res, next) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
-      path: "/"
+      path: "/",
     });
 
     res.status(200).json({
@@ -73,7 +73,6 @@ export const login = async (req, res, next) => {
         email: user.email,
       },
     });
-
   } catch (err) {
     next(err);
   }
@@ -114,9 +113,9 @@ export const register = async (req, res, next) => {
       data: {
         token: refreshToken,
         userId: newUser.id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      }
-    })
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
 
     //set cookies: access_token & refresh_token
     res.cookie("access_token", accessToken, {
@@ -124,7 +123,7 @@ export const register = async (req, res, next) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
       maxAge: 15 * 60 * 1000, //15min
-      path: "/"
+      path: "/",
     });
 
     res.cookie("refresh_token", refreshToken, {
@@ -132,7 +131,7 @@ export const register = async (req, res, next) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, //7d
-      path: "/"
+      path: "/",
     });
 
     res.status(201).json({
@@ -160,12 +159,14 @@ export const refresh = async (req, res, next) => {
     const storedToken = await prisma.refreshTokens.findFirst({
       where: {
         token: refreshToken,
-        expiresAt: { gt: new Date() }
+        expiresAt: { gt: new Date() },
       },
-      include: { user: true }
-    })
+      include: { user: true },
+    });
     if (!storedToken) {
-      return res.status(403).json({ error: "Invalid refresh token, not present in db" })
+      return res
+        .status(403)
+        .json({ error: "Invalid refresh token, not present in db" });
     }
 
     //verify jwt
@@ -174,20 +175,18 @@ export const refresh = async (req, res, next) => {
       return res.status(403).json({ error: "Token mismatch" });
     }
 
-
     //if all is good, generate new tokens
     const newAccessToken = signAccessToken({ sub: storedToken.userId });
-    const newRefreshToken = signRefreshToken({ sub: storedToken.userId })
+    const newRefreshToken = signRefreshToken({ sub: storedToken.userId });
 
     //update token in db
     await prisma.refreshTokens.update({
       where: { id: storedToken.id },
       data: {
         token: newRefreshToken,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      }
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
     });
-
 
     //set new cookies
     res.cookie("access_token", newAccessToken, {
@@ -195,7 +194,7 @@ export const refresh = async (req, res, next) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
       maxAge: 15 * 60 * 1000,
-      path: "/"
+      path: "/",
     });
 
     res.cookie("refresh_token", newRefreshToken, {
@@ -203,7 +202,7 @@ export const refresh = async (req, res, next) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: "/"
+      path: "/",
     });
 
     return res.json({
@@ -221,7 +220,7 @@ export const logout = async (req, res, next) => {
     //remove token from database if it exists
     if (refreshToken) {
       await prisma.refreshTokens.deleteMany({
-        where: { token: refreshToken }
+        where: { token: refreshToken },
       });
     }
 
@@ -230,14 +229,14 @@ export const logout = async (req, res, next) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      path: "/"
+      path: "/",
     });
-    
+
     res.clearCookie("refresh_token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      path: "/"
+      path: "/",
     });
 
     return res.json({ message: "Logged out successfully" });
@@ -249,7 +248,7 @@ export const logout = async (req, res, next) => {
 export const me = async (req, res, next) => {
   try {
     //read the access token gfrom cookie
-    const accessToken = req.cookies.access_token
+    const accessToken = req.cookies.access_token;
     if (!accessToken) {
       return res.status(401).json({ error: "Authentication token missing" });
     }
@@ -258,12 +257,10 @@ export const me = async (req, res, next) => {
     try {
       decoded = verifyAccessToken(accessToken);
     } catch (err) {
-      return res
-        .status(403)
-        .json({ error: "Invalid or expired access token" });
+      return res.status(403).json({ error: "Invalid or expired access token" });
     }
     //use decoded token to find user info in db
-    const user = await prisma.users.findUnique({ where: { id: decoded.sub } })
+    const user = await prisma.users.findUnique({ where: { id: decoded.sub } });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -272,15 +269,13 @@ export const me = async (req, res, next) => {
       user: {
         id: user.id,
         username: user.username,
-        email: user.email
-      }
-    })
-
+        email: user.email,
+      },
+    });
   } catch (err) {
-    next(err)
+    next(err);
   }
-
-}
+};
 
 export const getCsrfToken = (req, res) => {
   res.json({ csrfToken: req.csrfToken() });

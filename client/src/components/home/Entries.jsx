@@ -6,7 +6,7 @@ import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 import { LoadingContext } from "../../contexts/LoadingContext.jsx";
 import NotificationModal from "../gen-art/NotificationModal.jsx";
 import { useNavigate } from "react-router-dom";
-import LoadingSpinner from '../loading/LoadingSpinner.jsx'
+import LoadingSpinner from "../loading/LoadingSpinner.jsx";
 import defaultMoodIcon from "../../assets/icons/moods/great.svg";
 
 const Entries = () => {

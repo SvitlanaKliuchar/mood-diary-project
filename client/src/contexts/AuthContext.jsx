@@ -22,7 +22,6 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    
     setupInterceptors({ logout });
 
     (async () => {
@@ -46,7 +45,7 @@ const AuthProvider = ({ children }) => {
       const { data, status } = await axiosInstance.post(
         "/auth/login",
         credentials,
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       if (status === 200 && data?.user) {
         setUser(data.user);
@@ -64,7 +63,7 @@ const AuthProvider = ({ children }) => {
       const { data, status } = await axiosInstance.post(
         "/auth/register",
         credentials,
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       if (status === 201 && data?.user) {
         setUser(data.user);

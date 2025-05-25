@@ -10,7 +10,7 @@ export const authenticate = async (req, res, next) => {
 
     const payload = verifyAccessToken(token);
     const user = await prisma.users.findUnique({ where: { id: payload.sub } });
-    
+
     if (!user) {
       return res.status(401).json({ error: "User not found. Invalid token." });
     }
@@ -19,16 +19,16 @@ export const authenticate = async (req, res, next) => {
     next();
   } catch (err) {
     console.error("Authentication error:", err);
-    
+
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({ error: "Token has expired." });
     }
     if (err.name === "JsonWebTokenError") {
       return res.status(401).json({ error: "Invalid token." });
     }
-    
+
     return res.status(500).json({ error: "Authentication failed." });
   }
 };
 
-export default authenticate
+export default authenticate;

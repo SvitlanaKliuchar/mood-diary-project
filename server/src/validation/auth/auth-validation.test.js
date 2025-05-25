@@ -44,14 +44,13 @@ describe("Auth Validation", () => {
       repeatPassword: "Different123!",
     };
     expect(() => registerSchema.parse(invalidPayload)).toThrow(
-      "Passwords do not match."
+      "Passwords do not match.",
     );
   });
 
-
   it("should validate a correct login payload", () => {
     const validPayload = {
-      identifier: "testuser", 
+      identifier: "testuser",
       password: "Password123!",
     };
     expect(() => loginSchema.parse(validPayload)).not.toThrow();

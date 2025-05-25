@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
-import { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } from "./jwt.js";
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
+} from "./jwt.js";
 
 describe("JWT Utilities", () => {
   it("should generate a valid access token", () => {

@@ -41,13 +41,19 @@ function TestConsumer() {
         <p data-testid="user-display">No user</p>
       )}
 
-      <button onClick={() => login({ identifier: "myuser", password: "mypass" })}>
+      <button
+        onClick={() => login({ identifier: "myuser", password: "mypass" })}
+      >
         Test Login
       </button>
 
       <button
         onClick={() =>
-          register({ username: "NewUser", email: "new@email.com", password: "pass" })
+          register({
+            username: "NewUser",
+            email: "new@email.com",
+            password: "pass",
+          })
         }
       >
         Test Register
@@ -81,7 +87,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(screen.getByTestId("loading-state")).toBeInTheDocument();
@@ -91,7 +97,7 @@ describe("AuthProvider", () => {
     });
 
     expect(screen.getByTestId("user-display")).toHaveTextContent("FetchedUser");
-    expect(mock.history.get.filter(r => r.url === "/auth/me").length).toBe(1);
+    expect(mock.history.get.filter((r) => r.url === "/auth/me").length).toBe(1);
   });
 
   it("handles unauthorized /auth/me by not setting a user", async () => {
@@ -100,7 +106,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -119,7 +125,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -148,7 +154,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -179,7 +185,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -188,11 +194,19 @@ describe("AuthProvider", () => {
 
     let regResult;
     await act(async () => {
-      regResult = await contextRef.register({ username: "NewUser", email: "new@example.com", password: "pass" });
+      regResult = await contextRef.register({
+        username: "NewUser",
+        email: "new@example.com",
+        password: "pass",
+      });
     });
 
     expect(regResult).toBe(true);
-    expect(contextRef.user).toEqual({ id: 99, username: "NewUser", email: "new@example.com" });
+    expect(contextRef.user).toEqual({
+      id: 99,
+      username: "NewUser",
+      email: "new@example.com",
+    });
   });
 
   it("prevents registration when server returns an error", async () => {
@@ -208,7 +222,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -217,7 +231,11 @@ describe("AuthProvider", () => {
 
     let regResult;
     await act(async () => {
-      regResult = await contextRef.register({ username: "FailUser", email: "fail@example.com", password: "pass" });
+      regResult = await contextRef.register({
+        username: "FailUser",
+        email: "fail@example.com",
+        password: "pass",
+      });
     });
 
     expect(regResult).toBe(false);
@@ -225,7 +243,9 @@ describe("AuthProvider", () => {
   });
 
   it("successfully logs out a user and clears context", async () => {
-    mock.onGet("/auth/me").reply(200, { user: { id: 123, username: "PreUser" } });
+    mock
+      .onGet("/auth/me")
+      .reply(200, { user: { id: 123, username: "PreUser" } });
     mock.onPost("/auth/logout").reply(200, { message: "Logged out" });
 
     let contextRef;
@@ -237,7 +257,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -256,7 +276,9 @@ describe("AuthProvider", () => {
   });
 
   it("prevents logout and retains user state when server returns an error", async () => {
-    mock.onGet("/auth/me").reply(200, { user: { id: 500, username: "FailLogout" } });
+    mock
+      .onGet("/auth/me")
+      .reply(200, { user: { id: 500, username: "FailLogout" } });
     mock.onPost("/auth/logout").reply(500, { message: "Server died" });
 
     let contextRef;
@@ -268,7 +290,7 @@ describe("AuthProvider", () => {
     render(
       <AuthProvider>
         <ConsumerWithRef />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -287,21 +309,29 @@ describe("AuthProvider", () => {
   });
 
   it("automatically refreshes access token upon 401 and retries the original request", async () => {
-    mock.onGet("/auth/me").reply(200, { user: { id: 1, username: "CachedUser" } });
+    mock
+      .onGet("/auth/me")
+      .reply(200, { user: { id: 1, username: "CachedUser" } });
 
     // Test token refresh with /entries endpoint (more realistic for mood diary app)
     mock.onGet("/entries").replyOnce(401);
-    mock.onPost("/auth/refresh").replyOnce(200, { message: "Access token refreshed" });
-    mock.onGet("/entries").replyOnce(200, { entries: [{ id: 1, mood: "happy", content: "Great day!" }] });
+    mock
+      .onPost("/auth/refresh")
+      .replyOnce(200, { message: "Access token refreshed" });
+    mock.onGet("/entries").replyOnce(200, {
+      entries: [{ id: 1, mood: "happy", content: "Great day!" }],
+    });
 
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("user-display")).toHaveTextContent("CachedUser");
+      expect(screen.getByTestId("user-display")).toHaveTextContent(
+        "CachedUser",
+      );
     });
 
     await act(async () => {
@@ -310,13 +340,15 @@ describe("AuthProvider", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("entries-data")).toHaveTextContent(
-        JSON.stringify({ entries: [{ id: 1, mood: "happy", content: "Great day!" }] })
+        JSON.stringify({
+          entries: [{ id: 1, mood: "happy", content: "Great day!" }],
+        }),
       );
     });
 
     // Updated expectations to account for CSRF token fetch:
     // 1. /auth/me (initial load)
-    // 2. /entries (401 response) 
+    // 2. /entries (401 response)
     // 3. /auth/csrf-token (for refresh POST request)
     // 4. /entries (retry after refresh)
     expect(mock.history.get.length).toBe(4);

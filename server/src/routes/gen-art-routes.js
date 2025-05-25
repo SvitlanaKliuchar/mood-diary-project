@@ -1,13 +1,17 @@
 import { Router } from "express";
 import authenticate from "../middleware/auth-middleware.js";
-import { fetchArtPieces, addArtPiece, deleteArtPiece } from "../controllers/gen-art-controller.js";
+import {
+  fetchArtPieces,
+  addArtPiece,
+  deleteArtPiece,
+} from "../controllers/gen-art-controller.js";
 
-const genArtRouter = Router()
+const genArtRouter = Router();
 
-genArtRouter.get('/', authenticate, fetchArtPieces)
+genArtRouter.get("/", authenticate, fetchArtPieces);
 
-genArtRouter.post('/', authenticate, addArtPiece)
+genArtRouter.post("/", authenticate, addArtPiece);
 
-genArtRouter.delete('/:id', authenticate, deleteArtPiece)
+genArtRouter.delete("/:id", authenticate, deleteArtPiece);
 
-export default genArtRouter
+export default genArtRouter;

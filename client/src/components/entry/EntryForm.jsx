@@ -70,9 +70,9 @@ const EntryForm = () => {
       setSleep(existingEntry.sleep || []);
       setProductivity(existingEntry.productivity || []);
       setNote(existingEntry.note || "");
-      setPhoto(null); 
-      setError(null); 
-      setSuccess(null); 
+      setPhoto(null);
+      setError(null);
+      setSuccess(null);
     }
   }, [id, isEditing, entries]);
 
@@ -110,7 +110,6 @@ const EntryForm = () => {
         setTimeout(() => {
           navigate("/home", { replace: true }); // prevent back navigation to form
         }, 1500); // show success message for 1.5 seconds
-
       } else {
         const response = await axiosInstance.post("/moods", formData, {
           headers: {

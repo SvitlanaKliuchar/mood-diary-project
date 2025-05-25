@@ -65,13 +65,19 @@ const createTestInstance = () => {
 
         const originalRequest = error.config;
         const status = error.response.status;
-        console.warn(`http status => ${status} | url => ${originalRequest.url}`);
+        console.warn(
+          `http status => ${status} | url => ${originalRequest.url}`,
+        );
 
         if (status === 404) {
           return Promise.reject(new Error("Resource not found"));
         }
 
-        if (status === 401 && !originalRequest._retry && originalRequest.url !== "/auth/refresh") {
+        if (
+          status === 401 &&
+          !originalRequest._retry &&
+          originalRequest.url !== "/auth/refresh"
+        ) {
           console.log("got a 401, attempt refresh =>", originalRequest.url);
 
           if (isRefreshing) {
@@ -114,11 +120,11 @@ describe("axiosInstance", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     const testSetup = createTestInstance();
     testInstance = testSetup.instance;
     setupTestInterceptors = testSetup.setupTestInterceptors;
-    
+
     mockAxios = new MockAdapter(testInstance);
 
     vi.spyOn(console, "log").mockImplementation(() => {});
@@ -160,9 +166,11 @@ describe("axiosInstance", () => {
 
       await testInstance.post("/data", { test: "data" });
 
-      const csrfRequests = mockAxios.history.get.filter(req => req.url === "/auth/csrf-token");
+      const csrfRequests = mockAxios.history.get.filter(
+        (req) => req.url === "/auth/csrf-token",
+      );
       expect(csrfRequests).toHaveLength(1);
-      
+
       expect(mockAxios.history.post).toHaveLength(1);
       expect(mockAxios.history.post[0].headers["X-CSRF-Token"]).toBe(csrfToken);
     });
@@ -174,7 +182,9 @@ describe("axiosInstance", () => {
 
       await testInstance.put("/data/1", { test: "data" });
 
-      const csrfRequests = mockAxios.history.get.filter(req => req.url === "/auth/csrf-token");
+      const csrfRequests = mockAxios.history.get.filter(
+        (req) => req.url === "/auth/csrf-token",
+      );
       expect(csrfRequests).toHaveLength(1);
       expect(mockAxios.history.put[0].headers["X-CSRF-Token"]).toBe(csrfToken);
     });
@@ -186,9 +196,13 @@ describe("axiosInstance", () => {
 
       await testInstance.patch("/data/1", { test: "data" });
 
-      const csrfRequests = mockAxios.history.get.filter(req => req.url === "/auth/csrf-token");
+      const csrfRequests = mockAxios.history.get.filter(
+        (req) => req.url === "/auth/csrf-token",
+      );
       expect(csrfRequests).toHaveLength(1);
-      expect(mockAxios.history.patch[0].headers["X-CSRF-Token"]).toBe(csrfToken);
+      expect(mockAxios.history.patch[0].headers["X-CSRF-Token"]).toBe(
+        csrfToken,
+      );
     });
 
     it("fetches CSRF token for DELETE requests", async () => {
@@ -198,9 +212,13 @@ describe("axiosInstance", () => {
 
       await testInstance.delete("/data/1");
 
-      const csrfRequests = mockAxios.history.get.filter(req => req.url === "/auth/csrf-token");
+      const csrfRequests = mockAxios.history.get.filter(
+        (req) => req.url === "/auth/csrf-token",
+      );
       expect(csrfRequests).toHaveLength(1);
-      expect(mockAxios.history.delete[0].headers["X-CSRF-Token"]).toBe(csrfToken);
+      expect(mockAxios.history.delete[0].headers["X-CSRF-Token"]).toBe(
+        csrfToken,
+      );
     });
 
     it("does not fetch CSRF token for GET requests", async () => {
@@ -220,7 +238,7 @@ describe("axiosInstance", () => {
 
       expect(console.error).toHaveBeenCalledWith(
         "Failed to fetch CSRF token:",
-        expect.any(String)
+        expect.any(String),
       );
       expect(mockAxios.history.post).toHaveLength(1);
       expect(mockAxios.history.post[0].headers["X-CSRF-Token"]).toBeUndefined();
@@ -236,10 +254,10 @@ describe("axiosInstance", () => {
       mockAxios.onGet("/not-found").reply(404);
 
       await expect(testInstance.get("/not-found")).rejects.toThrow(
-        "Resource not found"
+        "Resource not found",
       );
       expect(console.warn).toHaveBeenCalledWith(
-        "http status => 404 | url => /not-found"
+        "http status => 404 | url => /not-found",
       );
     });
 
@@ -247,11 +265,11 @@ describe("axiosInstance", () => {
       mockAxios.onGet("/network-error").networkError();
 
       await expect(testInstance.get("/network-error")).rejects.toThrow(
-        "Network error. Check connection."
+        "Network error. Check connection.",
       );
       expect(console.error).toHaveBeenCalledWith(
         "no response object => possible network/CORS error:",
-        expect.any(String)
+        expect.any(String),
       );
     });
 
@@ -260,7 +278,7 @@ describe("axiosInstance", () => {
 
       await expect(testInstance.get("/server-error")).rejects.toThrow();
       expect(console.warn).toHaveBeenCalledWith(
-        "http status => 500 | url => /server-error"
+        "http status => 500 | url => /server-error",
       );
     });
   });
@@ -272,7 +290,9 @@ describe("axiosInstance", () => {
 
     it("refreshes token on 401 unauthorized", async () => {
       mockAxios.onGet("/protected").replyOnce(401);
-      mockAxios.onPost("/auth/refresh").replyOnce(200, { message: "Token refreshed" });
+      mockAxios
+        .onPost("/auth/refresh")
+        .replyOnce(200, { message: "Token refreshed" });
       mockAxios.onGet("/protected").replyOnce(200, { data: "protected data" });
 
       const response = await testInstance.get("/protected");
@@ -280,16 +300,18 @@ describe("axiosInstance", () => {
       expect(response.data).toEqual({ data: "protected data" });
       expect(console.log).toHaveBeenCalledWith(
         "got a 401, attempt refresh =>",
-        "/protected"
+        "/protected",
       );
     });
 
     it("calls logout when refresh fails", async () => {
       // Mock the initial request that fails with 401
       mockAxios.onGet("/protected").replyOnce(401);
-      
+
       // Mock the refresh request that also fails with 401
-      mockAxios.onPost("/auth/refresh").replyOnce(401, { error: "Invalid refresh token" });
+      mockAxios
+        .onPost("/auth/refresh")
+        .replyOnce(401, { error: "Invalid refresh token" });
 
       // Ensure the request fails
       await expect(testInstance.get("/protected")).rejects.toThrow();
@@ -297,7 +319,7 @@ describe("axiosInstance", () => {
       expect(mockLogout).toHaveBeenCalled();
       expect(console.log).toHaveBeenCalledWith(
         "got a 401, attempt refresh =>",
-        "/protected"
+        "/protected",
       );
     });
 
@@ -305,30 +327,34 @@ describe("axiosInstance", () => {
       // First requests fail with 401
       mockAxios.onGet("/protected1").replyOnce(401);
       mockAxios.onGet("/protected2").replyOnce(401);
-      
+
       // Refresh succeeds
-      mockAxios.onPost("/auth/refresh").replyOnce(200, { message: "Token refreshed" });
-      
+      mockAxios
+        .onPost("/auth/refresh")
+        .replyOnce(200, { message: "Token refreshed" });
+
       // Retry requests succeed
       mockAxios.onGet("/protected1").replyOnce(200, { data: "data1" });
       mockAxios.onGet("/protected2").replyOnce(200, { data: "data2" });
 
       const [response1, response2] = await Promise.all([
         testInstance.get("/protected1"),
-        testInstance.get("/protected2")
+        testInstance.get("/protected2"),
       ]);
 
       expect(response1.data).toEqual({ data: "data1" });
       expect(response2.data).toEqual({ data: "data2" });
-      
-      const refreshRequests = mockAxios.history.post.filter(req => req.url === "/auth/refresh");
+
+      const refreshRequests = mockAxios.history.post.filter(
+        (req) => req.url === "/auth/refresh",
+      );
       expect(refreshRequests).toHaveLength(1);
     });
 
     it("does not retry already retried requests", async () => {
       // Mock the initial request that fails with 401
       mockAxios.onGet("/protected").replyOnce(401);
-      
+
       // Mock the refresh request that also fails with 401
       mockAxios.onPost("/auth/refresh").replyOnce(401);
 
@@ -336,7 +362,9 @@ describe("axiosInstance", () => {
       await expect(testInstance.get("/protected")).rejects.toThrow();
 
       expect(mockLogout).toHaveBeenCalled();
-      const refreshRequests = mockAxios.history.post.filter(req => req.url === "/auth/refresh");
+      const refreshRequests = mockAxios.history.post.filter(
+        (req) => req.url === "/auth/refresh",
+      );
       expect(refreshRequests).toHaveLength(1);
     });
   });
@@ -353,7 +381,9 @@ describe("axiosInstance", () => {
 
       await expect(testInstance.get("/error")).rejects.toThrow();
 
-      expect(console.log).toHaveBeenCalledWith("Response Interceptor (ERROR) triggered.");
+      expect(console.log).toHaveBeenCalledWith(
+        "Response Interceptor (ERROR) triggered.",
+      );
     });
   });
 
@@ -364,28 +394,36 @@ describe("axiosInstance", () => {
 
     it("includes CSRF token when retrying after token refresh", async () => {
       const csrfToken = "test-csrf-token";
-      
+
       // First POST request fails with 401
       mockAxios.onPost("/protected-post").replyOnce(401);
-      
+
       // Refresh succeeds
-      mockAxios.onPost("/auth/refresh").replyOnce(200, { message: "Token refreshed" });
-      
+      mockAxios
+        .onPost("/auth/refresh")
+        .replyOnce(200, { message: "Token refreshed" });
+
       // CSRF token fetch for retry
       mockAxios.onGet("/auth/csrf-token").reply(200, { csrfToken });
-      
+
       // Retry succeeds
       mockAxios.onPost("/protected-post").replyOnce(200, { success: true });
 
-      const response = await testInstance.post("/protected-post", { data: "test" });
+      const response = await testInstance.post("/protected-post", {
+        data: "test",
+      });
 
       expect(response.data).toEqual({ success: true });
-      
+
       // Expect 3 CSRF requests: original POST, refresh POST, and retry POST
-      const csrfRequests = mockAxios.history.get.filter(req => req.url === "/auth/csrf-token");
+      const csrfRequests = mockAxios.history.get.filter(
+        (req) => req.url === "/auth/csrf-token",
+      );
       expect(csrfRequests).toHaveLength(3);
-      
-      const postRequests = mockAxios.history.post.filter(req => req.url === "/protected-post");
+
+      const postRequests = mockAxios.history.post.filter(
+        (req) => req.url === "/protected-post",
+      );
       expect(postRequests).toHaveLength(2); // Original + retry
       expect(postRequests[1].headers["X-CSRF-Token"]).toBe(csrfToken);
     });

@@ -5,34 +5,35 @@ import logger from "./middleware/logging-middleware.js";
 import authRouter from "./routes/auth-routes.js";
 import moodsRouter from "./routes/moods-routes.js";
 import errorHandler from "./middleware/error-middleware.js";
-import { fileURLToPath } from 'url'
-import path from 'path'
+import { fileURLToPath } from "url";
+import path from "path";
 import statsRouter from "./routes/stats-routes.js";
 import googleOAuthRouter from "./routes/google-oauth-routes.js";
 import githubOAuthRouter from "./routes/github-oauth-routes.js";
-import './config/passport.js'
+import "./config/passport.js";
 import passport from "passport";
 import csurf from "csurf";
 import passwordResetRouter from "./routes/password-reset-routes.js";
 import settingsRouter from "./routes/settings-routes.js";
-import profileRouter from "./routes/profile-routes.js"
+import profileRouter from "./routes/profile-routes.js";
 import genArtRouter from "./routes/gen-art-routes.js";
 import {
-    envGeneralLimiter as generalLimiter,
-    envAuthLimiter as authLimiter,
-    envPasswordResetLimiter as passwordResetLimiter,
-    envUploadLimiter as uploadLimiter
+  envGeneralLimiter as generalLimiter,
+  envAuthLimiter as authLimiter,
+  envPasswordResetLimiter as passwordResetLimiter,
+  envUploadLimiter as uploadLimiter,
 } from "./config/rate-limits.js";
 
-
 const app = express();
+app.set("trust proxy", 1);  
+
 
 //middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, 
+    origin: process.env.CLIENT_URL,
     credentials: true,
-  })
+  }),
 );
 app.use(generalLimiter); //general limiter applied to all requests
 app.use(express.json());
@@ -46,15 +47,16 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
     },
-  })
+  }),
 );
-
-
 
 //serve static files from the 'uploads' directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads')));
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "..", "public", "uploads")),
+);
 
 //routes with specific rate limiting
 app.use("/auth", authLimiter, authRouter);

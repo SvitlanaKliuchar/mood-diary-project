@@ -4,7 +4,7 @@ import {
   refresh,
   logout,
   me,
-  getCsrfToken
+  getCsrfToken,
 } from "../controllers/auth-controller.js";
 import { Router } from "express";
 

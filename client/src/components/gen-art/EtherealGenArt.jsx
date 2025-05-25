@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback, forwardRef } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  forwardRef,
+} from "react";
 import { buildArtConfig } from "@/data/gen-art-mapping.js";
 import {
   fitCanvasToContainer,
@@ -35,7 +41,7 @@ const EtherealGenArt = forwardRef(({ moodLogs }, ref) => {
   const startLoop = useCallback(() => {
     // cancel any existing animation first
     cleanupAnimation();
-    
+
     const animate = (ts) => {
       // double check: component still mounted AND should animate
       if (!isMountedRef.current || !isAnimating) {
@@ -47,11 +53,11 @@ const EtherealGenArt = forwardRef(({ moodLogs }, ref) => {
       const dt = ts - prev;
       animationState.current.lastFrameTime = ts;
       animationState.current.time += dt;
-      
+
       try {
         renderFrame(dt / 1000);
       } catch (error) {
-        console.error('Animation frame error:', error);
+        console.error("Animation frame error:", error);
         cleanupAnimation();
         return;
       }
@@ -61,7 +67,7 @@ const EtherealGenArt = forwardRef(({ moodLogs }, ref) => {
         animationRef.current = requestAnimationFrame(animate);
       }
     };
-    
+
     // initial animation frame
     if (isMountedRef.current && isAnimating) {
       animationRef.current = requestAnimationFrame(animate);
@@ -87,15 +93,15 @@ const EtherealGenArt = forwardRef(({ moodLogs }, ref) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ro = new ResizeObserver(() => {
       if (isMountedRef.current && fitCanvasToContainer(canvas)) {
         setupArt(artConfigs.current);
       }
     });
-    
+
     ro.observe(canvas.parentElement);
-    
+
     return () => {
       ro.disconnect();
     };
@@ -148,7 +154,7 @@ const EtherealGenArt = forwardRef(({ moodLogs }, ref) => {
   //simulation helpers
   const updateFlowFields = (dt) => {
     if (!isMountedRef.current) return;
-    
+
     const { time, flowFields } = animationState.current;
     flowFields.forEach((f) => {
       f.grid.forEach((p) => {
@@ -162,7 +168,7 @@ const EtherealGenArt = forwardRef(({ moodLogs }, ref) => {
 
   const renderLayers = (ctx, w, h) => {
     if (!isMountedRef.current) return;
-    
+
     const t = animationState.current.time;
     animationState.current.layers.forEach((l) => {
       ctx.save();
@@ -195,7 +201,7 @@ const EtherealGenArt = forwardRef(({ moodLogs }, ref) => {
 
   const updateAndRenderParticles = (ctx, w, h, dt) => {
     if (!isMountedRef.current) return;
-    
+
     const t = animationState.current.time;
     const fld = animationState.current.flowFields[0];
 
@@ -371,6 +377,6 @@ const EtherealGenArt = forwardRef(({ moodLogs }, ref) => {
 });
 
 //display name for debugging
-EtherealGenArt.displayName = 'EtherealGenArt';
+EtherealGenArt.displayName = "EtherealGenArt";
 
 export default EtherealGenArt;

@@ -40,14 +40,14 @@ const seedData = async () => {
             note: "Started working on a new project",
             sleep: ["bad sleep"],
             date: new Date("2025-01-20"),
-            createdAt: new Date()
+            createdAt: new Date(),
           },
           {
             mood: "awful",
             emotions: ["unsure", "stressed", "angry"],
             note: "Had a meeting with my family, they were very toxic",
             date: new Date("2025-01-21"),
-            createdAt: new Date()
+            createdAt: new Date(),
           },
         ],
       },

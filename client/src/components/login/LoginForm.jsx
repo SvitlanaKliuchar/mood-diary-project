@@ -80,15 +80,9 @@ const LoginForm = () => {
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <img
-                  src={eyeClosedIcon}
-                  alt="Hide password"
-                />
+                <img src={eyeClosedIcon} alt="Hide password" />
               ) : (
-                <img
-                  src={eyeOpenIcon}
-                  alt="Show password"
-                />
+                <img src={eyeOpenIcon} alt="Show password" />
               )}
             </button>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from "react"; 
+import React, { useState, useEffect, useContext, useRef } from "react";
 import EtherealGenArt from "./EtherealGenArt.jsx";
 import { recordCanvasAsGif } from "../../utils/recordCanvasAsGif.js";
 import axiosInstance from "../../utils/axiosInstance.js";
@@ -13,7 +13,7 @@ export default function GenArtWrapper() {
   const [isSaving, setIsSaving] = useState(false);
   const [isExportingImage, setIsExportingImage] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const { user } = useContext(AuthContext);
   const { entries } = useContext(EntriesContext);
 
@@ -63,7 +63,7 @@ export default function GenArtWrapper() {
 
     setIsExportingImage(true);
     setError(null);
-    
+
     try {
       const dataUrl = canvas.toDataURL("image/png");
       const link = document.createElement("a");
@@ -84,13 +84,13 @@ export default function GenArtWrapper() {
     if (isGenerating) return;
     const canvas = canvasRef.current;
     if (!canvas) {
-      setError("No canvas found"); 
+      setError("No canvas found");
       return;
     }
 
     setIsGeneratingGif(true);
     setError(null);
-    
+
     try {
       const options = {
         duration: 2000,
@@ -121,7 +121,7 @@ export default function GenArtWrapper() {
 
     setIsSaving(true);
     setError(null);
-    
+
     try {
       const ts = Date.now();
       const uid = user.id;
@@ -146,7 +146,7 @@ export default function GenArtWrapper() {
         thumbnailUrl,
       });
 
-      setError(null); 
+      setError(null);
     } catch (err) {
       console.error(err);
       setError(err.message ?? "Upload failed");
@@ -190,7 +190,8 @@ export default function GenArtWrapper() {
       const left = Math.random() * 80 + 10;
       const top = Math.random() * 80 + 10;
       const size = Math.random() * 60 + 20;
-      const color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+      const color =
+        pastelColors[Math.floor(Math.random() * pastelColors.length)];
       const delay = Math.random() * 4;
       const duration = Math.random() * 2 + 3;
 
@@ -236,7 +237,8 @@ export default function GenArtWrapper() {
         const length = Math.sqrt(
           Math.pow(endLeft - startLeft, 2) + Math.pow(endTop - startTop, 2),
         );
-        const angle = Math.atan2(endTop - startTop, endLeft - startLeft) * (180 / Math.PI);
+        const angle =
+          Math.atan2(endTop - startTop, endLeft - startLeft) * (180 / Math.PI);
 
         connectors.push({
           left: `${startLeft}%`,
@@ -261,26 +263,29 @@ export default function GenArtWrapper() {
       <h1 className={styles.heading}>Your Personal Art Piece</h1>
 
       {error && (
-        <div className={styles.error} style={{ 
-          background: '#fee2e2', 
-          border: '1px solid #fecaca', 
-          color: '#dc2626', 
-          padding: '1rem', 
-          borderRadius: '8px', 
-          marginBottom: '1rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div
+          className={styles.error}
+          style={{
+            background: "#fee2e2",
+            border: "1px solid #fecaca",
+            color: "#dc2626",
+            padding: "1rem",
+            borderRadius: "8px",
+            marginBottom: "1rem",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <span>{error}</span>
-          <button 
+          <button
             onClick={() => setError(null)}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: '#dc2626', 
-              cursor: 'pointer',
-              fontSize: '1.25rem'
+            style={{
+              background: "none",
+              border: "none",
+              color: "#dc2626",
+              cursor: "pointer",
+              fontSize: "1.25rem",
             }}
           >
             ×
