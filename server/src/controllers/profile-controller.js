@@ -41,7 +41,7 @@ export const deleteUserProfile = async (req, res, next) => {
         res.json(deletedUser)
     } catch (err) {
         next(err)
-    }
+    }d
 }
 // Security & Validation: Profile updates often need extra layers of 
 // validation (e.g., ensuring the new 

@@ -214,47 +214,95 @@ const calculateDayOfWeekAverages = (entries) => {
     return result;
 }
 
+// all division by zero issues resolved
 const approximateProductivityCorrelation = (entries) => {
-    if (entries.length < 2) return 0;
+    // need at least 2 entries
+    if (!entries || entries.length < 2) return 0;
 
     //extract pairs of (moodValue, productivityLength)
     const dataPairs = entries.map(e => {
         return [moodToNumber(e.mood), (e.productivity || []).length];
+    }).filter(pair => {
+        // filter out invalid data pairs
+        return typeof pair[0] === 'number' && typeof pair[1] === 'number' &&
+               isFinite(pair[0]) && isFinite(pair[1]);
     });
 
-    //a simple Cov(X,Y)/[StdDev(X)*StdDev(Y)] approach
-    // 1) compute means
+    // ensure we have valid data pairs
+    if (dataPairs.length < 2) return 0;
+
+    // 1) compute means with safety checks
     const moodMean = average(dataPairs.map(dp => dp[0]));
     const prodMean = average(dataPairs.map(dp => dp[1]));
+
+    // ensure means are valid numbers
+    if (!isFinite(moodMean) || !isFinite(prodMean)) return 0;
 
     // 2) compute numerator = sum( (x - mx)*(y - my ) )
     let numerator = 0;
     dataPairs.forEach(([moodVal, prodVal]) => {
-        numerator += (moodVal - moodMean) * (prodVal - prodMean);
+        const moodDiff = moodVal - moodMean;
+        const prodDiff = prodVal - prodMean;
+        
+        // ensure differences are valid
+        if (isFinite(moodDiff) && isFinite(prodDiff)) {
+            numerator += moodDiff * prodDiff;
+        }
     });
 
-    // 3) compute denominators = sqrt( sum((x - mx)^2) ) * sqrt( sum((y - my)^2) )
-    const moodStd = Math.sqrt(
-        dataPairs.reduce((acc, [mVal]) => acc + Math.pow(mVal - moodMean, 2), 0)
-    );
-    const prodStd = Math.sqrt(
-        dataPairs.reduce((acc, [, pVal]) => acc + Math.pow(pVal - prodMean, 2), 0)
-    );
+    // ensure numerator is valid
+    if (!isFinite(numerator)) return 0;
 
-    //if either std is 0, correlation is undefined or zero
-    if (moodStd === 0 || prodStd === 0) return 0;
+    // 3) compute standard deviations with safety checks
+    let moodSumSquares = 0;
+    let prodSumSquares = 0;
+    
+    dataPairs.forEach(([moodVal, prodVal]) => {
+        const moodDiff = moodVal - moodMean;
+        const prodDiff = prodVal - prodMean;
+        
+        if (isFinite(moodDiff) && isFinite(prodDiff)) {
+            moodSumSquares += moodDiff * moodDiff;
+            prodSumSquares += prodDiff * prodDiff;
+        }
+    });
 
-    // orrelation coefficient in [-1, 1]
-    const correlation = numerator / (moodStd * prodStd);
+    // prevent division by zero in standard deviation
+    if (moodSumSquares <= 0 || prodSumSquares <= 0) return 0;
+
+    const moodStd = Math.sqrt(moodSumSquares);
+    const prodStd = Math.sqrt(prodSumSquares);
+
+    // ensure standard deviations are valid and non-zero
+    if (!isFinite(moodStd) || !isFinite(prodStd) || moodStd === 0 || prodStd === 0) {
+        return 0;
+    }
+
+    // final correlation calculation with division by zero protection
+    const denominator = moodStd * prodStd;
+    if (denominator === 0 || !isFinite(denominator)) return 0;
+
+    const correlation = numerator / denominator;
+
+    // ensure correlation is a valid number within bounds
+    if (!isFinite(correlation)) return 0;
+    
+    // ensure correlation is within valid range [-1, 1]
+    const clampedCorrelation = Math.max(-1, Math.min(1, correlation));
 
     //round to 3 decimals for convenience
-    return parseFloat(correlation.toFixed(3));
+    return parseFloat(clampedCorrelation.toFixed(3));
 }
 
-//utility function to compute average of the array
+//utility function with division by zero protection
 const average = (nums) => {
-    if (!nums.length) return 0;
-    return nums.reduce((acc, n) => acc + n, 0) / nums.length;
+    if (!nums || nums.length === 0) return 0; // handle empty arrays
+    
+    const validNums = nums.filter(n => typeof n === 'number' && isFinite(n));
+    if (validNums.length === 0) return 0; // handle all invalid numbers
+    
+    const sum = validNums.reduce((acc, n) => acc + n, 0);
+    return sum / validNums.length; // validNums.length is guaranteed > 0
 }
 
 const processNotes = (notes, allMoodNotes = null) => {
@@ -315,8 +363,9 @@ const processNotes = (notes, allMoodNotes = null) => {
                 }
             })
 
-             //calculate IDF: log(totalMoods / moodCount)
-             idfScores[term] = Math.log(totalMoods / (moodCount || 1));
+             // prevent division by zero in IDF calculation
+             const denominator = Math.max(moodCount, 1); // ensure denominator is at least 1
+             idfScores[term] = totalMoods > 0 ? Math.log(totalMoods / denominator) : 0;
             
              //calculate TF-IDF: term frequency * IDF
              tfidfScores[term] = wordFreq[term] * idfScores[term];
