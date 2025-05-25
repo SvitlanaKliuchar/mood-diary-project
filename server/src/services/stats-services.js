@@ -1,11 +1,14 @@
 import prisma from "../config/db.js"
 import natural from 'natural';
 import stopwords from 'natural/lib/natural/util/stopwords.js';
+import { validateUserId } from '../utils/validation.js';
 
 const tokenizer = new natural.WordTokenizer()
 const stemmer = natural.PorterStemmer
 
 export const calculateMoodStats = async (userId) => {
+    //input validation
+    validateUserId(userId);
     try {
         //get all mood entries for the user
         const moods = await prisma.moods.findMany({
