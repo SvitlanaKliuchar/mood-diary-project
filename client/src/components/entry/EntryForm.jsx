@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import axiosInstance from "../../utils/axiosInstance.js";
 import EntryMoodDate from "./EntryMoodDate.jsx";
 import EntryMain from "./EntryMain.jsx";
@@ -29,6 +29,32 @@ const EntryForm = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
+  // function to reset form to initial state
+  const resetForm = useCallback(() => {
+    setDate(new Date());
+    setMood("");
+    setEmotions([]);
+    setSleep([]);
+    setProductivity([]);
+    setNote("");
+    setPhoto(null);
+    setError(null);
+    setSuccess(null);
+  }, []);
+
+  // reset form on component mount (unless editing)
+  useEffect(() => {
+    if (!isEditing) {
+      resetForm();
+    }
+  }, [isEditing, resetForm]);
+
+  // clear messages when user starts interacting
+  const clearMessages = useCallback(() => {
+    if (error) setError(null);
+    if (success) setSuccess(null);
+  }, [error, success]);
+
   //if editing, preload existing data
   useEffect(() => {
     if (!isEditing) return;
@@ -44,10 +70,12 @@ const EntryForm = () => {
       setSleep(existingEntry.sleep || []);
       setProductivity(existingEntry.productivity || []);
       setNote(existingEntry.note || "");
+      setPhoto(null); 
+      setError(null); 
+      setSuccess(null); 
     }
   }, [id, isEditing, entries]);
 
-  //handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     startLoading();
@@ -55,7 +83,6 @@ const EntryForm = () => {
     setSuccess(null);
 
     //basic validation
-    //TODO: implement robust validation both client and server side
     if (!date || !mood) {
       setError("Please select both date and mood.");
       finishLoading();
@@ -79,7 +106,11 @@ const EntryForm = () => {
         await updateEntry(id, formData);
         setSuccess("Entry updated successfully!");
 
-        navigate("/home");
+        // delay navigation to show success message
+        setTimeout(() => {
+          navigate("/home", { replace: true }); // prevent back navigation to form
+        }, 1500); // show success message for 1.5 seconds
+
       } else {
         const response = await axiosInstance.post("/moods", formData, {
           headers: {
@@ -94,48 +125,76 @@ const EntryForm = () => {
         //add the new entry to the context
         addEntry(newMood);
 
-        //reset form fields
-        setDate(new Date());
-        setMood("");
-        setEmotions([]);
-        setSleep([]);
-        setProductivity([]);
-        setNote("");
-        setPhoto(null);
-
-        //navigate to home page after successful submission
-        navigate("/home");
+        setTimeout(() => {
+          resetForm(); // Reset form first
+          navigate("/home", { replace: true }); // Then navigate
+        }, 1500);
       }
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "An error occured while submitting your entry",
+          "An error occurred while submitting your entry",
       );
     } finally {
       finishLoading();
     }
   };
 
+  const handleDateChange = (newDate) => {
+    setDate(newDate);
+    clearMessages();
+  };
+
+  const handleMoodChange = (newMood) => {
+    setMood(newMood);
+    clearMessages();
+  };
+
+  const handleEmotionsChange = (newEmotions) => {
+    setEmotions(newEmotions);
+    clearMessages();
+  };
+
+  const handleSleepChange = (newSleep) => {
+    setSleep(newSleep);
+    clearMessages();
+  };
+
+  const handleProductivityChange = (newProductivity) => {
+    setProductivity(newProductivity);
+    clearMessages();
+  };
+
+  const handleNoteChange = (newNote) => {
+    setNote(newNote);
+    clearMessages();
+  };
+
+  const handlePhotoChange = (newPhoto) => {
+    setPhoto(newPhoto);
+    clearMessages();
+  };
+
   return (
     <form onSubmit={handleSubmit} className={styles["entry-form"]}>
       <EntryMoodDate
         date={date}
-        setDate={setDate}
+        setDate={handleDateChange}
         mood={mood}
-        setMood={setMood}
+        setMood={handleMoodChange}
       />
 
       <EntryMain
         emotions={emotions}
-        setEmotions={setEmotions}
+        setEmotions={handleEmotionsChange}
         sleep={sleep}
-        setSleep={setSleep}
+        setSleep={handleSleepChange}
         productivity={productivity}
-        setProductivity={setProductivity}
+        setProductivity={handleProductivityChange}
         note={note}
-        setNote={setNote}
+        setNote={handleNoteChange}
         photo={photo}
-        setPhoto={setPhoto}
+        setPhoto={handlePhotoChange}
       />
 
       <SubmitButton />
