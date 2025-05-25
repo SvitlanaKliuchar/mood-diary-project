@@ -71,14 +71,11 @@ export const getMoods = async (req, res, next) => {
     const { start, end } = req.query;
     const userId = req.user.id;
     let moods;
-
     if (start && end) {
       const startDate = new Date(start);
       startDate.setUTCHours(0, 0, 0, 0);
-
       const endDate = new Date(end);
       endDate.setUTCHours(23, 59, 59, 999);
-
       moods = await prisma.moods.findMany({
         where: {
           user_id: userId,
@@ -95,8 +92,6 @@ export const getMoods = async (req, res, next) => {
         orderBy: { date: "desc" },
       });
     }
-
-
     res.status(200).json(moods);
   } catch (err) {
     console.error("Error retrieving moods:", err);
