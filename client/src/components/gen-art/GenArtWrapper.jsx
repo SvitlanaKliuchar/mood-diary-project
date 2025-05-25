@@ -1,58 +1,40 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react"; 
 import EtherealGenArt from "./EtherealGenArt.jsx";
 import { recordCanvasAsGif } from "../../utils/recordCanvasAsGif.js";
 import axiosInstance from "../../utils/axiosInstance.js";
 import { uploadToSupabase } from "../../utils/uploadToSupabase.js";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
+import { EntriesContext } from "../../contexts/EntriesContext.jsx";
 import { saveAs } from "file-saver";
 import styles from "./GenArt.module.css";
 
-// global function to start the animation
-window.startArtGeneration = null;
-
 export default function GenArtWrapper() {
-  const [moodLogs, setMoodLogs] = useState([]);
   const [isGeneratingGif, setIsGeneratingGif] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isExportingImage, setIsExportingImage] = useState(false);
+  const [error, setError] = useState(null);
+  
   const { user } = useContext(AuthContext);
+  const { entries } = useContext(EntriesContext);
 
   const [isGenerating, setIsGenerating] = useState(true);
   const [generationProgress, setGenerationProgress] = useState(0);
 
-  // make startArtGeneration available globally
+  const canvasRef = useRef();
+
   useEffect(() => {
-    window.startArtGeneration = () => {
+    const startArtGeneration = () => {
       setIsGenerating(true);
       setGenerationProgress(0);
     };
 
+    window.startArtGeneration = startArtGeneration;
+
     return () => {
-      window.startArtGeneration = null;
+      delete window.startArtGeneration;
     };
   }, []);
 
-  // fetch mood entries
-  useEffect(() => {
-    const fetchMoodEntries = async () => {
-      try {
-        const { data } = await axiosInstance.get("/moods");
-        const normalized = data.map((e) => ({
-          ...e,
-          date:
-            typeof e.date === "string"
-              ? e.date
-              : new Date(e.date).toISOString().slice(0, 10),
-        }));
-        setMoodLogs(normalized);
-      } catch (error) {
-        console.error("Error fetching mood entries:", error);
-      }
-    };
-    fetchMoodEntries();
-  }, []);
-
-  // handle generation progress animation
   useEffect(() => {
     if (isGenerating) {
       const simulateProgress = () => {
@@ -61,7 +43,6 @@ export default function GenArtWrapper() {
             setTimeout(() => setIsGenerating(false), 600);
             return 100;
           }
-          // slightly slower progress for better visual effect
           const increment = Math.max(1, Math.floor((100 - prev) / 15));
           return Math.min(prev + increment, 100);
         });
@@ -74,10 +55,15 @@ export default function GenArtWrapper() {
 
   const handleExportAsImage = () => {
     if (isGenerating) return;
-    const canvas = document.querySelector("canvas");
-    if (!canvas) return alert("No canvas found");
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      setError("No canvas found");
+      return;
+    }
 
     setIsExportingImage(true);
+    setError(null);
+    
     try {
       const dataUrl = canvas.toDataURL("image/png");
       const link = document.createElement("a");
@@ -88,7 +74,7 @@ export default function GenArtWrapper() {
       document.body.removeChild(link);
     } catch (error) {
       console.error("Error exporting image:", error);
-      alert("Image export failed");
+      setError("Image export failed");
     } finally {
       setIsExportingImage(false);
     }
@@ -96,12 +82,16 @@ export default function GenArtWrapper() {
 
   const handleSaveGif = async () => {
     if (isGenerating) return;
-    const canvas = document.querySelector("canvas");
-    if (!canvas) return alert("No canvas found");
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      setError("No canvas found"); 
+      return;
+    }
 
     setIsGeneratingGif(true);
+    setError(null);
+    
     try {
-      // pass customized options for better quality/length
       const options = {
         duration: 2000,
         fps: 24,
@@ -109,6 +99,9 @@ export default function GenArtWrapper() {
 
       const blob = await recordCanvasAsGif(canvas, options);
       saveAs(blob, "generated_art.gif");
+    } catch (error) {
+      console.error("Error generating GIF:", error);
+      setError("GIF generation failed");
     } finally {
       setIsGeneratingGif(false);
     }
@@ -116,11 +109,19 @@ export default function GenArtWrapper() {
 
   const handleSaveToGallery = async () => {
     if (isGenerating) return;
-    const canvas = document.querySelector("canvas");
-    if (!canvas) return alert("No canvas found");
-    if (!user?.id) return alert("User not authenticated");
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      setError("No canvas found");
+      return;
+    }
+    if (!user?.id) {
+      setError("User not authenticated");
+      return;
+    }
 
     setIsSaving(true);
+    setError(null);
+    
     try {
       const ts = Date.now();
       const uid = user.id;
@@ -139,17 +140,16 @@ export default function GenArtWrapper() {
         `user_${uid}/art-${ts}.gif`,
       );
 
-      // metadata
       await axiosInstance.post("/gen-art", {
         title: `Art ${new Date().toLocaleDateString()}`,
         gifUrl,
         thumbnailUrl,
       });
 
-      alert("Saved to gallery!");
+      setError(null); 
     } catch (err) {
       console.error(err);
-      alert(err.message ?? "Upload failed");
+      setError(err.message ?? "Upload failed");
     } finally {
       setIsSaving(false);
     }
@@ -163,15 +163,14 @@ export default function GenArtWrapper() {
     "rgba(253, 253, 188, 0.6)", // yellow
   ];
 
-  // generate dynamic elements for the animation
   const generateLines = () => {
     const lines = [];
     for (let i = 0; i < 20; i++) {
       const isHorizontal = Math.random() > 0.5;
-      const left = Math.random() * 80 + 10; // 10-90%
-      const top = Math.random() * 80 + 10; // 10-90%
-      const length = Math.random() * 20 + 10; // 10-30%
-      const delay = Math.random() * 3; // 0-3s delay
+      const left = Math.random() * 80 + 10;
+      const top = Math.random() * 80 + 10;
+      const length = Math.random() * 20 + 10;
+      const delay = Math.random() * 3;
 
       lines.push({
         isHorizontal,
@@ -190,11 +189,10 @@ export default function GenArtWrapper() {
     for (let i = 0; i < 15; i++) {
       const left = Math.random() * 80 + 10;
       const top = Math.random() * 80 + 10;
-      const size = Math.random() * 60 + 20; // 20-80px
-      const color =
-        pastelColors[Math.floor(Math.random() * pastelColors.length)];
+      const size = Math.random() * 60 + 20;
+      const color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
       const delay = Math.random() * 4;
-      const duration = Math.random() * 2 + 3; // 3-5s
+      const duration = Math.random() * 2 + 3;
 
       shapes.push({ left, top, size, color, delay, duration });
     }
@@ -207,7 +205,6 @@ export default function GenArtWrapper() {
       const left = Math.random() * 100;
       const top = Math.random() * 100;
       const delay = Math.random() * 5;
-
       dots.push({ left, top, delay });
     }
     return dots;
@@ -217,18 +214,15 @@ export default function GenArtWrapper() {
     const beams = [];
     for (let i = 0; i < 8; i++) {
       const top = Math.random() * 100;
-      const width = Math.random() * 30 + 70; // 70-100% width
-      const delay = i * 0.5; // stagger the beams
-
+      const width = Math.random() * 30 + 70;
+      const delay = i * 0.5;
       beams.push({ top, width, delay });
     }
     return beams;
   };
 
-  // generate connectors between dots
   const generateConnectors = (dots) => {
     const connectors = [];
-    // connect some dots with lines
     for (let i = 0; i < 20; i++) {
       const startDot = Math.floor(Math.random() * dots.length);
       const endDot = Math.floor(Math.random() * dots.length);
@@ -239,12 +233,10 @@ export default function GenArtWrapper() {
         const endLeft = dots[endDot].left;
         const endTop = dots[endDot].top;
 
-        // calculate length and angle
         const length = Math.sqrt(
           Math.pow(endLeft - startLeft, 2) + Math.pow(endTop - startTop, 2),
         );
-        const angle =
-          Math.atan2(endTop - startTop, endLeft - startLeft) * (180 / Math.PI);
+        const angle = Math.atan2(endTop - startTop, endLeft - startLeft) * (180 / Math.PI);
 
         connectors.push({
           left: `${startLeft}%`,
@@ -268,12 +260,39 @@ export default function GenArtWrapper() {
     <div className={styles.container}>
       <h1 className={styles.heading}>Your Personal Art Piece</h1>
 
+      {error && (
+        <div className={styles.error} style={{ 
+          background: '#fee2e2', 
+          border: '1px solid #fecaca', 
+          color: '#dc2626', 
+          padding: '1rem', 
+          borderRadius: '8px', 
+          marginBottom: '1rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span>{error}</span>
+          <button 
+            onClick={() => setError(null)}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: '#dc2626', 
+              cursor: 'pointer',
+              fontSize: '1.25rem'
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <div className={styles["canvas-wrapper"]}>
         {isGenerating ? (
           <div className={styles["generation-container"]}>
             <div className={styles["grid-background"]}></div>
 
-            {/* animated lines that form patterns */}
             {lines.map((line, i) => (
               <div
                 key={`line-${i}`}
@@ -289,7 +308,6 @@ export default function GenArtWrapper() {
               ></div>
             ))}
 
-            {/* floating geometric shapes */}
             {shapes.map((shape, i) => (
               <div
                 key={`shape-${i}`}
@@ -303,16 +321,15 @@ export default function GenArtWrapper() {
                   animationDelay: `${shape.delay}s`,
                   animationDuration: `${shape.duration}s`,
                   clipPath: [
-                    "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)", // diamond
-                    "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)", // hexagon
-                    "polygon(50% 0%, 100% 100%, 0% 100%)", // triangle
-                    "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)", // star
+                    "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+                    "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                    "polygon(50% 0%, 100% 100%, 0% 100%)",
+                    "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
                   ][Math.floor(i % 4)],
                 }}
               ></div>
             ))}
 
-            {/* connecting dots */}
             {dots.map((dot, i) => (
               <div
                 key={`dot-${i}`}
@@ -325,7 +342,6 @@ export default function GenArtWrapper() {
               ></div>
             ))}
 
-            {/* connectors between dots */}
             {connectors.map((conn, i) => (
               <div
                 key={`conn-${i}`}
@@ -340,7 +356,6 @@ export default function GenArtWrapper() {
               ></div>
             ))}
 
-            {/* light beams */}
             {beams.map((beam, i) => (
               <div
                 key={`beam-${i}`}
@@ -353,7 +368,6 @@ export default function GenArtWrapper() {
               ></div>
             ))}
 
-            {/* progress overlay */}
             <div className={styles["generation-overlay"]}>
               <div className={styles["progress-container"]}>
                 <div
@@ -375,7 +389,7 @@ export default function GenArtWrapper() {
             </div>
           </div>
         ) : (
-          <EtherealGenArt moodLogs={moodLogs} />
+          <EtherealGenArt moodLogs={entries} ref={canvasRef} />
         )}
       </div>
 

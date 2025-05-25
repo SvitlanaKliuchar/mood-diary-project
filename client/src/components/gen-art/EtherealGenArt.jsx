@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, forwardRef } from "react";
 import { buildArtConfig } from "@/data/gen-art-mapping.js";
 import {
   fitCanvasToContainer,
@@ -7,8 +7,8 @@ import {
   createParticles,
 } from "../../utils/genArtHelpers";
 
-const EtherealGenArt = ({ moodLogs }) => {
-  const canvasRef = useRef(null);
+const EtherealGenArt = forwardRef(({ moodLogs }, ref) => {
+  const canvasRef = ref || useRef(null);
   const animationRef = useRef(null);
   const artConfigs = useRef(moodLogs.map(buildArtConfig));
   const isMountedRef = useRef(true); // track component mount status
@@ -368,6 +368,9 @@ const EtherealGenArt = ({ moodLogs }) => {
       />
     </div>
   );
-};
+});
+
+//display name for debugging
+EtherealGenArt.displayName = 'EtherealGenArt';
 
 export default EtherealGenArt;
