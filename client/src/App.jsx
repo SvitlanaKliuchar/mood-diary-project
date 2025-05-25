@@ -13,7 +13,6 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import LoadingSpinner from "./components/loading/LoadingSpinner.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
-import GenArtPage from "./pages/GenerativeArt.jsx";
 
 function App() {
   return (
@@ -24,17 +23,15 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/calendar" element={<Calendar />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/entry" element={<Entry />} />
-          <Route path="/entry/:id" element={<Entry />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/gen-art" element={<GenArtPage />} />
-
           <Route element={<ProtectedRoute />}>
             <Route path="/settings" element={<Settings />} />
             <Route path="/stats" element={<Stats />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/entry" element={<Entry />} />
+            <Route path="/entry/:id" element={<Entry />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Route>
         </Routes>
       </Router>
