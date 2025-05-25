@@ -17,6 +17,13 @@ import passwordResetRouter from "./routes/password-reset-routes.js";
 import settingsRouter from "./routes/settings-routes.js";
 import profileRouter from "./routes/profile-routes.js"
 import genArtRouter from "./routes/gen-art-routes.js";
+import {
+    envGeneralLimiter as generalLimiter,
+    envAuthLimiter as authLimiter,
+    envPasswordResetLimiter as passwordResetLimiter,
+    envUploadLimiter as uploadLimiter
+} from "./config/rate-limits.js";
+
 
 const app = express();
 
@@ -27,6 +34,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(generalLimiter); //general limiter applied to all requests
 app.use(express.json());
 app.use(cookieParser());
 app.use(logger);
@@ -48,16 +56,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads')));
 
-//routes
-app.use("/auth", authRouter);
-app.use("/auth", googleOAuthRouter);
-app.use("/auth", githubOAuthRouter);
-app.use("/auth", passwordResetRouter)
-app.use("/moods", moodsRouter);
+//routes with specific rate limiting
+app.use("/auth", authLimiter, authRouter);
+app.use("/auth", authLimiter, googleOAuthRouter);
+app.use("/auth", authLimiter, githubOAuthRouter);
+app.use("/auth", passwordResetLimiter, passwordResetRouter);
+app.use("/moods", uploadLimiter, moodsRouter);
 app.use("/stats", statsRouter);
 app.use("/settings", settingsRouter);
-app.use("/profile", profileRouter)
-app.use("/gen-art", genArtRouter)
+app.use("/profile", profileRouter);
+app.use("/gen-art", genArtRouter);
 
 //csrf error handling
 app.use((err, req, res, next) => {
