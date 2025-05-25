@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react"; 
 import axiosInstance from "../utils/axiosInstance";
 import { AuthContext } from "./AuthContext";
 
@@ -7,19 +7,18 @@ export const EntriesContext = createContext(null);
 export const EntriesProvider = ({ children }) => {
   const [entries, setEntries] = useState([]);
   const [displayedDate, setDisplayedDate] = useState(new Date());
-
   const { user } = useContext(AuthContext);
 
   const addEntry = (newEntry) => {
     setEntries((prevEntries) => [newEntry, ...prevEntries]);
   };
 
-  const refreshEntries = async () => {
+  // wrap refreshEntries in useCallback to prevent recreation
+  const refreshEntries = useCallback(async () => {
     try {
       const startOfMonth = new Date(
         Date.UTC(displayedDate.getFullYear(), displayedDate.getMonth(), 1),
       );
-
       const endOfMonth = new Date(
         Date.UTC(
           displayedDate.getFullYear(),
@@ -31,39 +30,39 @@ export const EntriesProvider = ({ children }) => {
           999,
         ),
       );
-
+      
       const response = await axiosInstance.get("/moods", {
         params: {
           start: startOfMonth.toISOString(),
           end: endOfMonth.toISOString(),
         },
       });
+      
       setEntries(response.data);
     } catch (error) {
       console.error("Failed to fetch entries: ", error);
       setEntries([]);
     }
-  };
+  }, [displayedDate]); 
 
-  // fix the issue of entries not being fetched right after user logs in
-  // trigger refresh whenever the user logs in or displayedDate changes.
+  // now refreshEntries is stable and included in dependencies
   useEffect(() => {
     if (user) {
       refreshEntries();
     }
-  }, [user, displayedDate]);
+  }, [user, refreshEntries]); 
 
   const updateEntry = async (id, formData) => {
     try {
       const response = await axiosInstance.put(`/moods/${id}`, formData);
-
-      //update the entries state with modified entry (we go through all entries but only change the one with the right id)
+      
+      // update the entries state with modified entry
       setEntries((prevEntries) =>
         prevEntries.map((entry) =>
           entry.id === id ? response.data.mood : entry,
         ),
       );
-
+      
       return response.data;
     } catch (error) {
       console.error("Failed to update entry: ", error);
@@ -74,8 +73,8 @@ export const EntriesProvider = ({ children }) => {
   const deleteEntry = async (id) => {
     try {
       await axiosInstance.delete(`/moods/${id}`);
-
-      //remove the deleted entry from the entries state
+      
+      // remove the deleted entry from the entries state
       setEntries((prevEntries) =>
         prevEntries.filter((entry) => entry.id !== id),
       );
@@ -90,7 +89,7 @@ export const EntriesProvider = ({ children }) => {
       value={{
         entries,
         addEntry,
-        refreshEntries,
+        refreshEntries, 
         displayedDate,
         setDisplayedDate,
         updateEntry,
