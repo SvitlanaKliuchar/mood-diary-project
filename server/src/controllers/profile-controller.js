@@ -27,7 +27,7 @@ export const updateUserProfile = async (req, res, next) => {
 export const deleteUserProfile = async (req, res, next) => {
     try {
         const userId = parseInt(req.params.userId, 10)
-        const { password } = req.body
+        const password = req.headers['x-delete-password'] || req.body.password;
         const user = await prisma.users.findUnique({ where: { id: userId } })
         if (!user) {
             return res.status(404).json({ error: "User not found" });
