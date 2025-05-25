@@ -15,6 +15,7 @@ import MoodWordAssociations from "./stats-elements/MoodWordAssociations.jsx";
 import GenerateArtButton from "./stats-elements/GenerateArtButton.jsx";
 import GenArtWrapper from "../gen-art/GenArtWrapper.jsx";
 import { useLocation } from "react-router-dom";
+import footerStarImage from "../../assets/images/footer-star.png";
 
 const MoodDashboard = () => {
   const [streak, setStreak] = useState(0);
@@ -165,12 +166,12 @@ const MoodDashboard = () => {
         >
           <img
             className={styles["sparkle-left"]}
-            src="src/assets/images/footer-star.png"
+            src={footerStarImage}
             alt=""
           />
           <img
             className={styles["sparkle-right"]}
-            src="src/assets/images/footer-star.png"
+            src={footerStarImage}
             alt=""
           />
           <h3 className={styles["gen-art-heading"]}>

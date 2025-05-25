@@ -10,11 +10,11 @@ vi.mock('react-router-dom', () => ({
 }));
 
 // Mock the assets for password visibility toggle
-vi.mock('src/assets/icons/login/eye-open.svg', () => ({
+vi.mock('../../assets/icons/login/eye-open.svg', () => ({
   default: 'eye-open-icon'
 }));
 
-vi.mock('src/assets/icons/login/eye-closed.svg', () => ({
+vi.mock('../../assets/icons/login/eye-closed.svg', () => ({
   default: 'eye-closed-icon'
 }));
 

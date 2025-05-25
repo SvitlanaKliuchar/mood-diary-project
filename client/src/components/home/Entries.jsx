@@ -7,6 +7,7 @@ import { LoadingContext } from "../../contexts/LoadingContext.jsx";
 import NotificationModal from "../gen-art/NotificationModal.jsx";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from '../loading/LoadingSpinner.jsx'
+import defaultMoodIcon from "../../assets/icons/moods/great.svg";
 
 const Entries = () => {
   const { entries, refreshEntries, displayedDate, updateEntry, deleteEntry } =
@@ -76,7 +77,7 @@ const Entries = () => {
   // helper function to find the appropriate icon for a given mood
   const getMoodIcon = (moodValue) => {
     const found = moods.find((m) => m.value === moodValue);
-    return found?.iconUrl || "/src/assets/icons/moods/great.svg";
+    return found?.iconUrl || defaultMoodIcon;
   };
 
   // helper functions to format date and time

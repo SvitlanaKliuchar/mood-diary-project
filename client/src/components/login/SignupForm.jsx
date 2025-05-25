@@ -6,6 +6,9 @@ import { signupSchema } from "../../schemas/validationSchemas";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 
+import eyeOpenIcon from "../../assets/icons/login/eye-open.svg";
+import eyeClosedIcon from "../../assets/icons/login/eye-closed.svg";
+
 const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -93,12 +96,12 @@ const SignupForm = () => {
             >
               {showPassword ? (
                 <img
-                  src="src/assets/icons/login/eye-closed.svg"
+                  src={eyeClosedIcon}
                   alt="Hide password"
                 />
               ) : (
                 <img
-                  src="src/assets/icons/login/eye-open.svg"
+                  src={eyeOpenIcon}
                   alt="Show password"
                 />
               )}
@@ -129,21 +132,21 @@ const SignupForm = () => {
             >
               {showPassword ? (
                 <img
-                  src="src/assets/icons/login/eye-closed.svg"
+                  src={eyeClosedIcon}
                   alt="Hide password"
                 />
               ) : (
                 <img
-                  src="src/assets/icons/login/eye-open.svg"
+                  src={eyeOpenIcon}
                   alt="Show password"
                 />
               )}
             </button>
           </div>
 
-          {errors.password && (
+          {errors.repeatPassword && (
             <div role="alert" className={styles.error}>
-              {errors.password.message}
+              {errors.repeatPassword.message}
             </div>
           )}
         </div>

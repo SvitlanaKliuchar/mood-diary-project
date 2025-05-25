@@ -6,6 +6,9 @@ import { loginSchema } from "../../schemas/validationSchemas";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+import eyeOpenIcon from "../../assets/icons/login/eye-open.svg";
+import eyeClosedIcon from "../../assets/icons/login/eye-closed.svg";
+
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -78,12 +81,12 @@ const LoginForm = () => {
             >
               {showPassword ? (
                 <img
-                  src="src/assets/icons/login/eye-closed.svg"
+                  src={eyeClosedIcon}
                   alt="Hide password"
                 />
               ) : (
                 <img
-                  src="src/assets/icons/login/eye-open.svg"
+                  src={eyeOpenIcon}
                   alt="Show password"
                 />
               )}
